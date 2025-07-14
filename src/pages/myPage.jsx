@@ -1,13 +1,13 @@
 import BasicLayout from "../layouts/basicLayout";
 
-function MainPage() {
+function MyPage() {
   return (
     <BasicLayout>
       <div>
-        <h1>양뱡향 수어 통역</h1>
+        <h1>마이 페이지</h1>
       </div>
     </BasicLayout>
   );
 }
 
-export default MainPage;
+export default MyPage;

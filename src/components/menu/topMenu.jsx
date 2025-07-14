@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import LogoutButton from "./logoutButton";
 
 function TopMenuComponent() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -7,21 +8,28 @@ function TopMenuComponent() {
   return (
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-white text-xl font-bold">로고</div>
+        <div className="text-white text-xl font-bold">수담, 手談</div>
         {/* 데스크탑 메뉴 */}
         <div className="space-x-6 hidden md:flex">
           <NavLink
             to="/"
             className="text-white hover:text-yellow-300 transition"
           >
-            Main
+            양방향 수어 통역
           </NavLink>
           <NavLink
             to="/about"
             className="text-white hover:text-yellow-300 transition"
           >
-            About
+            학습하기
           </NavLink>
+          <NavLink
+            to="/myPage"
+            className="text-white hover:text-yellow-300 transition"
+          >
+            마이페이지
+          </NavLink>
+          <LogoutButton />
         </div>
         {/* 모바일 메뉴 토글 버튼 */}
         <div className="md:hidden">
@@ -58,15 +66,23 @@ function TopMenuComponent() {
           className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
           onClick={() => setMobileOpen(false)}
         >
-          Main
+          양방향 수어 통역
         </NavLink>
         <NavLink
           to="/about"
           className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
           onClick={() => setMobileOpen(false)}
         >
-          About
+          학습하기
         </NavLink>
+        <NavLink
+          to="/myPage"
+          className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
+          onClick={() => setMobileOpen(false)}
+        >
+          학습하기
+        </NavLink>
+        <LogoutButton />
       </div>
     </nav>
   );

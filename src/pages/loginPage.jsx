@@ -18,7 +18,6 @@ function LoginPage() {
 
       const { uid, nickname, token } = res.data;
       signin(uid, nickname, token);
-      alert(`환영합니다, ${nickname}님!`); // 이 줄 추가
       window.location.href = "/"; // 메인화면 이동
     } catch {
       setError("아이디 또는 비밀번호가 올바르지 않습니다.");

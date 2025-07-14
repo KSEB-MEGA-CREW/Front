@@ -7,6 +7,7 @@ const Loading = () => <div>Loading....</div>;
 
 const Main = lazy(() => import("../pages/mainPage"));
 const About = lazy(() => import("../pages/aboutPage"));
+const Mypage = lazy(() => import("../pages/myPage"));
 const Login = lazy(() => import("../pages/loginPage"));
 console.log("login");
 
@@ -35,6 +36,16 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <Suspense fallback={<Loading />}>
           <About />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/mypage",
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<Loading />}>
+          <Mypage />
         </Suspense>
       </ProtectedRoute>
     ),
