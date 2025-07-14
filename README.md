@@ -7,15 +7,15 @@ src/
    assets/
 	  (사진)
    components/
-		  menu/
-			 topMenu.jsx
-		  cookie.jsx
+	     menu/
+		  topMenu.jsx
+	     cookie.jsx
    layouts/
-	    basicLayout.jsx
+	  basicLayout.jsx
    pages/
-	   mainPage.jsx
-	   loginPage.jsx
-	   aboutPage.jsx
+	mainPage.jsx
+	loginPage.jsx
+	aboutPage.jsx
    router/
 	  protectedRouter.jsx
 	  root.jsx
