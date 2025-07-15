@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import LogoutButton from "./logoutButton";
+import LogoutButton from "../button/logoutButton";
 
 function TopMenuComponent() {
   const [mobileOpen, setMobileOpen] = useState(false);

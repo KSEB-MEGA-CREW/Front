@@ -1,5 +1,9 @@
 import { createContext, useState, useEffect } from "react";
-import { getCookie, setCookie, removeCookie } from "../components/cookie";
+import {
+  getCookie,
+  setCookie,
+  removeCookie,
+} from "../components/cookie/cookie";
 import axios from "axios";
 
 export const TestContext = createContext();
