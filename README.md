@@ -37,8 +37,10 @@ GitHub에서 소스를 클론한 뒤, 터미널에서 아래 명령어로 필요
 
 ```
 {
-  "success": true,
-  "token": "JWT_TOKEN_VALUE"
+  "ok": true,
+  "uid": "dfj9384jdj3",
+  "nickname": "홍길동",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
@@ -46,8 +48,8 @@ GitHub에서 소스를 클론한 뒤, 터미널에서 아래 명령어로 필요
 
 ```
 {
-  "success": false,
-  "message": "Invalid credentials"
+  "ok": false,
+  "message": "아이디/비밀번호가 일치하지 않습니다."
 }
 ```
 
