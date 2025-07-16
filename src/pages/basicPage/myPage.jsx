@@ -1,4 +1,4 @@
-import BasicLayout from "../layouts/basicLayout";
+import BasicLayout from "../../layouts/basicLayout";
 
 function MyPage() {
   return (

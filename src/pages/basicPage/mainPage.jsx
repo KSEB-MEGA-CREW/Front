@@ -1,10 +1,10 @@
-import BasicLayout from "../layouts/basicLayout";
+import BasicLayout from "../../layouts/basicLayout";
 
 function MainPage() {
   return (
     <BasicLayout>
       <div>
-        <h1>양뱡향 수어 통역</h1>
+        <h1>메인페이지</h1>
       </div>
     </BasicLayout>
   );

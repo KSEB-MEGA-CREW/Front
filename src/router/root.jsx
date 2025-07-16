@@ -1,16 +1,22 @@
-import { createBrowserRouter, RouterProvider } from "react-router";
-
+import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ProtectedRoute from "./protectedRouter";
 
-const Loading = () => <div>Loading....</div>;
+// 페이지 컴포넌트 Lazy Loading
+const Main = lazy(() => import("../pages/basicPage/mainPage"));
+const Translate = lazy(() => import("../pages/basicPage/translatePage"));
+const Study = lazy(() => import("../pages/basicPage/studyPage"));
+const Mypage = lazy(() => import("../pages/basicPage/myPage"));
 
-const Main = lazy(() => import("../pages/mainPage"));
-const About = lazy(() => import("../pages/aboutPage"));
-const Mypage = lazy(() => import("../pages/myPage"));
-const Login = lazy(() => import("../pages/loginPage"));
-const SignUp = lazy(() => import("../pages/signupPage"));
-console.log("login");
+const Login = lazy(() => import("../pages/loginPage/loginPage"));
+const SignUp = lazy(() => import("../pages/loginPage/signupPage"));
+const OAuth2RedirectHandler = lazy(() =>
+  import("../pages/loginPage/OAuth2RedirectHandler")
+);
+
+const Loading = () => (
+  <div className="flex justify-center items-center h-screen">Loading....</div>
+);
 
 const router = createBrowserRouter([
   {
@@ -30,6 +36,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: "/oauth2/redirect",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <OAuth2RedirectHandler />
+      </Suspense>
+    ),
+  },
+  {
     path: "/",
     element: (
       <ProtectedRoute>
@@ -40,11 +54,21 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/about",
+    path: "/translate",
     element: (
       <ProtectedRoute>
         <Suspense fallback={<Loading />}>
-          <About />
+          <Translate />
+        </Suspense>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/study",
+    element: (
+      <ProtectedRoute>
+        <Suspense fallback={<Loading />}>
+          <Study />
         </Suspense>
       </ProtectedRoute>
     ),

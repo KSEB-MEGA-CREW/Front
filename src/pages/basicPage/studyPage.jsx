@@ -1,6 +1,6 @@
-import BasicLayout from "../layouts/basicLayout";
+import BasicLayout from "../../layouts/basicLayout";
 
-function AboutPage() {
+function StudyPage() {
   return (
     <BasicLayout>
       <div>
@@ -10,4 +10,4 @@ function AboutPage() {
   );
 }
 
-export default AboutPage;
+export default StudyPage;

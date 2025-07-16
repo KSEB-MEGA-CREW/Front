@@ -8,17 +8,24 @@ function TopMenuComponent() {
   return (
     <nav className="bg-gray-800 p-4">
       <div className="container mx-auto flex justify-between items-center">
-        <div className="text-white text-xl font-bold">수담, 手談</div>
+        <div className="text-white text-xl font-bold">
+          <NavLink
+            to="/"
+            className="text-white hover:text-yellow-300 transition"
+          >
+            수담, 手談
+          </NavLink>
+        </div>
         {/* 데스크탑 메뉴 */}
         <div className="space-x-6 hidden md:flex">
           <NavLink
-            to="/"
+            to="/translate"
             className="text-white hover:text-yellow-300 transition"
           >
             양방향 수어 통역
           </NavLink>
           <NavLink
-            to="/about"
+            to="/study"
             className="text-white hover:text-yellow-300 transition"
           >
             학습하기
@@ -66,11 +73,18 @@ function TopMenuComponent() {
           className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
           onClick={() => setMobileOpen(false)}
         >
+          수담, 手談
+        </NavLink>
+        <NavLink
+          to="/translate"
+          className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
+          onClick={() => setMobileOpen(false)}
+        >
           양방향 수어 통역
         </NavLink>
         <NavLink
-          to="/about"
-          className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
+          to="/study"
+          className="block text-white py-2s px-4 rounded hover:bg-gray-700 transition"
           onClick={() => setMobileOpen(false)}
         >
           학습하기

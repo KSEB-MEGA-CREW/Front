@@ -1,12 +1,14 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import router from "./router/root";
-import { RouterProvider } from "react-router";
-import TestContextWrapper from "./store/testContext";
+import { RouterProvider } from "react-router-dom";
+import { AuthContextProvider } from "./store/authContext";
+import { CookiesProvider } from "react-cookie";
 
-console.log("main");
 createRoot(document.getElementById("root")).render(
-  <TestContextWrapper>
-    <RouterProvider router={router} />,
-  </TestContextWrapper>
+  <CookiesProvider>
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
+  </CookiesProvider>
 );
