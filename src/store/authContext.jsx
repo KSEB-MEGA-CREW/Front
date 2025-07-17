@@ -49,6 +49,7 @@ export function AuthContextProvider({ children }) {
 
     const expires = new Date();
     expires.setDate(expires.getDate() + 1); // 1일 후 만료
+    console.log("토큰", authData.token);
     setCookie("accessToken", authData.token, {
       path: "/",
       expires,

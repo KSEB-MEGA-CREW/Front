@@ -4,10 +4,12 @@ import { authAPI } from "../../api/authApi";
 
 function SignUpPage() {
   const [formData, setFormData] = useState({
-    name: "",
+    nickname: "",
     email: "",
     password: "",
     confirmPassword: "",
+    gender: "",
+    hearing: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,13 +30,16 @@ function SignUpPage() {
 
     try {
       const response = await authAPI.signup({
-        name: formData.name,
+        name: formData.nickname,
         email: formData.email,
         password: formData.password,
+        gender: formData.gender,
+        hearing: formData.hearing,
       });
 
       if (response.success) {
         alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
+        console.log(formData);
         navigate("/login");
       } else {
         setError(response.message || "회원가입에 실패했습니다.");
@@ -52,11 +57,11 @@ function SignUpPage() {
         <h2 className="text-2xl font-bold text-center">회원가입</h2>
         <form onSubmit={handleSignup} className="space-y-4">
           <input
-            name="name"
+            name="nickname"
             type="text"
-            value={formData.name}
+            value={formData.nickname}
             onChange={handleInputChange}
-            placeholder="이름"
+            placeholder="닉네임"
             required
             className="w-full px-4 py-2 border rounded-md"
           />
@@ -87,6 +92,62 @@ function SignUpPage() {
             required
             className="w-full px-4 py-2 border rounded-md"
           />
+          <div className="flex space-x-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                checked={formData.gender === "male"}
+                onChange={handleInputChange}
+                required
+              />
+              <span>남성 </span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                checked={formData.gender === "female"}
+                onChange={handleInputChange}
+              />
+              <span>여성 </span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="gender"
+                value="other"
+                checked={formData.gender === "other"}
+                onChange={handleInputChange}
+              />
+              <span>기타</span>
+            </label>
+          </div>
+          <div className="flex space-x-4">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="hearing"
+                value="hardtohear"
+                checked={formData.hearing === "hardtohear"}
+                onChange={handleInputChange}
+                required
+              />
+              <span>난청(60-89dB) </span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                name="hearing"
+                value="deaf"
+                checked={formData.hearing === "deaf"}
+                onChange={handleInputChange}
+              />
+              <span>농(90dB 이상) </span>
+            </label>
+          </div>
 
           {error && <p className="text-sm text-red-500">{error}</p>}
 
