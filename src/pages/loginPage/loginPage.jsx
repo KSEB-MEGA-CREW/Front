@@ -19,6 +19,7 @@ function LoginPage() {
     setLoading(true);
     setError("");
     try {
+      console.log("로그인 확인합니다");
       const response = await authAPI.login(formData);
       console.log("서버로부터 받은 로그인 응답:", response); // 디버깅용 로그
 

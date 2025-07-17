@@ -30,6 +30,7 @@ function OAuth2RedirectHandler() {
               token: token,
               user: userResponse.data,
             });
+            console.log("user : ", userResponse.data);
             navigate("/");
           } else {
             throw new Error("사용자 정보를 가져오는데 실패했습니다.");
