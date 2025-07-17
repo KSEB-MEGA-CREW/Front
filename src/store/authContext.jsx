@@ -42,6 +42,7 @@ export function AuthContextProvider({ children }) {
   }, [cookies.accessToken, removeCookie]);
 
   const login = (authData) => {
+    console.log("df");
     if (!authData || !authData.token || !authData.user) {
       console.error("Login failed: Invalid auth data received.");
       return;
