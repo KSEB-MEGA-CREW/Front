@@ -3,22 +3,34 @@ import { useCookies } from "react-cookie";
 import { authAPI } from "../api/authApi";
 
 export const AuthContext = createContext();
-
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthContextProvider({ children }) {
   const [cookies, setCookie, removeCookie] = useCookies(["accessToken"]);
-  const [user, setUser] = useState(null);
+
+  // 1. localStorage에서 user 초기값 불러오기
+  const [user, setUser] = useState(() => {
+    const data = localStorage.getItem("user");
+    return data ? JSON.parse(data) : null;
+  });
+
   const [loading, setLoading] = useState(true);
+
+  // 2. user가 바뀔 때마다 localStorage 동기화
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
 
   useEffect(() => {
     const checkUserStatus = async () => {
-      // user 상태가 이미 있으면(로그인 직후) 불필요한 API 호출을 건너뜁니다.
       if (user) {
         setLoading(false);
         return;
       }
-
       const token = cookies.accessToken;
       if (token) {
         try {
@@ -37,20 +49,16 @@ export function AuthContextProvider({ children }) {
       }
       setLoading(false);
     };
-
     checkUserStatus();
   }, [cookies.accessToken, removeCookie]);
 
   const login = (authData) => {
-    console.log("df");
     if (!authData || !authData.token || !authData.user) {
       console.error("Login failed: Invalid auth data received.");
       return;
     }
-
     const expires = new Date();
-    expires.setDate(expires.getDate() + 1); // 1일 후 만료
-    console.log("토큰", authData.token);
+    expires.setDate(expires.getDate() + 1);
     setCookie("accessToken", authData.token, {
       path: "/",
       expires,

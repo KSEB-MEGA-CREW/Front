@@ -22,6 +22,7 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
+      console.log("로그인 확인합니다");
       const response = await authAPI.login(formData);
       if (response.success && response.data?.token) {
         login(response.data);
