@@ -1,10 +1,11 @@
 import BasicLayout from "../../layouts/basicLayout";
+import { Outlet } from "react-router-dom";
 
 function StudyPage() {
   return (
     <BasicLayout>
-      <div>
-        <h1>학습하기</h1>
+      <div className="w-full">
+        <Outlet />
       </div>
     </BasicLayout>
   );

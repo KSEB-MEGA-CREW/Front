@@ -37,23 +37,69 @@ GitHub에서 소스를 클론한 뒤, 터미널에서 아래 명령어로 필요
 
 ```
 {
-  "ok": true,
-  "uid": "dfj9384jdj3",
-  "nickname": "홍길동",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "success": true,
+  "data": {
+    "token": "mocked-jwt-token",
+    "user": {
+      "id": 1,
+      "email": "user@example.com",
+      "nickname": "Mock User"
+    }
+  },
+  "message": "로그인 성공"
 }
+
 ```
 
 - 실패 (401 Unauthorized 등):
 
 ```
 {
-  "ok": false,
-  "message": "아이디/비밀번호가 일치하지 않습니다."
+  "success": false,
+  "message": "Invalid credentials"
 }
 ```
 
-### < 사용자 정보 조회 API >
+### < 회원가입 API >
+
+#### 요청
+
+Endpoint: /api/signup
+
+Method: POST
+
+Request Body:
+
+```
+{
+  "email": "user@example.com",
+  "password": "mypassword",
+  "nickname": "nickname",
+  "gender": "male" | "female" | "other",
+  "deaf": "Deaf" | "Hard to hear"
+}
+```
+
+#### 기대 응답
+
+- 성공 (200 OK):
+
+```
+{
+  "ok": true
+}
+```
+
+- 실패 (400 Bad Request):
+
+```
+{
+  "ok": false,
+  "message": "가입 실패 사유 설명"
+}
+```
+
+### < 토큰 유효 여부 조회 API >
 
 #### 요청
 
@@ -63,10 +109,7 @@ GitHub에서 소스를 클론한 뒤, 터미널에서 아래 명령어로 필요
 
 - Headers:
 
-```
-    Authorization: Bearer {token}
-    로그인 시 발급받은 JWT 토큰을 Bearer 접두어와 함께 전달
-```
+- Authorization: Bearer {token}
 
 #### 기대 응답
 
@@ -92,23 +135,45 @@ GitHub에서 소스를 클론한 뒤, 터미널에서 아래 명령어로 필요
 
 ```
 src/
+  api/
+    authApi.jsx # api 관리
   assets/           # 이미지 및 기타 정적 파일
     (사진)
   components/       # UI 컴포넌트
     menu/
-      topMenu.jsx
-    cookie.jsx
+       topMenu.jsx
+       studyMenu.jsx
+    button/
+       logoutButton.jsx
+       avatarButton.jsx
+       videoButton.jsx
   layouts/          # 레이아웃 컴포넌트
     basicLayout.jsx
   pages/            # 페이지별 컴포넌트
-    mainPage.jsx
-    loginPage.jsx
-    aboutPage.jsx
+     /basicPage
+        mainPage.jsx
+        myPage.jsx
+     /loginPage
+        loginPage.jsx
+        signupPage.jsx
+        OAuth2RedirectHandler.jsx
+     /studyPage
+        studyPage.jsx
+        studySentence.jsx
+        studyWord.jsx
+     /translatePage
+        avatarPage.jsx
+        translatePage.jsx
+        videoPage.jsx
+    studyPage.jsx
+    translatePage.jsx
   router/           # 라우터 관련 파일
     protectedRouter.jsx
     root.jsx
+    studyRouter.jsx
+    translateRouter.jsx
   store/            # 상태 관리
-    textContext.jsx
+    authContext.jsx
   index.css         # 전체 스타일
   main.jsx          # 엔트리 포인트
 ```
