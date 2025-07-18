@@ -9,7 +9,7 @@ export default function SignUpPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    gender: "",
+    // gender: "", 현재 백엔드에서 gender가 추가되어 있지 않아서 주석 처리했습니다 나중에 논의하고 추가할게요!
     hearing: "",
   });
   const [error, setError] = useState("");
@@ -233,7 +233,7 @@ export default function SignUpPage() {
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
               {/* 성별 */}
-              <div>
+              {/* <div>
                 <label className="block text-white/70 mb-1 font-semibold">
                   성별
                 </label>
@@ -270,7 +270,7 @@ export default function SignUpPage() {
                     <span>기타</span>
                   </label>
                 </div>
-              </div>
+              </div> */}
               {/* 청각 */}
               <div>
                 <label className="block text-white/70 mb-1 font-semibold">
