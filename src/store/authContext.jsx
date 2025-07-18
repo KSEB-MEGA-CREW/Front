@@ -57,7 +57,7 @@ export function AuthContextProvider({ children }) {
       console.error("Login failed: Invalid auth data received.");
       return;
     }
-    const expires = new Date();
+    const expires = new Date(Date.now() + 3 * 60 * 60 * 1000); //3시간 후 만료
     expires.setDate(expires.getDate() + 1);
     setCookie("accessToken", authData.token, {
       path: "/",

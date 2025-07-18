@@ -23,6 +23,14 @@ export const authAPI = {
     });
     return response.json();
   },
+  getquiz: async (quizRequest) => {
+    const response = await fetch(`${API_BASE_URL}/api/quiz`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(quizRequest),
+    });
+    return response.json();
+  },
 };
 
 const OAUTH2_REDIRECT_URI = "http://localhost:3000/oauth2/redirect";
