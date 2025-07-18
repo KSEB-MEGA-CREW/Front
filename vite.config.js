@@ -10,6 +10,17 @@ export default defineConfig({
     port: 3000, // React 앱 포트
     host: true, // 외부 접속 허용
 
+    // ✅ WebSocket 연결 문제 해결을 위한 HMR 설정 추가
+    hmr: {
+      port: 3000,
+      host: 'localhost'
+    },
+
+    // ✅ WebSocket 설정 추가
+    ws: {
+      port: 3000
+    },
+
     // 프록시 설정 - 백엔드 API 요청을 프록시
     proxy: {
       '/api': {
