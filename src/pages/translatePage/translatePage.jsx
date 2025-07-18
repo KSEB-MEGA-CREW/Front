@@ -9,7 +9,7 @@ function TranslatePage() {
       <AvatarButton />
       <VideoButton />
 
-      <div className="w-full">
+      <div className="w-full ">
         <Outlet />
       </div>
     </BasicLayout>
