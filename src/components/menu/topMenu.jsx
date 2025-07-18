@@ -94,7 +94,7 @@ function TopMenuComponent() {
           className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
           onClick={() => setMobileOpen(false)}
         >
-          학습하기
+          마이페이지
         </NavLink>
         <LogoutButton />
       </div>
