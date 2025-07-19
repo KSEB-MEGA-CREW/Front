@@ -117,7 +117,7 @@ export const authAPI = {
 };
 
 export const quizAPI = {
-  getQuiz: async (quizRequest) => {
+  getQuiz: async (quizRequest) => { // api 호출 비동기 처리
     const response = await apiRequest('/api/quiz', {
       method: "POST",
       body: JSON.stringify(quizRequest),
@@ -128,10 +128,27 @@ export const quizAPI = {
 };
 
 // 구글 로그인 후 리다이렉션 URI에 맞게 변경
-const OAUTH2_REDIRECT_URI = import.meta.env.VITE_OAUTH_REDIRECT_URI || "http://localhost:3000/auth/callback/google";
+// const OAUTH2_REDIRECT_URI = import.meta.env.VITE_OAUTH_REDIRECT_URI || "http://localhost:3000/auth/callback/google";
 
 // 구글 OAuth2 URL - 구글 로그인 url에 맞게 수정
 export const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
+
+// token 유효성 검사를 여기서 처리
+export const validateToken = async () => {
+  const token = localStorage.getItem('token');
+  if(!token){
+    return false;
+  }
+
+  try{
+    const reponse = await authAPI.getCurrentUser();
+    return reponse.success;
+  } catch(error){
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    return false;
+  }
+};
 
 // 카카오는 추후 수정 예정
 // export const KAKAO_AUTH_URL = `${API_BASE_URL}/login/oauth2/code/kakao`;
