@@ -14,12 +14,18 @@ const apiRequest = async (url, options = {}) => {
     const response = await fetch(`${API_BASE_URL}${url}`, {
       headers: { 
         "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Cache-Control": "no-cache",
+        "Pragma": "no-cache",
         ...getAuthHeaders(),
         ...headers,
       },
+      credentials: 'include',
+      cache: 'no-cache',
       ...restOptions,
     });
     
+    // 401 처리
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
@@ -27,37 +33,83 @@ const apiRequest = async (url, options = {}) => {
       throw new Error('인증이 만료되었습니다.');
     }
     
+    // 403 처리
+    if(response.status === 403){
+      throw new Error('접근 권한이 없습니다.');
+    }
+
+    // 404 처리
+    if(response.status === 404){
+      throw new Error('요청한 리소스를 찾을 수 없습니다.');
+    }
+
+    // 500 처리
+    if(response.status >= 500){
+      throw new Error('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+    }
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.message || `HTTP ${response.status}: ${response.statusText}`);
     }
-    
-    return await response.json();
+
+    const data = await response.json();
+    return data;
   } catch (error) {
-    if (error.name === 'TypeError') {
+    if (error.name === 'TypeError' && error.message.includes('fetch')) {
       throw new Error('네트워크 연결을 확인해주세요.');
     }
+    // debug용 console.log
+    console.log('API 요청 오류:',error);
     throw error;
   }
 };
 
 // API 함수들
 export const authAPI = {
-  login: (loginRequest) => 
-    apiRequest('/api/auth/login', {
-      method: "POST",
-      body: JSON.stringify(loginRequest),
-    }),
-    
-  signup: (signupRequest) => 
-    apiRequest('/api/auth/signup', {
-      method: "POST",
-      body: JSON.stringify(signupRequest),
-    }),
-    
-  getCurrentUser: () => 
-    apiRequest('/api/auth/me'),
-    
+  // signup
+  signup: async (signupRequest) => {
+    try{
+      const reponse = await apiRequest('/api/auth/signup', {
+        method: "POST",
+        body: JSON.stringify(signupRequest),
+      });
+      return reponse;
+    }catch(error){
+      console.error('회원가입 오류:', error);
+      throw error;
+    }
+  },
+  // login
+  login: async (loginRequest) => {
+    try{
+      const response = await apiRequest('/api/auth/login',{
+        method: "POST",
+        body: JSON.stringify(loginRequest),
+      });
+
+      // token -> localStorage에 저장
+      if(response.success && response.data.token){
+        localStorage.setItem('token', reponse.data.token);
+        localStorage.setItem('user', JSON.stringify(reponse.data.userInfo));
+      }
+      return response;
+    }catch(error){
+      console.log('로그인 오류:',error);
+      throw error;
+    }
+  },
+  // getCurrentUser 현재 로그인한 사용자 정보 조회
+  getCurrentUser: async() => {
+    try{
+      const response = await apiRequest('/api/auth/me');
+      return response;
+    }catch(error){
+      console.error('사용자 정보 조회 오류:', error);
+      throw error;
+    }
+  },
+  //logout
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -65,18 +117,21 @@ export const authAPI = {
 };
 
 export const quizAPI = {
-  getQuiz: (quizRequest) => 
-    apiRequest('/api/quiz', {
+  getQuiz: async (quizRequest) => {
+    const response = await apiRequest('/api/quiz', {
       method: "POST",
       body: JSON.stringify(quizRequest),
-    }),
+    });
+
+    return response;
+  },
 };
 
 // 구글 로그인 후 리다이렉션 URI에 맞게 변경
 const OAUTH2_REDIRECT_URI = import.meta.env.VITE_OAUTH_REDIRECT_URI || "http://localhost:3000/auth/callback/google";
 
-// 구글 OAuth2 URL - 백엔드 엔드포인트에 맞게 수정
-export const GOOGLE_AUTH_URL = `${API_BASE_URL}/login/oauth2/code/google`;
+// 구글 OAuth2 URL - 구글 로그인 url에 맞게 수정
+export const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 
 // 카카오는 추후 수정 예정
-export const KAKAO_AUTH_URL = `${API_BASE_URL}/login/oauth2/code/kakao`;
+// export const KAKAO_AUTH_URL = `${API_BASE_URL}/login/oauth2/code/kakao`;
