@@ -16,8 +16,61 @@ export const AuthProvider = ({children}) => {
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  
-}
+  // 초기화 시 토큰 확인
+  useEffect(() => {
+    const initializeAuth = async () => {
+      try{
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
+
+        if(storedToken && storedUser){
+          const isValid = await validateToken();
+          if(isValid){
+            setToken(storedToken);
+            setUser(JSON.parse(storedUser));
+          }else{
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+          }
+        }
+      } catch(error){
+        console.log('Auth 초기화 오류:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeAuth();
+  }, []);
+
+  const login = ({token, user}) => {
+    setToken(token);
+    setUser(user);
+    localStorage.setItem('token',token);
+    localStorage.setItem('user',JSON.stringify(user));
+  };
+
+  const logout = () => {
+    setToken(null);
+    setUser(null);
+    authApi.logout();
+  };
+
+  const value = {
+    user,
+    token,
+    loading,
+    login,
+    logout,
+    isAuthenticated: !!token
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 
 

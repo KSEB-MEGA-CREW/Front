@@ -66,7 +66,7 @@ const apiRequest = async (url, options = {}) => {
 };
 
 // API 함수들
-export const authAPI = {
+export const authApi = {
   // signup
   signup: async (signupRequest) => {
     try{
