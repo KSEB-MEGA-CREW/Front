@@ -2,13 +2,11 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import router from "./router/root";
 import { RouterProvider } from "react-router-dom";
-import { AuthContextProvider } from "./store/authContext";
-import { CookiesProvider } from "react-cookie";
+import { AuthProvider } from "./store/authContext"; 
+// import { CookiesProvider } from "react-cookie"; // 제거 (JWT 토큰 사용으로 불필요)
 
 createRoot(document.getElementById("root")).render(
-  <CookiesProvider>
-    <AuthContextProvider>
-      <RouterProvider router={router} />
-    </AuthContextProvider>
-  </CookiesProvider>
+  <AuthProvider> {/* AuthContextProvider → AuthProvider로 변경 */}
+    <RouterProvider router={router} />
+  </AuthProvider>
 );
