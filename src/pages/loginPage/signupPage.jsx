@@ -2,25 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authAPI } from "../../api/authApi";
 
+
 export default function SignUpPage() {
-  // 기존 상태 유지
-  const [formData, setFormData] = useState({
-    nickname: "",
+  // 백엔드 UserSignupRequest에 맞춘 필드명 수정 => 앞으로도 백엔드의 dto 참고하여 필드명 작성 부탁드립니다!!
+  const[formData, setFormData] = useState({
+    username: "", // nickname -> username
     email: "",
     password: "",
-    confirmPassword: "",
-    // gender: "", 현재 백엔드에서 gender가 추가되어 있지 않아서 주석 처리했습니다 나중에 논의하고 추가할게요!
     hearing: "",
   });
-  const [error, setError] = useState("");
+
+  const [errors, setErrors] = useState({}); // 개별 필드 에러 관리
   const [loading, setLoading] = useState(false);
 
   // 마우스 위치 상태
-  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
-
+  const [mousePosition, setMousePosition] = useState({x:50, y:50});
+  
   const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth) * 100,
@@ -32,40 +32,105 @@ export default function SignUpPage() {
   }, []);
 
   const handleInputChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    // 실시간 에러 제거
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
+
+  // 폼 검증 함수
+  const validateForm = () => {
+    const newErrors = {};
+
+    // 사용자명 검증
+    if (!formData.username) {
+      newErrors.username = '사용자명을 입력해주세요.';
+    } else if (formData.username.length < 2) {
+      newErrors.username = '사용자명은 2자 이상이어야 합니다.';
+    }
+
+    // 이메일 검증
+    if (!formData.email) {
+      newErrors.email = '이메일을 입력해주세요.';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = '올바른 이메일 형식을 입력해주세요.';
+    }
+
+    // 비밀번호 검증
+    if (!formData.password) {
+      newErrors.password = '비밀번호를 입력해주세요.';
+    } else if (formData.password.length < 6) {
+      newErrors.password = '비밀번호는 6자 이상이어야 합니다.';
+    }
+
+    // 비밀번호 확인 검증
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = '비밀번호 확인을 입력해주세요.';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
+    }
+
+    // 청각상태 검증
+    if (!formData.hearing) {
+      newErrors.hearing = '청각상태를 선택해주세요.';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.");
+    
+    if (!validateForm()) {
       return;
     }
+
     setLoading(true);
-    setError("");
+    setErrors({});
+    
     try {
-      const response = await authAPI.signup({
-        name: formData.nickname,
+      // 백엔드 UserSignupRequest에 맞춘 데이터 구조
+      const signupData = {
+        username: formData.username, // nickname → username
         email: formData.email,
         password: formData.password,
-        gender: formData.gender,
         hearing: formData.hearing,
-      });
+      };
+
+      console.log('회원가입 요청 데이터:', signupData);
+
+      const response = await authAPI.signup(signupData);
 
       if (response.success) {
-        alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
+        // alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");
         navigate("/login");
       } else {
-        setError(response.message || "회원가입에 실패했습니다.");
+        setErrors({ submit: response.message || "회원가입에 실패했습니다." });
       }
-    } catch {
-      setError("회원가입 중 오류가 발생했습니다.");
+    } catch (error) {
+      console.error('회원가입 오류:', error);
+      
+      // 에러 메시지 파싱
+      if (error.message.includes('이미 존재하는 이메일')) {
+        setErrors({ email: '이미 존재하는 이메일입니다.' });
+      } else if (error.message.includes('이미 존재하는 username')) {
+        setErrors({ username: '이미 존재하는 사용자명입니다.' });
+      } else {
+        setErrors({ submit: error.message || "회원가입 중 오류가 발생했습니다." });
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // 배경 스타일
+  // 배경 스타일 -> 스타일은 수정하지 않았습니다!!!
   const backgroundStyle = {
     backgroundImage: "url('/assets/image.png')",
     backgroundSize: "cover",
