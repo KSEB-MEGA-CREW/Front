@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { authApi, GOOGLE_AUTH_URL, KAKAO_AUTH_URL } from "../../api/authApi";
+import { authApi, GOOGLE_AUTH_URL} from "../../api/authApi";
 import { useAuth } from "../../store/authContext";
 
 export default function LoginPage() {
@@ -52,7 +52,7 @@ export default function LoginPage() {
   };
 
   const handleSocialLogin = (provider) => {
-    const authUrl = provider === "google" ? GOOGLE_AUTH_URL : KAKAO_AUTH_URL;
+    const authUrl = GOOGLE_AUTH_URL;
     
     if(!authUrl){
       setError(`${provider} 로그인 URL이 설정되지 않았습니다.`);

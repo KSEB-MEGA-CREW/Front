@@ -16,8 +16,18 @@ const OAuth2RedirectHandler = lazy(() =>
   import("../pages/loginPage/OAuth2RedirectHandler")
 );
 
+// AuthCallback 컴포넌트 추가 (또는 OAuth2RedirectHandler를 재사용)
+const AuthCallback = lazy(() => 
+  import("../components/authCallback")
+);
+
 const Loading = () => (
-  <div className="flex justify-center items-center h-screen">Loading....</div>
+  <div className="flex justify-center items-center h-screen">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+      <div>Loading....</div>
+    </div>
+  </div>
 );
 
 const router = createBrowserRouter([
@@ -37,11 +47,21 @@ const router = createBrowserRouter([
       </Suspense>
     ),
   },
+  // 기존 OAuth2 리다이렉트 핸들러 (호환성 유지)
   {
     path: "/oauth2/redirect",
     element: (
       <Suspense fallback={<Loading />}>
         <OAuth2RedirectHandler />
+      </Suspense>
+    ),
+  },
+  // 백엔드 SuccessHandler가 리다이렉트하는 경로
+  {
+    path: "/auth/callback",
+    element: (
+      <Suspense fallback={<Loading />}>
+        <AuthCallback />
       </Suspense>
     ),
   },
