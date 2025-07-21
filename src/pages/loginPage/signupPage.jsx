@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { authAPI } from "../../api/authApi";
+import { authApi } from "../../api/authApi";
 
 
 export default function SignUpPage() {
@@ -106,7 +106,7 @@ export default function SignUpPage() {
 
       console.log('회원가입 요청 데이터:', signupData);
 
-      const response = await authAPI.signup(signupData);
+      const response = await authApi.signup(signupData);
 
       if (response.success) {
         // alert("회원가입이 완료되었습니다. 로그인 페이지로 이동합니다.");

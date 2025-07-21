@@ -9,11 +9,11 @@ const getAuthHeaders = () => {
 // 공통 API 요청 함수
 const apiRequest = async (url, options = {}) => {
   const { headers = {}, ...restOptions } = options;
-  
+     
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, {
-      headers: { 
-        "Content-Type": "application/json",
+      headers: {
+         "Content-Type": "application/json",
         "Accept": "application/json",
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
@@ -24,7 +24,7 @@ const apiRequest = async (url, options = {}) => {
       cache: 'no-cache',
       ...restOptions,
     });
-    
+         
     // 401 처리
     if (response.status === 401) {
       localStorage.removeItem('token');
@@ -32,7 +32,7 @@ const apiRequest = async (url, options = {}) => {
       window.location.href = '/login';
       throw new Error('인증이 만료되었습니다.');
     }
-    
+         
     // 403 처리
     if(response.status === 403){
       throw new Error('접근 권한이 없습니다.');
@@ -60,7 +60,7 @@ const apiRequest = async (url, options = {}) => {
       throw new Error('네트워크 연결을 확인해주세요.');
     }
     // debug용 console.log
-    console.log('API 요청 오류:',error);
+    console.log('API 요청 오류:', error);
     throw error;
   }
 };
@@ -69,46 +69,49 @@ const apiRequest = async (url, options = {}) => {
 export const authApi = {
   // signup
   signup: async (signupRequest) => {
-    try{
-      const reponse = await apiRequest('/api/auth/signup', {
+    try {
+      const response = await apiRequest('/api/auth/signup', {
         method: "POST",
         body: JSON.stringify(signupRequest),
       });
-      return reponse;
-    }catch(error){
+      return response;
+    } catch(error) {
       console.error('회원가입 오류:', error);
       throw error;
     }
   },
+  
   // login
   login: async (loginRequest) => {
-    try{
-      const response = await apiRequest('/api/auth/login',{
+    try {
+      const response = await apiRequest('/api/auth/login', {
         method: "POST",
         body: JSON.stringify(loginRequest),
       });
-
+       
       // token -> localStorage에 저장
-      if(response.success && response.data.token){
-        localStorage.setItem('token', reponse.data.token);
-        localStorage.setItem('user', JSON.stringify(reponse.data.userInfo));
+      if(response.success && response.data.token) {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify(response.data.userInfo));
       }
       return response;
-    }catch(error){
-      console.log('로그인 오류:',error);
+    } catch(error) {
+      console.log('로그인 오류:', error);
       throw error;
     }
   },
+  
   // getCurrentUser 현재 로그인한 사용자 정보 조회
   getCurrentUser: async() => {
-    try{
+    try {
       const response = await apiRequest('/api/auth/me');
       return response;
-    }catch(error){
+    } catch(error) {
       console.error('사용자 정보 조회 오류:', error);
       throw error;
     }
   },
+  
   //logout
   logout: () => {
     localStorage.removeItem('token');
@@ -116,19 +119,16 @@ export const authApi = {
   },
 };
 
-export const quizAPI = {
+export const quizApi = {
   getQuiz: async (quizRequest) => { // api 호출 비동기 처리
     const response = await apiRequest('/api/quiz', {
       method: "POST",
       body: JSON.stringify(quizRequest),
     });
-
+     
     return response;
   },
 };
-
-// 구글 로그인 후 리다이렉션 URI에 맞게 변경
-// const OAUTH2_REDIRECT_URI = import.meta.env.VITE_OAUTH_REDIRECT_URI || "http://localhost:3000/auth/callback/google";
 
 // 구글 OAuth2 URL - 구글 로그인 url에 맞게 수정
 export const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
@@ -136,19 +136,24 @@ export const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 // token 유효성 검사를 여기서 처리
 export const validateToken = async () => {
   const token = localStorage.getItem('token');
-  if(!token){
+  if(!token) {
     return false;
   }
-
-  try{
-    const reponse = await authAPI.getCurrentUser();
-    return reponse.success;
-  } catch(error){
+   
+  try {
+    const response = await authApi.getCurrentUser(); // 수정: authApi 사용
+    return response.success;
+  } catch(error) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     return false;
   }
 };
 
-// 카카오는 추후 수정 예정
-// export const KAKAO_AUTH_URL = `${API_BASE_URL}/login/oauth2/code/kakao`;
+// 기본 export 추가 (선택사항)
+export default {
+  authApi,
+  quizApi,
+  validateToken,
+  GOOGLE_AUTH_URL
+};

@@ -7,27 +7,38 @@ export default defineConfig({
 
   // 개발 서버 설정
   server: {
-    port: 3000, // React 앱 포트
-    host: true, // 외부 접속 허용
+    port: 3000,
+    host: true,
 
-    // ✅ WebSocket 연결 문제 해결을 위한 HMR 설정 추가
+    // ✅ HMR 설정 개선
     hmr: {
-      port: 3000,
+      port: 3001, // 다른 포트 사용
       host: 'localhost'
     },
 
-    // ✅ WebSocket 설정 추가
+    // ✅ WebSocket 설정 개선
     ws: {
-      port: 3000
+      port: 3001 // HMR과 같은 포트
     },
 
-    // 프록시 설정 - 백엔드 API 요청을 프록시
+    // ✅ 프록시 설정 개선
     proxy: {
       '/api': {
-        target: 'http://localhost:8080', // Spring Boot 서버
+        target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        // rewrite: (path) => path.replace(/^\/api/, '') // 필요시 경로 변경
+        timeout: 60000, // 타임아웃 설정
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('proxy error', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('Sending Request to the Target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+          });
+        }
       },
 
       // OAuth2 관련 요청 프록시
@@ -35,30 +46,35 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
+        timeout: 60000
       },
 
       '/login': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
+        timeout: 60000
+      },
+
+      // ✅ WebSocket 프록시 추가
+      '/ws': {
+        target: 'ws://localhost:8080',
+        ws: true,
+        changeOrigin: true
       }
     }
   },
 
-  // 환경변수 설정
+  // ✅ 환경변수 설정 개선
   define: {
-    // 환경변수를 빌드 시점에 정의
-    __API_URL__: JSON.stringify(process.env.VITE_API_URL || 'http://localhost:8080/api'),
+    __API_URL__: JSON.stringify(process.env.VITE_API_URL || 'http://localhost:8080'),
   },
 
   // 빌드 설정
   build: {
     outDir: 'dist',
-    sourcemap: true, // 디버깅용 소스맵
-
-    // 청크 크기 경고 제한 조정
+    sourcemap: process.env.NODE_ENV === 'development',
     chunkSizeWarningLimit: 1000,
-
     rollupOptions: {
       output: {
         manualChunks: {
@@ -69,7 +85,7 @@ export default defineConfig({
     }
   },
 
-  // 경로 별칭 설정 (필요시 사용)
+  // 경로 별칭 설정
   resolve: {
     alias: {
       '@': '/src',
