@@ -14,7 +14,7 @@ export const useAuth = () => {
 export const AuthProvider = ({children}) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // 초기 로딩 상태
 
   // 초기화 시 토큰 확인
   useEffect(() => {
@@ -24,17 +24,23 @@ export const AuthProvider = ({children}) => {
         const storedUser = localStorage.getItem('user');
 
         if(storedToken && storedUser){
+          // 토큰 유효성 검증
+          
           const isValid = await validateToken();
           if(isValid){
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
           }else{
+            // 토큰이 유효하지 않으면 로컬스토리지 정리
             localStorage.removeItem('token');
             localStorage.removeItem('user');
           }
         }
       } catch(error){
         console.log('Auth 초기화 오류:', error);
+        // 에러 발생 시 로컬 스토리지 정리
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
       } finally {
         setLoading(false);
       }
@@ -44,6 +50,11 @@ export const AuthProvider = ({children}) => {
   }, []);
 
   const login = ({token, user}) => {
+    if(!token || !user){
+      cconsole.error('Login failed: Invalid auth data');
+      return;
+    }
+
     setToken(token);
     setUser(user);
     localStorage.setItem('token',token);
@@ -53,16 +64,19 @@ export const AuthProvider = ({children}) => {
   const logout = () => {
     setToken(null);
     setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     authApi.logout();
   };
 
   const value = {
     user,
     token,
+    isLoading: loading,
     loading,
     login,
     logout,
-    isAuthenticated: !!token
+    isAuthenticated: !!token && !!user
   };
 
   return (
