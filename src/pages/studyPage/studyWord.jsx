@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import { authAPI } from "../../api/authApi";
+import { FaVolumeUp, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { authApi } from "../../api/authApi";
 
 function StudyWord() {
   const [quizList, setQuizList] = useState([]);
@@ -11,7 +11,7 @@ function StudyWord() {
 
   // 문제 불러오기 및 상태 초기화
   const fetchQuestions = async () => {
-    const data = await authAPI.getquiz({});
+    const data = await authApi.getquiz({});
     setQuizList(data.slice(0, 5));
     setCurrent(0);
     setSelected(null);

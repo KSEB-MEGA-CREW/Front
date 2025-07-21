@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { authAPI, GOOGLE_AUTH_URL, KAKAO_AUTH_URL } from "../../api/authApi";
+import { authApi, GOOGLE_AUTH_URL} from "../../api/authApi";
 import { useAuth } from "../../store/authContext";
 
 export default function LoginPage() {
@@ -15,32 +15,80 @@ export default function LoginPage() {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    if(error){
+      setError("");
+    }
   };
 
   const handleLogin = async (e) => {
+    // 현재 페이지 URL 저장
+    sessionStorage.setItem('loginRedirect', window.location.pathname);
+
     e.preventDefault();
     setError("");
     setLoading(true);
-    try {
-      console.log("로그인 확인합니다");
-      const response = await authAPI.login(formData);
-      if (response.success && response.data?.token) {
-        login(response.data);
-        navigate("/");
-      } else {
+
+    try{
+      console.log("로그인 시도:", formData);
+      const response = await authApi.login(formData);
+
+      if(response.success && response.data?.token){
+        // login data 구조 수정
+        login({
+          token: response.data.token,
+          user:response.data.userInfo
+        });
+
+        // 리다이렉트 처리 추가
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect') || '/';
+        navigate(redirectTo, {replace: true});
+      } else{
         setError(response.message || "로그인에 실패했습니다.");
       }
-    } catch {
-      setError("로그인 중 오류가 발생했습니다.");
+    } catch(error){
+      console.error('로그인 오류:',error);
+      setError(error.message || "로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleSocialLogin = (provider) => {
-    const authUrl = provider === "google" ? GOOGLE_AUTH_URL : KAKAO_AUTH_URL;
+    const authUrl = GOOGLE_AUTH_URL;
+    
+    if(!authUrl){
+      setError(`${provider} 로그인 URL이 설정되지 않았습니다.`);
+      return;
+    }
+
+    console.log(`${provider} 소셜 로그인 시도:`, authUrl);
+
+    // 현재 페이지 정보를 세션 스토리지에 저장 (리다이렉션 후 복원용)
+    const currentUrl = window.location.pathname + window.location.search;
+    sessionStorage.setItem('loginRedirect', currentUrl);
+
+    // 소셜 로그인 페이지로 이동
     window.location.href = authUrl;
   };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const error = searchParams.get('error');
+
+    if(error){
+      const errorMessages = {
+        'no_email': '이메일 정보를 가져올 수 없습니다.',
+        'auth_failed': '소셜 로그인에 실패했습니다.',
+        'oauth_failed': '로그인 처리 중 오류가 발생했습니다.',
+        'no_token': '토큰을 찾을 수 없습니다.',
+        'server_error': '서버 오류가 발생했습니다.'
+      };
+
+      setError(errorMessages[error] || '알 수 없는 오류가 발생했습니다.');
+    }
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -262,7 +310,7 @@ export default function LoginPage() {
                   </svg>
                 </button>
 
-                {/* Kakao Login */}
+                {/* Kakao Login => 추후 연결 예정
                 <button
                   onClick={() => handleSocialLogin("kakao")}
                   className="p-3 hover:bg-white/10 rounded-full transition-all duration-200"
@@ -273,7 +321,7 @@ export default function LoginPage() {
                       d="M12 2C5.9 2 1 6.1 1 11c0 2.6 1.4 4.9 3.7 6.5L3 22l5.1-2.5c1.1.2 2.2.3 3.4.3 6.1 0 11-4.1 11-9S18.1 2 12 2z"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
 

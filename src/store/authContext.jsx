@@ -1,96 +1,181 @@
-import { createContext, useState, useEffect, useContext } from "react";
-import { useCookies } from "react-cookie";
-import { authAPI } from "../api/authApi";
+import React, {createContext, useState, useEffect, useContext} from "react";
+import {authApi, validateToken} from '../api/authApi';
 
-export const AuthContext = createContext();
-export const useAuth = () => useContext(AuthContext);
+const AuthContext = createContext();
 
-export function AuthContextProvider({ children }) {
-  const [cookies, setCookie, removeCookie] = useCookies(["accessToken"]);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if(!context){
+    throw new Error('useAuth must be used within an AuthProvider.');
+  }
+  return context;
+};
 
-  // 1. localStorage에서 user 초기값 불러오기
-  const [user, setUser] = useState(() => {
-    const data = localStorage.getItem("user");
-    return data ? JSON.parse(data) : null;
-  });
+export const AuthProvider = ({children}) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+  const [loading, setLoading] = useState(true); // 초기 로딩 상태
 
-  const [loading, setLoading] = useState(true);
-
-  // 2. user가 바뀔 때마다 localStorage 동기화
+  // 초기화 시 토큰 확인
   useEffect(() => {
-    if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
-    } else {
-      localStorage.removeItem("user");
-    }
-  }, [user]);
+    const initializeAuth = async () => {
+      try{
+        const storedToken = localStorage.getItem('token');
+        const storedUser = localStorage.getItem('user');
 
-  useEffect(() => {
-    const checkUserStatus = async () => {
-      if (user) {
-        setLoading(false);
-        return;
-      }
-      const token = cookies.accessToken;
-      if (token) {
-        try {
-          const response = await authAPI.getCurrentUser(token);
-          if (response.success) {
-            setUser(response.data);
-          } else {
-            removeCookie("accessToken", { path: "/" });
-            setUser(null);
+        if(storedToken && storedUser){
+          // 토큰 유효성 검증
+          
+          const isValid = await validateToken();
+          if(isValid){
+            setToken(storedToken);
+            setUser(JSON.parse(storedUser));
+          }else{
+            // 토큰이 유효하지 않으면 로컬스토리지 정리
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
           }
-        } catch (error) {
-          console.error("Failed to fetch user:", error);
-          removeCookie("accessToken", { path: "/" });
-          setUser(null);
         }
+      } catch(error){
+        console.log('Auth 초기화 오류:', error);
+        // 에러 발생 시 로컬 스토리지 정리
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-    checkUserStatus();
-  }, [cookies.accessToken, removeCookie]);
-  // 쿠키 accessToken 없으면 user 정보도 제거
-  useEffect(() => {
-    if (!cookies.accessToken) {
-      localStorage.removeItem("user");
-      console.log("쿠키 만료되었는지 체크하고 만료되면 localStorage 초기화");
-      setUser(null);
-    }
-  }, [cookies.accessToken]);
 
-  const login = (authData) => {
-    if (!authData || !authData.token || !authData.user) {
-      console.error("Login failed: Invalid auth data received.");
+    initializeAuth();
+  }, []);
+
+  const login = ({token, user}) => {
+    if(!token || !user){
+      cconsole.error('Login failed: Invalid auth data');
       return;
     }
-    const expires = new Date(Date.now() + 3 * 60 * 60 * 1000); //3시간 후 만료
-    expires.setDate(expires.getDate());
-    setCookie("accessToken", authData.token, {
-      path: "/",
-      expires,
-      sameSite: "strict",
-    });
-    setUser(authData.user);
+
+    setToken(token);
+    setUser(user);
+    localStorage.setItem('token',token);
+    localStorage.setItem('user',JSON.stringify(user));
   };
 
   const logout = () => {
-    removeCookie("accessToken", { path: "/" });
+    setToken(null);
     setUser(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    authApi.logout();
   };
 
   const value = {
     user,
-    isAuthenticated: !!user,
+    token,
+    isLoading: loading,
+    loading,
     login,
     logout,
-    isLoading: loading,
+    isAuthenticated: !!token && !!user
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
-}
+};
+
+
+
+
+
+
+// import { createContext, useState, useEffect, useContext } from "react";
+// import { useCookies } from "react-cookie";
+// import { authAPI } from "../api/authApi";
+
+// export const AuthContext = createContext();
+// export const useAuth = () => useContext(AuthContext);
+
+// export function AuthContextProvider({ children }) {
+//   const [cookies, setCookie, removeCookie] = useCookies(["accessToken"]);
+
+//   // 1. localStorage에서 user 초기값 불러오기
+//   const [user, setUser] = useState(() => {
+//     const data = localStorage.getItem("user");
+//     return data ? JSON.parse(data) : null;
+//   });
+
+//   const [loading, setLoading] = useState(true);
+
+//   // 2. user가 바뀔 때마다 localStorage 동기화
+//   useEffect(() => {
+//     if (user) {
+//       localStorage.setItem("user", JSON.stringify(user));
+//     } else {
+//       localStorage.removeItem("user");
+//     }
+//   }, [user]);
+
+//   useEffect(() => {
+//     const checkUserStatus = async () => {
+//       if (user) {
+//         setLoading(false);
+//         return;
+//       }
+//       const token = cookies.accessToken;
+//       if (token) {
+//         try {
+//           const response = await authAPI.getCurrentUser(token);
+//           if (response.success) {
+//             setUser(response.data);
+//           } else {
+//             removeCookie("accessToken", { path: "/" });
+//             setUser(null);
+//           }
+//         } catch (error) {
+//           console.error("Failed to fetch user:", error);
+//           removeCookie("accessToken", { path: "/" });
+//           setUser(null);
+//         }
+//       }
+//       setLoading(false);
+//     };
+//     checkUserStatus();
+//   }, [cookies.accessToken, removeCookie]);
+
+//   const login = (authData) => {
+//     if (!authData || !authData.token || !authData.user) {
+//       console.error("Login failed: Invalid auth data received.");
+//       return;
+//     }
+//     const expires = new Date(Date.now() + 3 * 60 * 60 * 1000); //3시간 후 만료
+//     expires.setDate(expires.getDate() + 1);
+//     setCookie("accessToken", authData.token, {
+//       path: "/",
+//       expires,
+//       sameSite: "strict",
+//     });
+//     setUser(authData.user);
+//   };
+
+//   const logout = () => {
+//     removeCookie("accessToken", { path: "/" });
+//     setUser(null);
+//   };
+
+//   const value = {
+//     user,
+//     isAuthenticated: !!user,
+//     login,
+//     logout,
+//     isLoading: loading,
+//   };
+
+//   return (
+//     <AuthContext.Provider value={value}>
+//       {!loading && children}
+//     </AuthContext.Provider>
+//   );
+// }

@@ -1,73 +1,55 @@
 import { createBrowserRouter } from "react-router-dom";
-import { lazy, Suspense } from "react";
-import ProtectedRoute from "./protectedRouter";
+import ProtectedRoute from "./protectedRoute";
 import StudyRouter from "./studyRouter";
 import TranslateRouter from "./translateRouter";
 
-// 페이지 컴포넌트 Lazy Loading
-const Main = lazy(() => import("../pages/basicPage/mainPage"));
-const Translate = lazy(() => import("../pages/translatePage/translatePage"));
-const Study = lazy(() => import("../pages/studyPage/studyPage"));
-const Mypage = lazy(() => import("../pages/basicPage/myPage"));
-
-const Login = lazy(() => import("../pages/loginPage/loginPage"));
-const SignUp = lazy(() => import("../pages/loginPage/signupPage"));
-const OAuth2RedirectHandler = lazy(() =>
-  import("../pages/loginPage/OAuth2RedirectHandler")
-);
-
-const Loading = () => (
-  <div className="flex justify-center items-center h-screen">Loading....</div>
-);
+// Lazy Loading => 직접 import로 변경
+import Main from "../pages/basicPage/mainPage";
+import Translate from "../pages/translatePage/translatePage";
+import Study from "../pages/studyPage/studyPage";
+import MyPage from "../pages/basicPage/myPage";
+import Login from "../pages/loginPage/loginPage";
+import SignUp from "../pages/loginPage/signupPage";
+import OAuth2RedirectHandler from "../pages/loginPage/OAuth2RedirectHandler";
+import AuthCallback from "../components/authCallback";
 
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: (
-      <Suspense fallback={<Loading />}>
-        <Login />
-      </Suspense>
-    ),
+    element: <Login />
   },
   {
     path: "/signup",
-    element: (
-      <Suspense fallback={<Loading />}>
-        <SignUp />
-      </Suspense>
-    ),
+    element: <SignUp />
   },
+  // 기존 OAuth2 리다이렉트 핸들러 (호환성 유지)
   {
     path: "/oauth2/redirect",
-    element: (
-      <Suspense fallback={<Loading />}>
-        <OAuth2RedirectHandler />
-      </Suspense>
-    ),
+    element: <OAuth2RedirectHandler />
+  },
+  // 백엔드 SuccessHandler가 리다이렉트하는 경로
+  {
+    path: "/auth/callback",
+    element: <AuthCallback />
   },
   {
-    path: "/",
-    element: (
-      <ProtectedRoute>
-        <Suspense fallback={<Loading />}>
-          <Main />
-        </Suspense>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/mypage",
-    element: (
-      <ProtectedRoute>
-        <Suspense fallback={<Loading />}>
-          <Mypage />
-        </Suspense>
-      </ProtectedRoute>
-    ),
-  },
-
-  TranslateRouter(),
-  StudyRouter(),
+   path: "/",
+   element: (
+     <ProtectedRoute>
+       <Main />
+     </ProtectedRoute>
+   ),
+ },
+ {
+   path: "/mypage",
+   element: (
+     <ProtectedRoute>
+       <MyPage />
+     </ProtectedRoute>
+   ),
+ },
+ TranslateRouter(),
+ StudyRouter(),
 ]);
 
 export default router;
