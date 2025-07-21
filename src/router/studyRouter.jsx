@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Navigate } from "react-router";
 
-import ProtectedRoute from "./protectedRouter";
+import ProtectedRoute from "./protectedRoute";
 import StudyPage from "../pages/studyPage/studyPage";
 
 const Loading = () => <div>Loading....</div>;
