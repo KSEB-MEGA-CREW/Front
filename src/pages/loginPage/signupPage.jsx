@@ -10,6 +10,7 @@ export default function SignUpPage() {
     email: "",
     password: "",
     hearing: "",
+    confirmPassword: "", // 프론트엔드 검증용 비밀번호 확인
   });
 
   const [errors, setErrors] = useState({}); // 개별 필드 에러 관리
@@ -20,7 +21,7 @@ export default function SignUpPage() {
   
   const navigate = useNavigate();
 
-    useEffect(() => {
+  useEffect(() => {
     const handleMouseMove = (e) => {
       setMousePosition({
         x: (e.clientX / window.innerWidth) * 100,
@@ -51,8 +52,8 @@ export default function SignUpPage() {
     // 사용자명 검증
     if (!formData.username) {
       newErrors.username = '사용자명을 입력해주세요.';
-    } else if (formData.username.length < 2) {
-      newErrors.username = '사용자명은 2자 이상이어야 합니다.';
+    } else if (formData.username.length < 2 || formData.username.length > 20) {
+      newErrors.username = '사용자명은 2자 이상 20자 이하여야 합니다.';
     }
 
     // 이메일 검증
@@ -62,11 +63,12 @@ export default function SignUpPage() {
       newErrors.email = '올바른 이메일 형식을 입력해주세요.';
     }
 
-    // 비밀번호 검증
+    // 비밀번호 검증 (백엔드 규칙에 맞춤)
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!formData.password) {
       newErrors.password = '비밀번호를 입력해주세요.';
-    } else if (formData.password.length < 6) {
-      newErrors.password = '비밀번호는 6자 이상이어야 합니다.';
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password = '비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.';
     }
 
     // 비밀번호 확인 검증
@@ -117,11 +119,13 @@ export default function SignUpPage() {
     } catch (error) {
       console.error('회원가입 오류:', error);
       
-      // 에러 메시지 파싱
+      // 서버 에러 메시지 파싱
       if (error.message.includes('이미 존재하는 이메일')) {
         setErrors({ email: '이미 존재하는 이메일입니다.' });
-      } else if (error.message.includes('이미 존재하는 username')) {
+      } else if (error.message.includes('이미 존재하는 닉네임')) {
         setErrors({ username: '이미 존재하는 사용자명입니다.' });
+      } else if (error.message.includes('비밀번호는 8자 이상')) {
+        setErrors({ password: '비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.' });
       } else {
         setErrors({ submit: error.message || "회원가입 중 오류가 발생했습니다." });
       }
@@ -261,15 +265,18 @@ export default function SignUpPage() {
               회원가입
             </h2>
             <form onSubmit={handleSignup} className="space-y-4">
+              {/*사용자명 입력*/}
               <input
-                name="nickname"
+                name="username"
                 type="text"
-                value={formData.nickname}
+                value={formData.username}
                 onChange={handleInputChange}
-                placeholder="닉네임"
+                placeholder="사용자명 (2-20자)"
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
+              {errors.username && <p className= "text-sm text-red-400 mt-1">{errors.username}</p>}
+              {/*이메일 입력*/}
               <input
                 name="email"
                 type="email"
@@ -279,15 +286,19 @@ export default function SignUpPage() {
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
+              {errors.email && <p className="text-sm text-red-400 mt-1">{errors.email}</p>}
+              {/* 비밀번호 입력 */}
               <input
                 name="password"
                 type="password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="비밀번호"
+                placeholder="비밀번호 (8자 이상, 영문/숫자/특수문자)"
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
+              {errors.password && <p className="text-sm text-red-400 mt-1">{errors.password}</p>}
+              {/* 비밀번호 확인 */}
               <input
                 name="confirmPassword"
                 type="password"
@@ -297,45 +308,7 @@ export default function SignUpPage() {
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
-              {/* 성별 */}
-              {/* <div>
-                <label className="block text-white/70 mb-1 font-semibold">
-                  성별
-                </label>
-                <div className="flex space-x-4">
-                  <label className="flex items-center space-x-2 text-white/80">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="male"
-                      checked={formData.gender === "male"}
-                      onChange={handleInputChange}
-                      required
-                    />
-                    <span>남성</span>
-                  </label>
-                  <label className="flex items-center space-x-2 text-white/80">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="female"
-                      checked={formData.gender === "female"}
-                      onChange={handleInputChange}
-                    />
-                    <span>여성</span>
-                  </label>
-                  <label className="flex items-center space-x-2 text-white/80">
-                    <input
-                      type="radio"
-                      name="gender"
-                      value="other"
-                      checked={formData.gender === "other"}
-                      onChange={handleInputChange}
-                    />
-                    <span>기타</span>
-                  </label>
-                </div>
-              </div> */}
+              {errors.confirmPassword && <p className="text-sm text-red-400 mt-1">{errors.confirmPassword}</p>}
               {/* 청각 */}
               <div>
                 <label className="block text-white/70 mb-1 font-semibold">
@@ -365,7 +338,7 @@ export default function SignUpPage() {
                   </label>
                 </div>
               </div>
-              {error && <p className="text-sm text-red-400">{error}</p>}
+              {errors.hearing && <p className="text-sm text-red-400">{errors.hearing}</p>}
               <button
                 type="submit"
                 disabled={loading}
@@ -374,6 +347,7 @@ export default function SignUpPage() {
                 {loading ? "가입 중..." : "회원가입"}
               </button>
             </form>
+            {/* 로그인 링크 */}
             <div className="text-sm text-center text-white/80 mt-6">
               이미 계정이 있으신가요?{" "}
               <Link to="/login" className="underline hover:text-white">
