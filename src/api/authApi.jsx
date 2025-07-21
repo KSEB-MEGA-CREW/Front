@@ -13,7 +13,7 @@ const apiRequest = async (url, options = {}) => {
   try {
     const response = await fetch(`${API_BASE_URL}${url}`, {
       headers: {
-         "Content-Type": "application/json",
+        "Content-Type": "application/json",
         "Accept": "application/json",
         "Cache-Control": "no-cache",
         "Pragma": "no-cache",
@@ -25,11 +25,15 @@ const apiRequest = async (url, options = {}) => {
       ...restOptions,
     });
          
-    // 401 처리
+    // 401 처리 (인증 만료))
     if (response.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // 현재 페이지가 로그인 페이지면 리다이렉트하지 않음 => 굳이 리다이렉트할 필요가 없으므로
+      // 현재 페이지가 로그인 페이지가 아닐 때만 리다이렉트
+      if(!window.location.pathname.includes('/login')){
+        window.location.href = '/login';
+      }
       throw new Error('인증이 만료되었습니다.');
     }
          
@@ -60,7 +64,7 @@ const apiRequest = async (url, options = {}) => {
       throw new Error('네트워크 연결을 확인해주세요.');
     }
     // debug용 console.log
-    console.log('API 요청 오류:', error);
+    console.error('API 요청 오류:', error);
     throw error;
   }
 };
