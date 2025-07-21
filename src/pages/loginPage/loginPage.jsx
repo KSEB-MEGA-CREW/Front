@@ -22,6 +22,9 @@ export default function LoginPage() {
   };
 
   const handleLogin = async (e) => {
+    // 현재 페이지 URL 저장
+    sessionStorage.setItem('loginRedirect', window.location.pathname);
+
     e.preventDefault();
     setError("");
     setLoading(true);

@@ -1,24 +1,27 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import {useAuth} from '../store/authContext';
 
 const authCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const {login} = useAuth();
 
   useEffect(() => {
+    const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
     console.log('AuthCallback 컴포넌트 로드됨');
     console.log('현재 URL:', window.location.href);
     console.log('URL 파라미터:', searchParams.toString());
     
-    const handleCallback = () => {
+    const handleCallback = async () => {
       const token = searchParams.get('token');
       const error = searchParams.get('error');
-      const success = searchParams.get('success');
 
       console.log('Token:', token);
       console.log('Error:', error);
-      console.log('Success:', success);
 
+      // 에러 처리 로직
       if (error) {
         console.error('OAuth 에러:', error);
         // 에러 메시지를 사용자 친화적으로 변환
@@ -35,31 +38,58 @@ const authCallback = () => {
         return;
       }
 
-      if (token && success === 'true') {
-        console.log('토큰 저장:', token);
-        
-        // 토큰 저장
-        localStorage.setItem('token', token);
-        
-        // 성공 메시지 (선택사항)
-        // alert('로그인에 성공했습니다!');
-        
-        // 메인 페이지로 이동
-        navigate('/');
-        return;
-      }
+      // 토큰 존재 확인
+      if (token) {
+        try{
+          const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          });
 
-      // 토큰도 에러도 없는 경우
-      console.warn('토큰과 에러 정보가 모두 없습니다');
-      console.warn('전체 URL 파라미터:', Object.fromEntries(searchParams));
-      navigate('/login');
+          if(response.ok){
+            const userResponse = await response.json();
+
+            // 성공적인 응답 확인
+            if(userResponse.success){
+              const userData = userResponse.data;
+
+              // authContext login 메서드 호출
+              login({
+                token,
+                user: userData
+              });
+
+              // redirect URL 복원
+              const redirectUrl = sessionStorage.getItem('loginRedirect') || '/';
+              sessionStorage.removeItem('loginRedirect');
+
+              navigate(redirectUrl, {replace: true});
+            } else{
+              // API 응답의 success가 false인 경우
+              throw new Error(userResponse.message || '사용자 정보 조회 실패');
+            }
+          } else {
+            // HTTP 상태 코드에 따른 에러 처리
+            const errorResponse = await response.json();
+            throw new Error(errorResponse.message || '사용자 정보 조회 실패');
+          }
+        } catch(error){
+          console.error('OAuth2 로그인 처리 오류:', error);
+
+          alert(error.message || '로그인 중 문제가 발생했습니다.');
+          navigate('/login');
+        }
+      } else{
+        // token이 없는 경우
+        navigate('/login');
+      }
     };
 
-    // 약간의 지연을 주어 URL 파싱 완료 대기
-    const timer = setTimeout(handleCallback, 200);
-    
-    return () => clearTimeout(timer);
-  }, [searchParams, navigate]);
+    handleCallback();
+  }, [searchParams, navigate, login]);
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
