@@ -58,13 +58,6 @@ function StudyWord() {
     }, 1100); // 1.1초 후 자동 다음 문제 or 결과화면
   };
 
-  // 발음 듣기
-  const handleSpeak = (word) => {
-    if (!window.speechSynthesis) return;
-    const utter = new window.SpeechSynthesisUtterance(word);
-    window.speechSynthesis.speak(utter);
-  };
-
   // "다시 풀기" 버튼 클릭
   const handleRetry = () => {
     fetchQuestions();
@@ -99,22 +92,11 @@ function StudyWord() {
                 </span>
                 <span className="flex-1">
                   <span className="font-bold">
-                    {quiz.word || quiz.signDescription}
+                    {userChoice.word || userChoice.meaning}
                   </span>
                   <span className="mx-2">–</span>
-                  <span>{userChoice.word || userChoice.meaning}</span>
+                  <span>{quiz.word || quiz.signDescription}</span>
                 </span>
-                {/* 발음 듣기 버튼(단어 문제일때만) */}
-                {quiz.word && (
-                  <button
-                    className="ml-3 text-xl text-gray-200 hover:text-yellow-300 transition"
-                    onClick={() => handleSpeak(quiz.word)}
-                    aria-label="발음 듣기"
-                    type="button"
-                  >
-                    <FaVolumeUp />
-                  </button>
-                )}
               </div>
             );
           })}
@@ -143,16 +125,6 @@ function StudyWord() {
           <span className="text-3xl font-bold tracking-wide text-white mx-2 select-none break-words w-full text-center">
             {quiz.word || quiz.signDescription || "(문제 없음)"}
           </span>
-          {quiz.word && (
-            <button
-              className="ml-3 text-2xl text-gray-200 hover:text-yellow-300 transition"
-              onClick={() => handleSpeak(quiz.word)}
-              aria-label="발음 듣기"
-              type="button"
-            >
-              <FaVolumeUp />
-            </button>
-          )}
         </div>
         <div className="w-full flex flex-col gap-3 mb-8 px-4">
           {quiz.choices.map((choice, idx) => {
