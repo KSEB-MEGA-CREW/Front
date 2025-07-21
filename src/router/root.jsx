@@ -1,6 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import { lazy, Suspense } from "react";
-import ProtectedRoute from "./protectedRouter";
+import ProtectedRoute from "./protectedRoute";
 import StudyRouter from "./studyRouter";
 import TranslateRouter from "./translateRouter";
 
