@@ -25,6 +25,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try{
       console.log("로그인 시도:", formData);
       const response = await authApi.login(formData);
@@ -36,9 +37,9 @@ export default function LoginPage() {
           user:response.data.userInfo
         });
 
-        // redirect 처리 추가
-        const urlParms = new URLSearchParams(window.location.search);
-        const redirectTo = urlParms.get('redirect') || '/';
+        // 리다이렉트 처리 추가
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectTo = urlParams.get('redirect') || '/';
         navigate(redirectTo, {replace: true});
       } else{
         setError(response.message || "로그인에 실패했습니다.");
@@ -306,7 +307,7 @@ export default function LoginPage() {
                   </svg>
                 </button>
 
-                {/* Kakao Login */}
+                {/* Kakao Login => 추후 연결 예정
                 <button
                   onClick={() => handleSocialLogin("kakao")}
                   className="p-3 hover:bg-white/10 rounded-full transition-all duration-200"
@@ -317,7 +318,7 @@ export default function LoginPage() {
                       d="M12 2C5.9 2 1 6.1 1 11c0 2.6 1.4 4.9 3.7 6.5L3 22l5.1-2.5c1.1.2 2.2.3 3.4.3 6.1 0 11-4.1 11-9S18.1 2 12 2z"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
             </div>
 
