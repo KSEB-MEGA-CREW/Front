@@ -51,6 +51,14 @@ export function AuthContextProvider({ children }) {
     };
     checkUserStatus();
   }, [cookies.accessToken, removeCookie]);
+  // 쿠키 accessToken 없으면 user 정보도 제거
+  useEffect(() => {
+    if (!cookies.accessToken) {
+      localStorage.removeItem("user");
+      console.log("쿠키 만료되었는지 체크하고 만료되면 localStorage 초기화");
+      setUser(null);
+    }
+  }, [cookies.accessToken]);
 
   const login = (authData) => {
     if (!authData || !authData.token || !authData.user) {
@@ -58,7 +66,7 @@ export function AuthContextProvider({ children }) {
       return;
     }
     const expires = new Date(Date.now() + 3 * 60 * 60 * 1000); //3시간 후 만료
-    expires.setDate(expires.getDate() + 1);
+    expires.setDate(expires.getDate());
     setCookie("accessToken", authData.token, {
       path: "/",
       expires,
