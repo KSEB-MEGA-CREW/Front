@@ -8,18 +8,16 @@ export default defineConfig({
   // 개발 서버 설정
   server: {
     port: 3000,
+    // ❌ 제거: historyApiFallback은 Vite에서 지원하지 않는 속성
     host: true,
 
     // ✅ HMR 설정 개선
     hmr: {
-      port: 3001, // 다른 포트 사용
+      port: 3001,
       host: 'localhost'
     },
 
-    // ✅ WebSocket 설정 개선
-    ws: {
-      port: 3001 // HMR과 같은 포트
-    },
+    // ❌ 제거: ws 설정이 중복됨 (hmr에 이미 포함)
 
     // ✅ 프록시 설정 개선
     proxy: {
@@ -27,7 +25,7 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        timeout: 60000, // 타임아웃 설정
+        timeout: 60000,
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.log('proxy error', err);
@@ -49,14 +47,9 @@ export default defineConfig({
         timeout: 60000
       },
 
-      '/login': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        secure: false,
-        timeout: 60000
-      },
+      // ❌ 수정: /login은 프론트엔드 라우트이므로 프록시 제거
 
-      // ✅ WebSocket 프록시 추가
+      // ✅ WebSocket 프록시
       '/ws': {
         target: 'ws://localhost:8080',
         ws: true,
