@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useAuth } from "../store/authContext";
+import { useAuth } from "../Context/authContext";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -16,13 +16,7 @@ const ProtectedRoute = ({ children }) => {
 
   // 인증되지 않은 사용자는 로그인 페이지로 리다이렉트
   if (!isAuthenticated) {
-    return (
-      <Navigate 
-        to="/login" 
-        state={{form: location}} 
-        replace 
-      />
-    );
+    return <Navigate to="/login" state={{ form: location }} replace />;
   }
 
   return children;
