@@ -1,18 +1,42 @@
 import React, { useEffect, useState } from "react";
-import { FaVolumeUp, FaCheckCircle, FaTimesCircle } from "react-icons/fa";
-import { authApi } from "../../api/authApi";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+// [수정 1] 올바른 API 객체(quizApi)를 import 합니다. 파일명에 상관없이 export된 이름을 사용해야 합니다.
+import { quizApi } from "../../api/authApi";
 
 function StudyWord() {
   const [quizList, setQuizList] = useState([]);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
-  const [answerResult, setAnswerResult] = useState([]); // 각 문제의 정오 결과 저장
+  const [answerResult, setAnswerResult] = useState([]);
   const [isFinished, setIsFinished] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 문제 불러오기 및 상태 초기화
   const fetchQuestions = async () => {
-    const data = await authApi.getquiz({});
-    setQuizList(data.slice(0, 5));
+    setIsLoading(true);
+    setQuizList([]);
+
+    try {
+      // [수정 2] 올바른 API 함수(quizApi.getQuiz)를 호출합니다.
+      const response = await quizApi.getQuiz({});
+
+      // [수정 3] API 응답 구조에 맞춰 데이터를 처리합니다. (가장 중요한 변경점)
+      // apiRequest는 JSON 객체를 반환하므로, 그 안의 data 배열을 사용해야 합니다.
+      // 응답 자체가 배열인지 확인합니다.
+      if (Array.isArray(response)) {
+        // 응답 자체가 배열이므로 그대로 사용합니다.
+        setQuizList(response.slice(0, 5));
+      } else {
+        // 혹시 모를 다른 형식의 응답에 대한 예외 처리
+        console.error("퀴즈 데이터 형식이 올바르지 않습니다:", response);
+        setQuizList([]);
+      }
+    } catch (error) {
+      console.error("퀴즈를 불러오는 중 오류 발생:", error);
+    } finally {
+      setIsLoading(false);
+    }
+
+    // 상태 초기화
     setCurrent(0);
     setSelected(null);
     setAnswerResult([]);
@@ -23,47 +47,54 @@ function StudyWord() {
     fetchQuestions();
   }, []);
 
-  if (quizList.length === 0)
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#11151b]">
-        <div className="text-xl text-gray-200 font-semibold">로딩중...</div>
+        <div className="text-xl text-gray-200 font-semibold">
+          퀴즈를 불러오는 중...
+        </div>
       </div>
     );
+  }
 
+  if (quizList.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#11151b]">
+        <div className="text-xl text-gray-200 font-semibold mb-4">
+          퀴즈를 불러오지 못했거나, 풀 퀴즈가 없습니다.
+        </div>
+        <button
+          className="mt-4 px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold text-white text-lg transition"
+          onClick={fetchQuestions}
+        >
+          다시 시도
+        </button>
+      </div>
+    );
+  }
+
+  // --- 이하 렌더링 코드는 기존과 동일합니다. ---
   const quiz = quizList[current];
 
-  // 선택지 선택
   const handleChoice = (idx) => {
     if (selected !== null) return;
-
     setSelected(idx);
-
-    // 결과 저장 및 다음 문제로 이동
     setTimeout(() => {
       const isCorrect = quiz.choices[idx].answer;
-      setAnswerResult((prev) => [
-        ...prev,
-        {
-          isCorrect,
-          selected: idx,
-          quiz,
-        },
-      ]);
+      setAnswerResult((prev) => [...prev, { isCorrect, selected: idx, quiz }]);
       if (current + 1 < quizList.length) {
         setCurrent((prev) => prev + 1);
         setSelected(null);
       } else {
         setIsFinished(true);
       }
-    }, 1100); // 1.1초 후 자동 다음 문제 or 결과화면
+    }, 1100);
   };
 
-  // "다시 풀기" 버튼 클릭
   const handleRetry = () => {
     fetchQuestions();
   };
 
-  // --- 결과 화면 ---
   if (isFinished) {
     return (
       <div className="min-h-screen flex flex-col items-center bg-[#11151b] px-2 py-8">
@@ -71,17 +102,13 @@ function StudyWord() {
           {answerResult.map((result, i) => {
             const { quiz, selected, isCorrect } = result;
             const userChoice = quiz.choices[selected];
-
+            const correctAnswer = quiz.choices.find((c) => c.answer);
             return (
               <div
                 key={i}
-                className={`flex items-center w-full px-4 py-3 rounded-md text-base font-medium 
-                  mb-2 
-                  ${
-                    isCorrect
-                      ? "bg-blue-700 text-white"
-                      : "bg-red-700 text-white"
-                  }`}
+                className={`flex items-center w-full px-4 py-3 rounded-md text-base font-medium mb-2 ${
+                  isCorrect ? "bg-blue-700 text-white" : "bg-red-700 text-white"
+                }`}
               >
                 <span className="mr-3 text-2xl">
                   {isCorrect ? (
@@ -91,11 +118,14 @@ function StudyWord() {
                   )}
                 </span>
                 <span className="flex-1">
-                  <span className="font-bold">
-                    {userChoice.word || userChoice.meaning}
-                  </span>
-                  <span className="mx-2">–</span>
-                  <span>{quiz.word || quiz.signDescription}</span>
+                  <strong className="font-bold">
+                    {quiz.word || quiz.signDescription}
+                  </strong>
+                  {!isCorrect && (
+                    <span className="text-sm opacity-80 ml-4">
+                      정답: {correctAnswer.word || correctAnswer.meaning}
+                    </span>
+                  )}
                 </span>
               </div>
             );
@@ -111,7 +141,6 @@ function StudyWord() {
     );
   }
 
-  // --- 문제 풀이 화면 ---
   return (
     <div className="min-h-screen flex flex-col items-center bg-[#11151b] px-2 relative">
       <div className="w-full flex flex-col items-center pt-10 relative">

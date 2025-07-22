@@ -21,9 +21,7 @@ function BasicLayout({ children }) {
         </div>
       ) : (
         // 그 외 페이지는 기본 그리드 목록
-        <div className="container mx-auto py-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 gap-6">
-          {children}
-        </div>
+        <div>{children}</div>
       )}
     </div>
   );

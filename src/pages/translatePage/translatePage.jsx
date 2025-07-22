@@ -6,9 +6,6 @@ import VideoButton from "../../components/button/videoButton";
 function TranslatePage() {
   return (
     <BasicLayout>
-      <AvatarButton />
-      <VideoButton />
-
       <div className="w-full ">
         <Outlet />
       </div>
