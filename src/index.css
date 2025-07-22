@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+/* react-calendar에 Tailwind CSS를 적용하기 위한 스타일 */
+.react-calendar {
+  @apply !w-full !max-w-md !border !border-gray-700 !bg-gray-800 !p-4 !rounded-lg !text-white;
+}
+
+/* 네비게이션 (월 이동 버튼) */
+.react-calendar__navigation button {
+  @apply !min-w-0 !px-4 !py-2 !rounded-md !text-gray-300 hover:!bg-gray-700;
+}
+.react-calendar__navigation__label {
+  @apply !font-bold !text-lg;
+}
+
+/* 요일 표시 */
+.react-calendar__month-view__weekdays__weekday {
+  @apply !p-2 !text-center !font-semibold !text-gray-400;
+}
+.react-calendar__month-view__weekdays__weekday abbr {
+  @apply !no-underline; /* 밑줄 제거 */
+}
+
+/* 날짜 타일 */
+.react-calendar__tile {
+  @apply !p-3 !rounded-md !text-gray-200 hover:!bg-gray-700 focus:!bg-blue-600;
+}
+.react-calendar__tile--now {
+  @apply !bg-blue-600 !text-white; /* 오늘 날짜 */
+}
+.react-calendar__tile--active {
+  @apply !bg-blue-700 !text-white; /* 선택된 날짜 */
+}

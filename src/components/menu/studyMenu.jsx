@@ -23,7 +23,7 @@ function StudyMenu() {
             }`
           }
         >
-          문장퀴즈
+          문장퀴즈(개발중)
         </NavLink>
       </div>
     </nav>
