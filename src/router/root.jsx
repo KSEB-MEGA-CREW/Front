@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import ProtectedRoute from "./protectedRoute";
 import StudyRouter from "./studyRouter";
 import TranslateRouter from "./translateRouter";
+import PublicRoute from "./publicRoute";
 
 // Lazy Loading => 직접 import로 변경
 import Main from "../pages/basicPage/mainPage";
@@ -14,11 +15,19 @@ import AuthCallback from "../components/authCallback";
 const router = createBrowserRouter([
   {
     path: "/login",
-    element: <Login />,
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
   },
   {
     path: "/signup",
-    element: <SignUp />,
+    element: (
+      <PublicRoute>
+        <SignUp />
+      </PublicRoute>
+    ),
   },
   // 기존 OAuth2 리다이렉트 핸들러 (호환성 유지)
   {

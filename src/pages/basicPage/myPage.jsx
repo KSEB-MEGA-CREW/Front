@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../store/authContext";
+import { useAuth } from "../../Context/authContext";
 import BasicLayout from "../../layouts/basicLayout";
 
 // 아이콘을 컴포넌트 내에 SVG로 직접 추가하여 별도 라이브러리 설치가 필요 없습니다.
