@@ -8,8 +8,6 @@ export default defineConfig({
     react(),
     tailwindcss(), // Tailwind CSS 플러그인 임포트
   ],
-});
-/*
   // 개발 서버 설정
   server: {
     port: 3000,
@@ -101,4 +99,3 @@ export default defineConfig({
     },
   },
 });
-*/
