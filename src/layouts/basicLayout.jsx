@@ -7,10 +7,12 @@ function BasicLayout({ children }) {
   const isStudyRoute = location.pathname.startsWith("/study");
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col bg-gray-100 text-white">
       <TopMenuComponent />
       {isStudyRoute && <StudyMenu />}
-      <div>{children}</div>
+
+      {/* TopMenu가 fixed일 경우를 고려해 위쪽 padding */}
+      <div className="">{children}</div>
     </div>
   );
 }

@@ -1,5 +1,4 @@
 import BasicLayout from "../../layouts/basicLayout";
-import StudyMenu from "../../components/menu/studyMenu";
 import { Outlet } from "react-router-dom";
 
 function StudyPage() {
