@@ -1,103 +1,90 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import LogoutButton from "../button/logoutButton";
+import { Menu, X, Home, Mic, BookOpen, User } from "lucide-react";
 
 function TopMenuComponent() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const menuItems = [
+    { to: "/translate", label: "양방향 수어 통역", icon: <Mic size={18} /> },
+    { to: "/study", label: "학습하기", icon: <BookOpen size={18} /> },
+    { to: "/myPage", label: "마이페이지", icon: <User size={18} /> },
+  ];
+
   return (
-    <nav className="bg-gray-800 p-4">
-      <div className="container mx-auto flex justify-between items-center">
-        <div className="text-white text-xl font-bold">
-          <NavLink
-            to="/"
-            className="text-white hover:text-yellow-300 transition"
-          >
-            수담, 手談
-          </NavLink>
-        </div>
+    <nav className="fixed top-0 left-0 w-full z-50 px-4 py-3 bg-gray-900/70 backdrop-blur-md border-b border-white/10 shadow-lg">
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* 로고 */}
+        <NavLink
+          to="/"
+          className="flex items-center space-x-2 text-xl font-bold text-white drop-shadow-neon"
+          onClick={() => setMobileOpen(false)}
+        >
+          <Home size={22} className="text-pink-400" />
+          <span className="hidden sm:inline">수담, 手談</span>
+        </NavLink>
+
         {/* 데스크탑 메뉴 */}
-        <div className="space-x-6 hidden md:flex">
-          <NavLink
-            to="/translate"
-            className="text-white hover:text-yellow-300 transition"
-          >
-            양방향 수어 통역
-          </NavLink>
-          <NavLink
-            to="/study"
-            className="text-white hover:text-yellow-300 transition"
-          >
-            학습하기
-          </NavLink>
-          <NavLink
-            to="/myPage"
-            className="text-white hover:text-yellow-300 transition"
-          >
-            마이페이지
-          </NavLink>
+        <div className="hidden md:flex flex-1 justify-center gap-8">
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `flex items-center gap-2 text-sm px-4 py-2 rounded-full transition-all duration-200 ${
+                  isActive
+                    ? "text-pink-400 bg-white/10 shadow-pink-500/30 shadow-md drop-shadow-md"
+                    : "text-white/80 hover:text-cyan-400 hover:bg-white/5"
+                }`
+              }
+            >
+              {item.icon}
+              {item.label}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* 로그아웃 버튼 */}
+        <div className="hidden md:block">
           <LogoutButton />
         </div>
-        {/* 모바일 메뉴 토글 버튼 */}
+
+        {/* 모바일 메뉴 버튼 */}
         <div className="md:hidden">
           <button
-            className="text-white focus:outline-none"
-            onClick={() => setMobileOpen((prev) => !prev)}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="text-white"
             aria-label="메뉴 열기"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            </svg>
+            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
+
       {/* 모바일 메뉴 */}
-      <div
-        className={`md:hidden bg-gray-800 p-4 space-y-2 ${
-          mobileOpen ? "" : "hidden"
-        }`}
-      >
-        <NavLink
-          to="/"
-          className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
-          onClick={() => setMobileOpen(false)}
-        >
-          수담, 手談
-        </NavLink>
-        <NavLink
-          to="/translate"
-          className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
-          onClick={() => setMobileOpen(false)}
-        >
-          양방향 수어 통역
-        </NavLink>
-        <NavLink
-          to="/study"
-          className="block text-white py-2s px-4 rounded hover:bg-gray-700 transition"
-          onClick={() => setMobileOpen(false)}
-        >
-          학습하기
-        </NavLink>
-        <NavLink
-          to="/myPage"
-          className="block text-white py-2 px-4 rounded hover:bg-gray-700 transition"
-          onClick={() => setMobileOpen(false)}
-        >
-          마이페이지
-        </NavLink>
-        <LogoutButton />
-      </div>
+      {mobileOpen && (
+        <div className="md:hidden mt-3 px-4 py-4 bg-gray-900/90 backdrop-blur-lg rounded-b-xl shadow-xl space-y-4 transition-all">
+          {menuItems.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              onClick={() => setMobileOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium transition-all ${
+                  isActive
+                    ? "text-pink-400 bg-white/10 shadow-pink-500/30 shadow-inner"
+                    : "text-white/80 hover:text-cyan-300 hover:bg-white/5"
+                }`
+              }
+            >
+              {item.icon}
+              {item.label}
+            </NavLink>
+          ))}
+          <LogoutButton />
+        </div>
+      )}
     </nav>
   );
 }

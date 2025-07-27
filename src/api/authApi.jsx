@@ -15,12 +15,12 @@ const apiRequest = async (url, options = {}) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
+        //"Cache-Control": "no-cache",
+        //Pragma: "no-cache",
         ...getAuthHeaders(),
         ...headers,
       },
-      credentials: "include",
+      //credentials: "include",
       cache: "no-cache",
       ...restOptions,
     });

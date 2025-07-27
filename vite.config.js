@@ -63,6 +63,7 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+
   },
 
   // ✅ 환경변수 설정 개선
@@ -98,3 +99,4 @@ export default defineConfig({
     },
   },
 });
+*/

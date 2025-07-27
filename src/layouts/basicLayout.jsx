@@ -7,22 +7,12 @@ function BasicLayout({ children }) {
   const isStudyRoute = location.pathname.startsWith("/study");
 
   return (
-    <div
-      className="min-h-screen w-full"
-      style={{ backgroundColor: isStudyRoute ? "#11151b" : undefined }}
-    >
+    <div className="min-h-screen flex flex-col bg-gray-100 text-white">
       <TopMenuComponent />
       {isStudyRoute && <StudyMenu />}
 
-      {isStudyRoute ? (
-        // 💡 study 하위 페이지에서는 가운데 정렬
-        <div className="flex items-center justify-center w-full px-4 py-10">
-          {children}
-        </div>
-      ) : (
-        // 그 외 페이지는 기본 그리드 목록
-        <div>{children}</div>
-      )}
+      {/* TopMenu가 fixed일 경우를 고려해 위쪽 padding */}
+      <div className="">{children}</div>
     </div>
   );
 }
