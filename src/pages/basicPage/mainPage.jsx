@@ -1,6 +1,5 @@
-import BasicLayout from "../../layouts/basicLayout";
 import { useState, useEffect } from "react";
-import { ChevronRight, Play, Users, Mic, BookOpen, Zap } from "lucide-react";
+import { Play, Users, Mic, BookOpen } from "lucide-react";
 import TopMenuComponent from "../../components/menu/topMenu";
 
 function MainPage() {
@@ -61,17 +60,19 @@ function MainPage() {
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
-      
+
       setScrollY(currentScrollY);
-      setScrollProgress((currentScrollY / (documentHeight - windowHeight)) * 100);
+      setScrollProgress(
+        (currentScrollY / (documentHeight - windowHeight)) * 100
+      );
     };
 
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener('scroll', handleScroll);
-    
+    window.addEventListener("scroll", handleScroll);
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -80,19 +81,19 @@ function MainPage() {
       icon: <Mic className="w-8 h-8" />,
       title: "실시간 수어 번역",
       description: "AI 기술로 수어와 음성을 실시간으로 번역합니다",
-      color: "from-blue-400 to-purple-500"
+      color: "from-blue-400 to-purple-500",
     },
     {
       icon: <Users className="w-8 h-8" />,
       title: "양방향 소통",
       description: "청각장애인과 청인 모두가 자연스럽게 대화할 수 있습니다",
-      color: "from-purple-400 to-pink-500"
+      color: "from-purple-400 to-pink-500",
     },
     {
       icon: <BookOpen className="w-8 h-8" />,
       title: "체계적인 학습",
       description: "단계별 수어 학습 프로그램을 제공합니다",
-      color: "from-pink-400 to-red-500"
+      color: "from-pink-400 to-red-500",
     },
   ];
 
@@ -100,7 +101,7 @@ function MainPage() {
     <div className="min-h-screen overflow-hidden relative">
       {/* 스크롤 진행도 바 */}
       <div className="fixed top-0 left-0 w-full h-1 bg-black/20 z-50">
-        <div 
+        <div
           className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 transition-all duration-300 ease-out"
           style={{ width: `${scrollProgress}%` }}
         />
@@ -113,15 +114,14 @@ function MainPage() {
             <div
               key={index}
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                scrollProgress > threshold 
-                  ? 'bg-cyan-400/80 scale-125 shadow-lg shadow-cyan-400/50' 
-                  : 'bg-white/20 scale-100'
+                scrollProgress > threshold
+                  ? "bg-cyan-400/80 scale-125 shadow-lg shadow-cyan-400/50"
+                  : "bg-white/20 scale-100"
               }`}
             />
           ))}
         </div>
       </div>
-
 
       {/* TopMenu - 달 안에 배치 */}
       <div className="absolute top-0 left-0 w-full z-40">
@@ -132,9 +132,9 @@ function MainPage() {
       <div className="fixed inset-0 -z-10">
         <div
           className="w-full h-full bg-cover bg-center transition-transform duration-200"
-          style={{ 
+          style={{
             backgroundImage: "url('/assets/back7.jpg')",
-            transform: `translateY(${scrollY * 0.2}px)`
+            transform: `translateY(${scrollY * 0.2}px)`,
           }}
         />
       </div>
@@ -150,10 +150,11 @@ function MainPage() {
               top: `${star.y}%`,
               width: `${star.size}px`,
               height: `${star.size}px`,
-              background: 'radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(147,51,234,0.4) 50%, transparent 100%)',
-              borderRadius: '50%',
+              background:
+                "radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(147,51,234,0.4) 50%, transparent 100%)",
+              borderRadius: "50%",
               animationDelay: `${star.twinkleSpeed}s`,
-              animationDuration: `${2 + star.twinkleSpeed}s`
+              animationDuration: `${2 + star.twinkleSpeed}s`,
             }}
           />
         ))}
@@ -170,8 +171,9 @@ function MainPage() {
               top: `${particle.y}%`,
               width: `${particle.size}px`,
               height: `${particle.size}px`,
-              background: 'linear-gradient(45deg, rgba(59,130,246,0.6), rgba(147,51,234,0.6))',
-              animationDelay: `${particle.speed}s`
+              background:
+                "linear-gradient(45deg, rgba(59,130,246,0.6), rgba(147,51,234,0.6))",
+              animationDelay: `${particle.speed}s`,
             }}
           />
         ))}
@@ -196,39 +198,45 @@ function MainPage() {
           style={{
             left: `${mousePosition.x}%`,
             top: `${mousePosition.y}%`,
-            transform: 'translate(-50%, -50%)',
+            transform: "translate(-50%, -50%)",
             background: `radial-gradient(circle, 
-              rgba(100, 130, 246, ${0.1 + Math.sin(Date.now() * 0.001) * 0.05}) 30%,
-              rgba(147, 100, 234, ${0.08 + Math.cos(Date.now() * 0.0015) * 0.04}) 50%,
-              rgba(236, 100, 200, ${0.05 + Math.sin(Date.now() * 0.002) * 0.03}) 60%,
+              rgba(100, 130, 246, ${
+                0.1 + Math.sin(Date.now() * 0.001) * 0.05
+              }) 30%,
+              rgba(147, 100, 234, ${
+                0.08 + Math.cos(Date.now() * 0.0015) * 0.04
+              }) 50%,
+              rgba(236, 100, 200, ${
+                0.05 + Math.sin(Date.now() * 0.002) * 0.03
+              }) 60%,
               transparent 100%
             )`,
-            filter: 'blur(40px)',
-            opacity: 0.6
+            filter: "blur(40px)",
+            opacity: 0.6,
           }}
         />
       </div>
 
       {/* 메인 콘텐츠 중앙 정렬 */}
-      <main 
+      <main
         className="relative z-20 flex flex-col items-center justify-center min-h-screen text-center px-6"
-        style={{ 
+        style={{
           transform: `translateY(${scrollY * -0.3}px)`,
-          opacity: Math.max(1 - scrollProgress / 25, 0.1)
+          opacity: Math.max(1 - scrollProgress / 25, 0.1),
         }}
       >
-        <h1 
+        <h1
           className="text-5xl md:text-6xl font-bold text-white drop-shadow-2xl mb-6 transition-all duration-700 animate-pulse-glow"
           style={{
-            transform: `scale(${1 - scrollProgress * 0.002})`
+            transform: `scale(${1 - scrollProgress * 0.002})`,
           }}
         >
           수어 통역이 더 가까워집니다
         </h1>
-        <p 
+        <p
           className="text-xl text-white/90 max-w-xl mb-10 transition-all duration-700 drop-shadow-lg"
           style={{
-            opacity: Math.max(1 - scrollProgress / 20, 0.5)
+            opacity: Math.max(1 - scrollProgress / 20, 0.5),
           }}
         >
           AI 기술로 수어와 음성을 실시간으로 번역하여, 청각장애인과 청인 간의
@@ -242,10 +250,10 @@ function MainPage() {
         </button>
 
         {/* 스크롤 다운 인디케이터 */}
-        <div 
+        <div
           className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce"
           style={{
-            opacity: Math.max(1 - scrollProgress / 10, 0)
+            opacity: Math.max(1 - scrollProgress / 10, 0),
           }}
         >
           <div className="flex flex-col items-center space-y-2">
@@ -258,10 +266,10 @@ function MainPage() {
       </main>
 
       {/* 기능 소개 섹션 */}
-      <section 
+      <section
         className="relative z-20 py-24 bg-gradient-to-b from-transparent to-black/20"
-        style={{ 
-          transform: `translateY(${scrollY * -0.1}px)`
+        style={{
+          transform: `translateY(${scrollY * -0.1}px)`,
         }}
       >
         <div className="container mx-auto px-6">
@@ -320,42 +328,55 @@ function MainPage() {
                   title: "실생활 솔루션",
                   description: `병원, 관공서, 교육기관 등 다양한 현장에서\n실시간 수어 통역은 소통의 해결책이 됩니다.\n`,
                   image: "/assets/imagecard01.png",
-                  side: "left"
+                  side: "left",
                 },
                 {
                   title: "AI 기술과 수어의 만남",
                   description: `인공지능 기반 실시간 번역 기술을 활용하여,\n수어와 음성/텍스트 간의 자연스러운 양방향 소통을 가능케 합니다.\n기술은 수어를 이해하고, 우리는 사람을 이해합니다.`,
                   image: "/assets/imagecard04.png",
-                  side: "right"
+                  side: "right",
                 },
                 {
                   title: "배움과 확장성",
                   description: `수어 학습기능을 지원하여 더 넓은 세상과 \n연결합니다.\n수어는 언어이자, 배움의 시작입니다.`,
                   image: "/assets/imagecard02.png",
-                  side: "left"
+                  side: "left",
                 },
                 {
                   title: "함께 만들어가는 수어 플랫폼",
                   description: `누구나 참여할 수 있는 열린 기술.\n이건 단순한 서비스가 아니라 '공존의 기술'입니다.`,
                   image: "/assets/imagecard03.png",
-                  side: "right"
-                }
+                  side: "right",
+                },
               ].map((item, index) => (
                 <div
                   key={index}
-                  className={`flex items-center ${item.side === 'right' ? 'flex-row-reverse' : ''}`}
+                  className={`flex items-center ${
+                    item.side === "right" ? "flex-row-reverse" : ""
+                  }`}
                   style={{
-                    opacity: scrollProgress > (60 + index * 10) ? 1 : 0.3,
-                    transform: `translateY(${Math.max(0, scrollY - (1000 + index * 200)) * -0.05}px)`,
-                    transition: 'all 0.8s ease-out'
+                    opacity: scrollProgress > 60 + index * 10 ? 1 : 0.3,
+                    transform: `translateY(${
+                      Math.max(0, scrollY - (1000 + index * 200)) * -0.05
+                    }px)`,
+                    transition: "all 0.8s ease-out",
                   }}
                 >
                   {/* 카드 본체 */}
-                  <div className={`w-1/2 ${item.side === 'right' ? 'pl-8' : 'pr-8'}`}>
+                  <div
+                    className={`w-1/2 ${
+                      item.side === "right" ? "pl-8" : "pr-8"
+                    }`}
+                  >
                     <div className="relative group bg-black/30 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:bg-black/40 transition-all duration-500 transform hover:scale-105">
-                      
                       {/* Hover 시 등장할 이미지 */}
-                      <div className={`absolute z-20 hidden md:block ${item.side === 'right' ? 'right-[calc(100%+75px)]' : 'left-[calc(100%+75px)]'} top-[0px] w-64 h-40 opacity-0 group-hover:opacity-100 transition-all duration-500 transform scale-90 group-hover:scale-100 rounded-xl overflow-hidden shadow-xl`}>
+                      <div
+                        className={`absolute z-20 hidden md:block ${
+                          item.side === "right"
+                            ? "right-[calc(100%+75px)]"
+                            : "left-[calc(100%+75px)]"
+                        } top-[0px] w-64 h-40 opacity-0 group-hover:opacity-100 transition-all duration-500 transform scale-90 group-hover:scale-100 rounded-xl overflow-hidden shadow-xl`}
+                      >
                         <img
                           src={item.image}
                           alt={`${item.title} 이미지`}
@@ -365,7 +386,9 @@ function MainPage() {
 
                       {/* 카드 내부 텍스트 */}
                       <div className="relative z-10">
-                        <h3 className="text-2xl font-bold text-white mb-4">{item.title}</h3>
+                        <h3 className="text-2xl font-bold text-white mb-4">
+                          {item.title}
+                        </h3>
                         <p className="text-white/90 leading-relaxed whitespace-pre-line">
                           {item.description}
                         </p>
@@ -376,7 +399,11 @@ function MainPage() {
                   {/* 연결점 */}
                   <div className="relative">
                     <div className="w-6 h-6 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full border-4 border-white/20 shadow-lg shadow-blue-500/30 animate-pulse"></div>
-                    <div className={`absolute top-1/2 ${item.side === 'right' ? 'right-6' : 'left-6'} w-8 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500`}></div>
+                    <div
+                      className={`absolute top-1/2 ${
+                        item.side === "right" ? "right-6" : "left-6"
+                      } w-8 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500`}
+                    ></div>
                   </div>
 
                   {/* 빈 공간 */}
@@ -391,44 +418,94 @@ function MainPage() {
       {/* CSS 애니메이션 정의 */}
       <style jsx>{`
         @keyframes twinkle {
-          0%, 100% { opacity: 0.3; transform: scale(1); }
-          50% { opacity: 1; transform: scale(1.2); }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-10px) rotate(120deg); }
-          66% { transform: translateY(5px) rotate(240deg); }
-        }
-        
-        @keyframes shootingStar {
-          0% { transform: translateX(-100px) translateY(-100px) rotate(45deg); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateX(100vw) translateY(100vh) rotate(45deg); opacity: 0; }
-        }
-        
-        @keyframes pulseGlow {
-          0%, 100% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.3); }
-          50% { box-shadow: 0 0 40px rgba(147, 51, 234, 0.6), 0 0 60px rgba(59, 130, 246, 0.4); }
-        }
-        
-        @keyframes orbitSlow {
-          0% { transform: rotate(0deg) translateX(200px) rotate(0deg); }
-          100% { transform: rotate(360deg) translateX(200px) rotate(-360deg); }
-        }
-        
-        @keyframes orbitFast {
-          0% { transform: rotate(0deg) translateX(150px) rotate(0deg); }
-          100% { transform: rotate(-360deg) translateX(150px) rotate(360deg); }
+          0%,
+          100% {
+            opacity: 0.3;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.2);
+          }
         }
 
-        .animate-twinkle { animation: twinkle 2s ease-in-out infinite; }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-shooting-star { animation: shootingStar 3s linear infinite; }
-        .animate-pulse-glow { animation: pulseGlow 4s ease-in-out infinite; }
-        .animate-orbit-slow { animation: orbitSlow 20s linear infinite; }
-        .animate-orbit-fast { animation: orbitFast 15s linear infinite; }
+        @keyframes float {
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          33% {
+            transform: translateY(-10px) rotate(120deg);
+          }
+          66% {
+            transform: translateY(5px) rotate(240deg);
+          }
+        }
+
+        @keyframes shootingStar {
+          0% {
+            transform: translateX(-100px) translateY(-100px) rotate(45deg);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            transform: translateX(100vw) translateY(100vh) rotate(45deg);
+            opacity: 0;
+          }
+        }
+
+        @keyframes pulseGlow {
+          0%,
+          100% {
+            box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
+          }
+          50% {
+            box-shadow: 0 0 40px rgba(147, 51, 234, 0.6),
+              0 0 60px rgba(59, 130, 246, 0.4);
+          }
+        }
+
+        @keyframes orbitSlow {
+          0% {
+            transform: rotate(0deg) translateX(200px) rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg) translateX(200px) rotate(-360deg);
+          }
+        }
+
+        @keyframes orbitFast {
+          0% {
+            transform: rotate(0deg) translateX(150px) rotate(0deg);
+          }
+          100% {
+            transform: rotate(-360deg) translateX(150px) rotate(360deg);
+          }
+        }
+
+        .animate-twinkle {
+          animation: twinkle 2s ease-in-out infinite;
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+        .animate-shooting-star {
+          animation: shootingStar 3s linear infinite;
+        }
+        .animate-pulse-glow {
+          animation: pulseGlow 4s ease-in-out infinite;
+        }
+        .animate-orbit-slow {
+          animation: orbitSlow 20s linear infinite;
+        }
+        .animate-orbit-fast {
+          animation: orbitFast 15s linear infinite;
+        }
       `}</style>
     </div>
   );

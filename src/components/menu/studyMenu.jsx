@@ -2,13 +2,14 @@
 import { NavLink } from "react-router-dom";
 
 function StudyMenu() {
+  console.log("ge");
   return (
     <nav className="bg-gray-900 w-full shadow-sm border-b border-gray-800">
       <div className="container mx-auto flex items-center justify-start space-x-8 px-4 h-12">
         <NavLink
           to="/study/word"
           className={({ isActive }) =>
-            `text-black text-base hover:text-yellow-300 transition ${
+            `text-white text-base hover:text-yellow-300 transition ${
               isActive ? "font-bold text-yellow-300" : ""
             }`
           }
