@@ -122,15 +122,6 @@ function MainPage() {
         </div>
       </div>
 
-      {/* 반달 - 중앙 상단 배치, 아래쪽이 둥근 형태 */}
-      <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-48 z-30 overflow-hidden">
-        <div className="relative w-full h-full">
-          {/* 달 빛 효과 
-         <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-[250px] h-[250px]">
-  <img src="/assets/moon.png" alt="moon" className="w-full h-full object-contain opacity-80" />
-</div> */}
-        </div>
-      </div>
 
       {/* TopMenu - 달 안에 배치 */}
       <div className="absolute top-0 left-0 w-full z-40">
