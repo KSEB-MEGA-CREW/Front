@@ -8,7 +8,7 @@ function StudyMenu() {
         <NavLink
           to="/study/word"
           className={({ isActive }) =>
-            `text-white text-base hover:text-yellow-300 transition ${
+            `text-black text-base hover:text-yellow-300 transition ${
               isActive ? "font-bold text-yellow-300" : ""
             }`
           }
