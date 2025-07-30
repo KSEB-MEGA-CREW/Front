@@ -1,0 +1,25 @@
+// 프레임 추출 관련 설정 상수
+
+export const VIDEO_CONFIG = {
+    FRAME_RATE: 10, // 10fps 고정
+    FRAME_INTERVAL: 100, // 100ms
+    CANVAS_WIDTH: 640,
+    CANVAS_HEIGHT: 480,
+    QUALITY: 0.8, // JPEG 품질
+    MAX_FILE_SIZE: 50 * 1024, // 50KB
+};
+
+export const API_CONFIG = {
+    BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
+    ENDPOINTS: {
+        ANALYZE_FRAME: '/api/signlanguage/analyze',
+        HEALTH_CHECK: '/api/signlanguage/health'
+    },
+    TIMEOUT: 5000,
+    MAX_RETRIES: 3
+};
+
+export const SESSION_CONFIG = {
+    GENERATE_UUID: () => crypto.randomUUID(),
+    TIMEOUT_MINUTES: 30
+}
