@@ -2,10 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 
-
 export default function SignUpPage() {
   // 백엔드 UserSignupRequest에 맞춘 필드명 수정 => 앞으로도 백엔드의 dto 참고하여 필드명 작성 부탁드립니다!!
-  const[formData, setFormData] = useState({
+  const [formData, setFormData] = useState({
     username: "", // nickname -> username
     email: "",
     password: "",
@@ -17,8 +16,8 @@ export default function SignUpPage() {
   const [loading, setLoading] = useState(false);
 
   // 마우스 위치 상태
-  const [mousePosition, setMousePosition] = useState({x:50, y:50});
-  
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,12 +34,12 @@ export default function SignUpPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-    
+
     // 실시간 에러 제거
     if (errors[name]) {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -51,36 +50,38 @@ export default function SignUpPage() {
 
     // 사용자명 검증
     if (!formData.username) {
-      newErrors.username = '사용자명을 입력해주세요.';
+      newErrors.username = "사용자명을 입력해주세요.";
     } else if (formData.username.length < 2 || formData.username.length > 20) {
-      newErrors.username = '사용자명은 2자 이상 20자 이하여야 합니다.';
+      newErrors.username = "사용자명은 2자 이상 20자 이하여야 합니다.";
     }
 
     // 이메일 검증
     if (!formData.email) {
-      newErrors.email = '이메일을 입력해주세요.';
+      newErrors.email = "이메일을 입력해주세요.";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = '올바른 이메일 형식을 입력해주세요.';
+      newErrors.email = "올바른 이메일 형식을 입력해주세요.";
     }
 
     // 비밀번호 검증 (백엔드 규칙에 맞춤)
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
+    const passwordRegex =
+      /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!formData.password) {
-      newErrors.password = '비밀번호를 입력해주세요.';
+      newErrors.password = "비밀번호를 입력해주세요.";
     } else if (!passwordRegex.test(formData.password)) {
-      newErrors.password = '비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.';
+      newErrors.password =
+        "비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.";
     }
 
     // 비밀번호 확인 검증
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = '비밀번호 확인을 입력해주세요.';
+      newErrors.confirmPassword = "비밀번호 확인을 입력해주세요.";
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다.';
+      newErrors.confirmPassword = "비밀번호가 일치하지 않습니다.";
     }
 
     // 청각상태 검증
     if (!formData.hearing) {
-      newErrors.hearing = '청각상태를 선택해주세요.';
+      newErrors.hearing = "청각상태를 선택해주세요.";
     }
 
     setErrors(newErrors);
@@ -89,14 +90,14 @@ export default function SignUpPage() {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
     setErrors({});
-    
+
     try {
       // 백엔드 UserSignupRequest에 맞춘 데이터 구조
       const signupData = {
@@ -106,7 +107,7 @@ export default function SignUpPage() {
         hearing: formData.hearing,
       };
 
-      console.log('회원가입 요청 데이터:', signupData);
+      console.log("회원가입 요청 데이터:", signupData);
 
       const response = await authApi.signup(signupData);
 
@@ -117,17 +118,22 @@ export default function SignUpPage() {
         setErrors({ submit: response.message || "회원가입에 실패했습니다." });
       }
     } catch (error) {
-      console.error('회원가입 오류:', error);
-      
+      console.error("회원가입 오류:", error);
+
       // 서버 에러 메시지 파싱
-      if (error.message.includes('이미 존재하는 이메일')) {
-        setErrors({ email: '이미 존재하는 이메일입니다.' });
-      } else if (error.message.includes('이미 존재하는 닉네임')) {
-        setErrors({ username: '이미 존재하는 사용자명입니다.' });
-      } else if (error.message.includes('비밀번호는 8자 이상')) {
-        setErrors({ password: '비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.' });
+      if (error.message.includes("이미 존재하는 이메일")) {
+        setErrors({ email: "이미 존재하는 이메일입니다." });
+      } else if (error.message.includes("이미 존재하는 닉네임")) {
+        setErrors({ username: "이미 존재하는 사용자명입니다." });
+      } else if (error.message.includes("비밀번호는 8자 이상")) {
+        setErrors({
+          password:
+            "비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다.",
+        });
       } else {
-        setErrors({ submit: error.message || "회원가입 중 오류가 발생했습니다." });
+        setErrors({
+          submit: error.message || "회원가입 중 오류가 발생했습니다.",
+        });
       }
     } finally {
       setLoading(false);
@@ -219,7 +225,7 @@ export default function SignUpPage() {
               className="text-8xl font-thin mb-8 tracking-widest"
               style={{ fontFamily: "Georgia, serif" }}
             >
-              수담
+              수담, 手談
             </h1>
             <p
               className="text-3xl font-light mb-6 tracking-wide"
@@ -275,7 +281,9 @@ export default function SignUpPage() {
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
-              {errors.username && <p className= "text-sm text-red-400 mt-1">{errors.username}</p>}
+              {errors.username && (
+                <p className="text-sm text-red-400 mt-1">{errors.username}</p>
+              )}
               {/*이메일 입력*/}
               <input
                 name="email"
@@ -286,7 +294,9 @@ export default function SignUpPage() {
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
-              {errors.email && <p className="text-sm text-red-400 mt-1">{errors.email}</p>}
+              {errors.email && (
+                <p className="text-sm text-red-400 mt-1">{errors.email}</p>
+              )}
               {/* 비밀번호 입력 */}
               <input
                 name="password"
@@ -297,7 +307,9 @@ export default function SignUpPage() {
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
-              {errors.password && <p className="text-sm text-red-400 mt-1">{errors.password}</p>}
+              {errors.password && (
+                <p className="text-sm text-red-400 mt-1">{errors.password}</p>
+              )}
               {/* 비밀번호 확인 */}
               <input
                 name="confirmPassword"
@@ -308,7 +320,11 @@ export default function SignUpPage() {
                 required
                 className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
               />
-              {errors.confirmPassword && <p className="text-sm text-red-400 mt-1">{errors.confirmPassword}</p>}
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-400 mt-1">
+                  {errors.confirmPassword}
+                </p>
+              )}
               {/* 청각 */}
               <div>
                 <label className="block text-white/70 mb-1 font-semibold">
@@ -338,7 +354,9 @@ export default function SignUpPage() {
                   </label>
                 </div>
               </div>
-              {errors.hearing && <p className="text-sm text-red-400">{errors.hearing}</p>}
+              {errors.hearing && (
+                <p className="text-sm text-red-400">{errors.hearing}</p>
+              )}
               <button
                 type="submit"
                 disabled={loading}
