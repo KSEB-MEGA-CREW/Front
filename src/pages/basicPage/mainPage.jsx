@@ -1,18 +1,27 @@
 import { useState, useEffect } from "react";
-import { Play, Users, Mic, BookOpen } from "lucide-react";
+import { Users, Mic, BookOpen } from "lucide-react";
 import TopMenuComponent from "../../components/menu/topMenu";
 
 function MainPage() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [stars, setStars] = useState([]);
   const [particles, setParticles] = useState([]);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
+  // 방문자 수 (랜덤 임시값, 실제 서비스 연동 시 API 사용)
+  const [todayUsers, setTodayUsers] = useState(
+    230 + Math.floor(Math.random() * 70)
+  );
 
   // 별과 입자 생성
   useEffect(() => {
-    // 반짝이는 별들 생성
     const generateStars = () => {
+      if (reduceMotion) {
+        setStars([]);
+        return;
+      }
       const newStars = [];
       for (let i = 0; i < 100; i++) {
         newStars.push({
@@ -27,8 +36,11 @@ function MainPage() {
       setStars(newStars);
     };
 
-    // 떠다니는 입자들 생성
     const generateParticles = () => {
+      if (reduceMotion) {
+        setParticles([]);
+        return;
+      }
       const newParticles = [];
       for (let i = 0; i < 50; i++) {
         newParticles.push({
@@ -45,7 +57,7 @@ function MainPage() {
 
     generateStars();
     generateParticles();
-  }, []);
+  }, [reduceMotion]);
 
   // 마우스 위치 및 스크롤 추적
   useEffect(() => {
@@ -55,7 +67,6 @@ function MainPage() {
         y: (e.clientY / window.innerHeight) * 100,
       });
     };
-
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
@@ -67,30 +78,34 @@ function MainPage() {
       );
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
+    if (!reduceMotion) {
+      window.addEventListener("mousemove", handleMouseMove);
+    }
     window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      if (!reduceMotion) {
+        window.removeEventListener("mousemove", handleMouseMove);
+      }
       window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [reduceMotion]);
 
   const features = [
     {
-      icon: <Mic className="w-8 h-8" />,
+      icon: <Mic className="w-8 h-8" aria-label="실시간 수어 번역 아이콘" />,
       title: "실시간 수어 번역",
       description: "AI 기술로 수어와 음성을 실시간으로 번역합니다",
       color: "from-blue-400 to-purple-500",
     },
     {
-      icon: <Users className="w-8 h-8" />,
+      icon: <Users className="w-8 h-8" aria-label="양방향 소통 아이콘" />,
       title: "양방향 소통",
       description: "청각장애인과 청인 모두가 자연스럽게 대화할 수 있습니다",
       color: "from-purple-400 to-pink-500",
     },
     {
-      icon: <BookOpen className="w-8 h-8" />,
+      icon: <BookOpen className="w-8 h-8" aria-label="체계적인 학습 아이콘" />,
       title: "체계적인 학습",
       description: "단계별 수어 학습 프로그램을 제공합니다",
       color: "from-pink-400 to-red-500",
@@ -100,15 +115,21 @@ function MainPage() {
   return (
     <div className="min-h-screen overflow-hidden relative">
       {/* 스크롤 진행도 바 */}
-      <div className="fixed top-0 left-0 w-full h-1 bg-black/20 z-50">
+      <div
+        className="fixed top-0 left-0 w-full h-1 bg-black/20 z-50"
+        aria-hidden
+      >
         <div
-          className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 transition-all duration-300 ease-out"
+          className="h-full bg-gradienat-to-r from-purple-500 via-blue-500 to-cyan-400 transition-all duration-300 ease-out"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
 
       {/* 플로팅 스크롤 인디케이터 */}
-      <div className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40">
+      <div
+        className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40"
+        aria-hidden
+      >
         <div className="flex flex-col space-y-2">
           {[0, 25, 50, 75, 100].map((threshold, index) => (
             <div
@@ -123,101 +144,118 @@ function MainPage() {
         </div>
       </div>
 
-      {/* TopMenu - 달 안에 배치 */}
-      <div className="absolute top-0 left-0 w-full z-40">
+      {/* TopMenu */}
+      <div className="absolute top-0 left-0 w-full z-40" role="navigation">
         <TopMenuComponent />
       </div>
 
       {/* 패럴랙스 배경 */}
-      <div className="fixed inset-0 -z-10">
+      <div className="fixed inset-0 -z-10" aria-hidden>
         <div
           className="w-full h-full bg-cover bg-center transition-transform duration-200"
           style={{
             backgroundImage: "url('/assets/back7.jpg')",
-            transform: `translateY(${scrollY * 0.2}px)`,
+            transform: reduceMotion
+              ? undefined
+              : `translateY(${scrollY * 0.2}px)`,
           }}
         />
       </div>
 
-      {/* 반짝이는 별들 */}
-      <div className="fixed inset-0 pointer-events-none z-5">
-        {stars.map((star) => (
+      {/* 별/파티클 효과 */}
+      {!reduceMotion && (
+        <>
+          <div className="fixed inset-0 pointer-events-none z-5" aria-hidden>
+            {stars.map((star) => (
+              <div
+                key={star.id}
+                className="absolute animate-twinkle"
+                style={{
+                  left: `${star.x}%`,
+                  top: `${star.y}%`,
+                  width: `${star.size}px`,
+                  height: `${star.size}px`,
+                  background:
+                    "radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(147,51,234,0.4) 50%, transparent 100%)",
+                  borderRadius: "50%",
+                  animationDelay: `${star.twinkleSpeed}s`,
+                  animationDuration: `${2 + star.twinkleSpeed}s`,
+                }}
+              />
+            ))}
+          </div>
+          <div className="fixed inset-0 pointer-events-none z-6" aria-hidden>
+            {particles.map((particle) => (
+              <div
+                key={particle.id}
+                className="absolute animate-float rounded-full"
+                style={{
+                  left: `${particle.x}%`,
+                  top: `${particle.y}%`,
+                  width: `${particle.size}px`,
+                  height: `${particle.size}px`,
+                  background:
+                    "linear-gradient(45deg, rgba(59,130,246,0.6), rgba(147,51,234,0.6))",
+                  animationDelay: `${particle.speed}s`,
+                }}
+              />
+            ))}
+          </div>
+          {/* 궤도 애니메이션 */}
           <div
-            key={star.id}
-            className="absolute animate-twinkle"
+            className="fixed inset-0 pointer-events-none z-8 flex items-center justify-center"
+            aria-hidden
+          >
+            <div className="relative">
+              <div className="animate-orbit-slow">
+                <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full shadow-lg shadow-blue-400/50"></div>
+              </div>
+              <div className="animate-orbit-fast">
+                <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full shadow-lg shadow-cyan-400/50"></div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* 마우스 오로라 효과 */}
+      {!reduceMotion && (
+        <div className="fixed inset-0 pointer-events-none z-9" aria-hidden>
+          <div
+            className="absolute w-96 h-96 rounded-full transition-all duration-1000 ease-out"
             style={{
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              background:
-                "radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(147,51,234,0.4) 50%, transparent 100%)",
-              borderRadius: "50%",
-              animationDelay: `${star.twinkleSpeed}s`,
-              animationDuration: `${2 + star.twinkleSpeed}s`,
+              left: `${mousePosition.x}%`,
+              top: `${mousePosition.y}%`,
+              transform: "translate(-50%, -50%)",
+              background: `radial-gradient(circle, 
+                rgba(100, 130, 246, ${
+                  0.1 + Math.sin(Date.now() * 0.001) * 0.05
+                }) 30%,
+                rgba(147, 100, 234, ${
+                  0.08 + Math.cos(Date.now() * 0.0015) * 0.04
+                }) 50%,
+                rgba(236, 100, 200, ${
+                  0.05 + Math.sin(Date.now() * 0.002) * 0.03
+                }) 60%,
+                transparent 100%
+              )`,
+              filter: "blur(40px)",
+              opacity: 0.6,
             }}
           />
-        ))}
-      </div>
-
-      {/* 떠다니는 입자들 */}
-      <div className="fixed inset-0 pointer-events-none z-6">
-        {particles.map((particle) => (
-          <div
-            key={particle.id}
-            className="absolute animate-float rounded-full"
-            style={{
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              background:
-                "linear-gradient(45deg, rgba(59,130,246,0.6), rgba(147,51,234,0.6))",
-              animationDelay: `${particle.speed}s`,
-            }}
-          />
-        ))}
-      </div>
-
-      {/* 궤도 도는 요소들 */}
-      <div className="fixed inset-0 pointer-events-none z-8 flex items-center justify-center">
-        <div className="relative">
-          <div className="animate-orbit-slow">
-            <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full shadow-lg shadow-blue-400/50"></div>
-          </div>
-          <div className="animate-orbit-fast">
-            <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full shadow-lg shadow-cyan-400/50"></div>
-          </div>
         </div>
-      </div>
+      )}
 
-      {/* 마우스 반응형 오로라 효과 */}
-      <div className="fixed inset-0 pointer-events-none z-9">
-        <div
-          className="absolute w-96 h-96 rounded-full transition-all duration-1000 ease-out"
-          style={{
-            left: `${mousePosition.x}%`,
-            top: `${mousePosition.y}%`,
-            transform: "translate(-50%, -50%)",
-            background: `radial-gradient(circle, 
-              rgba(100, 130, 246, ${
-                0.1 + Math.sin(Date.now() * 0.001) * 0.05
-              }) 30%,
-              rgba(147, 100, 234, ${
-                0.08 + Math.cos(Date.now() * 0.0015) * 0.04
-              }) 50%,
-              rgba(236, 100, 200, ${
-                0.05 + Math.sin(Date.now() * 0.002) * 0.03
-              }) 60%,
-              transparent 100%
-            )`,
-            filter: "blur(40px)",
-            opacity: 0.6,
-          }}
-        />
-      </div>
+      {/* 애니메이션 축소/해제 토글 */}
+      <button
+        className="fixed bottom-7 right-7 z-50 rounded-xl bg-white/80 px-4 py-2 shadow-lg text-sm font-medium opacity-80 hover:opacity-100 transition"
+        onClick={() => setReduceMotion((r) => !r)}
+        aria-pressed={reduceMotion}
+      >
+        {reduceMotion ? "애니메이션 ON" : "애니메이션 축소"}
+      </button>
 
-      {/* 메인 콘텐츠 중앙 정렬 */}
+      {/* 메인 콘텐츠 */}
       <main
         className="relative z-20 flex flex-col items-center justify-center min-h-screen text-center px-6"
         style={{
@@ -231,7 +269,7 @@ function MainPage() {
             transform: `scale(${1 - scrollProgress * 0.002})`,
           }}
         >
-          수어 통역이 더 가까워집니다
+          수어 통역이 <span className="text-blue-300">더 가까워집니다</span>
         </h1>
         <p
           className="text-xl text-white/90 max-w-xl mb-10 transition-all duration-700 drop-shadow-lg"
@@ -243,11 +281,29 @@ function MainPage() {
           원활한 소통을 지원합니다.
         </p>
 
-        {/* 플레이 버튼 - 개선된 디자인 */}
-        <button className="relative z-20 w-20 h-20 bg-white/10 backdrop-blur-sm border-2 border-white/30 rounded-full flex items-center justify-center hover:bg-white/20 transition-all duration-300 mb-12 hover:scale-110 hover:shadow-2xl hover:shadow-blue-500/30 animate-pulse-glow">
-          <Play className="w-8 h-8 text-white ml-1" />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/20 to-purple-500/20 animate-pulse"></div>
-        </button>
+        {/* CTA 버튼 추가 */}
+        <a
+          href="/translate"
+          className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold px-8 py-4 rounded-full shadow-lg shadow-purple-400/20 mb-10 hover:scale-105 transition transform hover:shadow-2xl hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          tabIndex={0}
+          aria-label="양방향 수어 통역 체험 바로가기"
+        >
+          지금 바로 체험하기
+        </a>
+
+        {/* 실시간(?) 통계/후기 */}
+        <div className="flex flex-col items-center mb-6">
+          <span className="text-white/70 text-base font-medium mb-1">
+            오늘{" "}
+            <strong className="text-cyan-300 text-xl">
+              {todayUsers.toLocaleString()}
+            </strong>
+            명이 통역 서비스를 체험했어요!
+          </span>
+          <span className="text-sm text-white/50">
+            이용자분들의 소중한 경험이 쌓이고 있습니다
+          </span>
+        </div>
 
         {/* 스크롤 다운 인디케이터 */}
         <div
@@ -255,6 +311,7 @@ function MainPage() {
           style={{
             opacity: Math.max(1 - scrollProgress / 10, 0),
           }}
+          aria-hidden
         >
           <div className="flex flex-col items-center space-y-2">
             <span className="text-white/70 text-sm">아래로 스크롤</span>
@@ -379,7 +436,7 @@ function MainPage() {
                       >
                         <img
                           src={item.image}
-                          alt={`${item.title} 이미지`}
+                          alt={`${item.title} 일러스트`}
                           className="w-full h-full object-cover rounded-xl"
                         />
                       </div>
@@ -415,6 +472,31 @@ function MainPage() {
         </div>
       </section>
 
+      {/* Footer */}
+      <footer className="relative z-30 flex flex-col items-center justify-center w-full py-10 bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white/70 text-sm">
+        <div className="flex flex-row flex-wrap gap-5 mb-3">
+          <a
+            href="/about"
+            className="hover:text-cyan-300 underline underline-offset-4 transition"
+          >
+            서비스 소개
+          </a>
+          <a
+            href="mailto:support@sudam.com"
+            className="hover:text-cyan-300 underline underline-offset-4 transition"
+          >
+            문의처
+          </a>
+          <a
+            href="/privacy"
+            className="hover:text-cyan-300 underline underline-offset-4 transition"
+          >
+            개인정보처리방침
+          </a>
+        </div>
+        <div>© {new Date().getFullYear()} 수담. All rights reserved.</div>
+      </footer>
+
       {/* CSS 애니메이션 정의 */}
       <style jsx>{`
         @keyframes twinkle {
@@ -428,7 +510,6 @@ function MainPage() {
             transform: scale(1.2);
           }
         }
-
         @keyframes float {
           0%,
           100% {
@@ -441,7 +522,6 @@ function MainPage() {
             transform: translateY(5px) rotate(240deg);
           }
         }
-
         @keyframes shootingStar {
           0% {
             transform: translateX(-100px) translateY(-100px) rotate(45deg);
@@ -458,7 +538,6 @@ function MainPage() {
             opacity: 0;
           }
         }
-
         @keyframes pulseGlow {
           0%,
           100% {
@@ -469,7 +548,6 @@ function MainPage() {
               0 0 60px rgba(59, 130, 246, 0.4);
           }
         }
-
         @keyframes orbitSlow {
           0% {
             transform: rotate(0deg) translateX(200px) rotate(0deg);
@@ -478,7 +556,6 @@ function MainPage() {
             transform: rotate(360deg) translateX(200px) rotate(-360deg);
           }
         }
-
         @keyframes orbitFast {
           0% {
             transform: rotate(0deg) translateX(150px) rotate(0deg);
@@ -487,7 +564,6 @@ function MainPage() {
             transform: rotate(-360deg) translateX(150px) rotate(360deg);
           }
         }
-
         .animate-twinkle {
           animation: twinkle 2s ease-in-out infinite;
         }
