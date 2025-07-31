@@ -161,17 +161,6 @@ function TopMenuComponent() {
             );
           })}
           <LogoutButton />
-          {!isLoading && user && (
-            <span
-              className={styles.nickname}
-              onClick={handleNicknameClick}
-              tabIndex={0}
-              role="button"
-              style={{ display: "block", marginTop: 10 }}
-            >
-              {user?.username || "사용자"}님 환영합니다!
-            </span>
-          )}
         </div>
       )}
     </nav>

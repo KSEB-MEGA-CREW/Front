@@ -13,13 +13,11 @@ function MainPage() {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [stars, setStars] = useState([]);
-  const [particles, setParticles] = useState([]);
   const [reduceMotion, setReduceMotion] = useState(true);
   const [translationDemo, setTranslationDemo] = useState(false);
   const [todayUsers, setTodayUsers] = useState(
     230 + Math.floor(Math.random() * 70)
-  );
+  ); //현재는 랜덤 생성이지만 나중에 조회수 저장하기
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -27,29 +25,6 @@ function MainPage() {
     }, 3000);
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    const generateStars = () => {
-      if (reduceMotion) {
-        setStars([]);
-        return;
-      }
-      const newStars = [];
-      for (let i = 0; i < 100; i++) {
-        newStars.push({
-          id: i,
-          x: Math.random() * 100,
-          y: Math.random() * 100,
-          size: Math.random() * 3 + 1,
-          opacity: Math.random() * 0.8 + 0.2,
-          twinkleSpeed: Math.random() * 3 + 1,
-        });
-      }
-      setStars(newStars);
-    };
-
-    generateStars();
-  }, [reduceMotion]);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -146,32 +121,6 @@ function MainPage() {
           }}
         />
         {/* 마우스 오로라 효과 (애니메이션 OFF면 표시 안 됨) */}
-        {!reduceMotion && (
-          <div className="fixed inset-0 pointer-events-none z-9" aria-hidden>
-            <div
-              className="absolute w-96 h-96 rounded-full transition-all duration-1000 ease-out"
-              style={{
-                left: `${mousePosition.x}%`,
-                top: `${mousePosition.y}%`,
-                transform: "translate(-50%, -50%)",
-                background: `radial-gradient(circle,
-                  rgba(100, 130, 246, ${
-                    0.1 + Math.sin(Date.now() * 0.001) * 0.05
-                  }) 30%,
-                  rgba(147, 100, 234, ${
-                    0.08 + Math.cos(Date.now() * 0.0015) * 0.04
-                  }) 50%,
-                  rgba(236, 100, 200, ${
-                    0.05 + Math.sin(Date.now() * 0.002) * 0.03
-                  }) 60%,
-                  transparent 100%
-                )`,
-                filter: "blur(40px)",
-                opacity: 0.6,
-              }}
-            />
-          </div>
-        )}
       </div>
       {/* 메인 콘텐츠 */}
       <main
