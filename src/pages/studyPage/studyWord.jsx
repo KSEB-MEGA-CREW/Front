@@ -3,7 +3,7 @@ import { FaCheckCircle, FaTimesCircle, FaCalendarAlt } from "react-icons/fa";
 import { quizApi } from "../../api/authApi";
 
 // [수정 1] 분리된 달력 모달 컴포넌트를 import 합니다.
-import CalendarModal from "../../components/calendarModal"; // 파일 경로에 맞게 수정하세요.
+import CalendarModal from "../../components/calendarModel"; // 파일 경로에 맞게 수정하세요.
 
 function StudyWord() {
   const [quizList, setQuizList] = useState([]);

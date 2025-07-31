@@ -11,6 +11,10 @@ import Login from "../pages/loginPage/loginPage";
 import SignUp from "../pages/loginPage/signupPage";
 import OAuth2RedirectHandler from "../pages/loginPage/OAuth2RedirectHandler";
 import AuthCallback from "../components/authCallback";
+import AboutPage from "../pages/basicPage/aboutPage";
+import PrivacyPage from "../pages/basicPage/privacyPage";
+
+<p></p>;
 
 const router = createBrowserRouter([
   {
@@ -52,6 +56,22 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <MyPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/about",
+    element: (
+      <ProtectedRoute>
+        <AboutPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/privacy",
+    element: (
+      <ProtectedRoute>
+        <PrivacyPage />
       </ProtectedRoute>
     ),
   },
