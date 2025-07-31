@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Users, Mic, BookOpen } from "lucide-react";
+import { Users, Mic, BookOpen, Hand, ArrowRightLeft, Volume2 } from "lucide-react";
 import TopMenuComponent from "../../components/menu/topMenu";
 
 function MainPage() {
@@ -9,11 +9,20 @@ function MainPage() {
   const [stars, setStars] = useState([]);
   const [particles, setParticles] = useState([]);
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [translationDemo, setTranslationDemo] = useState(false);
 
   // 방문자 수 (랜덤 임시값, 실제 서비스 연동 시 API 사용)
   const [todayUsers, setTodayUsers] = useState(
     230 + Math.floor(Math.random() * 70)
   );
+
+  // 번역 데모 애니메이션
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTranslationDemo(prev => !prev);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
 
   // 별과 입자 생성
   useEffect(() => {
@@ -120,7 +129,7 @@ function MainPage() {
         aria-hidden
       >
         <div
-          className="h-full bg-gradienat-to-r from-purple-500 via-blue-500 to-cyan-400 transition-all duration-300 ease-out"
+          className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 transition-all duration-300 ease-out"
           style={{ width: `${scrollProgress}%` }}
         />
       </div>
@@ -155,9 +164,7 @@ function MainPage() {
           className="w-full h-full bg-cover bg-center transition-transform duration-200"
           style={{
             backgroundImage: "url('/assets/back7.jpg')",
-            transform: reduceMotion
-              ? undefined
-              : `translateY(${scrollY * 0.2}px)`,
+            
           }}
         />
       </div>
@@ -263,34 +270,106 @@ function MainPage() {
           opacity: Math.max(1 - scrollProgress / 25, 0.1),
         }}
       >
+     
         <h1
-          className="text-5xl md:text-6xl font-bold text-white drop-shadow-2xl mb-6 transition-all duration-700 animate-pulse-glow"
+          className="text-5xl md:text-6xl font-bold text-white drop-shadow-2xl mb-12 transition-all duration-700 animate-pulse-glow"
           style={{
             transform: `scale(${1 - scrollProgress * 0.002})`,
           }}
         >
-          수어 통역이 <span className="text-blue-300">더 가까워집니다</span>
+          수어 통역이 <span className="text-white">더 가까워집니다</span>
         </h1>
+
+      
+        {/*
         <p
           className="text-xl text-white/90 max-w-xl mb-10 transition-all duration-700 drop-shadow-lg"
           style={{
             opacity: Math.max(1 - scrollProgress / 20, 0.5),
           }}
         >
-          AI 기술로 수어와 음성을 실시간으로 번역하여, 청각장애인과 청인 간의
-          원활한 소통을 지원합니다.
+          AI 기술로 수어와 음성을 실시간으로 번역하여, 
+          청각장애인과의 원활한 소통을 지원합니다.
         </p>
+        */}
 
-        {/* CTA 버튼 추가 */}
-        <a
-          href="/translate"
-          className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold px-8 py-4 rounded-full shadow-lg shadow-purple-400/20 mb-10 hover:scale-105 transition transform hover:shadow-2xl hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          {/* 양방향 번역 강조 섹션 - 클릭 가능한 CTA */}
+        <a 
+          href="/translate" 
+          className="relative mb-12 p-6 bg-black/20 backdrop-blur-xl rounded-2xl border-2 border-cyan-400/50 max-w-2xl w-full block group transition-all duration-300 hover:scale-[1.02] hover:bg-black/30 hover:shadow-2xl hover:shadow-cyan-400/20 cursor-pointer hover:border-cyan-400/70"
           tabIndex={0}
           aria-label="양방향 수어 통역 체험 바로가기"
         >
-          지금 바로 체험하기
+          {/* 글로우 효과 */}
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/10 via-blue-500/10 to-purple-500/10 rounded-2xl animate-pulse group-hover:from-cyan-400/20 group-hover:via-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300"></div>
+          
+          <div className="relative z-10">
+            <div className="flex items-center justify-center mb-4">
+              <div className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+                <span className="text-white">실시간</span>
+                <span className="text-white">양방향</span>
+                <span className="text-white">수어 번역</span>
+              </div>
+            </div>
+
+            {/* 번역 시각화 */} 
+            <div className="flex items-center justify-center space-x-6 mb-6">
+              {/* 수어 아이콘 */}
+              <div className={`relative transition-all duration-1000 ${translationDemo ? 'scale-110 text-cyan-400' : 'scale-100 text-white/70'}`}>
+                <Hand className="w-12 h-12 md:w-14 md:h-14" />
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs font-medium">
+  
+                </div>
+                {translationDemo && (
+                  <div className="absolute inset-0 bg-cyan-400/20 rounded-full animate-ping"></div>
+                )}
+              </div>
+
+              {/* 양방향 화살표 */}
+              <div className="relative">
+                <ArrowRightLeft className={`w-8 h-8 md:w-10 md:h-10 text-white transition-all duration-500 ${translationDemo ? 'rotate-180' : 'rotate-0'}`} />
+                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
+              </div>
+
+              {/* 음성 아이콘 */}
+              <div className={`relative transition-all duration-1000 ${!translationDemo ? 'scale-110 text-purple-400' : 'scale-100 text-white/70'}`}>
+                <Volume2 className="w-12 h-12 md:w-14 md:h-14" />
+                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs font-medium">
+                
+                </div>
+                {!translationDemo && (
+                  <div className="absolute inset-0 bg-purple-400/20 rounded-full animate-ping"></div>
+                )}
+              </div>
+            </div>
+
+            {/* 데모 텍스트 */}
+            <div className="text-center mb-4">
+              <p className="text-base md:text-lg text-white/90 mb-2">
+                {translationDemo ? 
+                  "🤟 '안녕하세요'   →   🎵 '안녕하세요'" : 
+                  "🎵 '반갑습니다'   →   🤟 '반갑습니다'"
+                }
+              </p>
+              <div className="text-xs text-white/70">
+                {translationDemo ? "수어를 음성으로 실시간 변환" : "음성을 수어로 실시간 변환"}
+              </div>
+            </div>
+            
+            {/* CTA 버튼 스타일 */}
+            <div className="text-center pt-4 border-t border-white/10">
+              <div className="inline-flex items-center justify-center bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full shadow-lg shadow-cyan-400/20 group-hover:shadow-cyan-400/40 group-hover:scale-105 transition-all duration-300 group-hover:from-cyan-400 group-hover:to-purple-400">
+                <span className="text-lg">지금 바로 체험하기</span>
+                <span className="ml-2 text-xl">✨</span>
+              </div>
+              <div className="text-white/50 text-xs mt-2">
+                클릭하여 양방향 수어 번역을 시작하세요
+              </div>
+            </div>
+          </div>
         </a>
 
+        
         {/* 실시간(?) 통계/후기 */}
         <div className="flex flex-col items-center mb-6">
           <span className="text-white/70 text-base font-medium mb-1">

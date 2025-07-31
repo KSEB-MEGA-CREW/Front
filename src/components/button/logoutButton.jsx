@@ -1,22 +1,27 @@
 import { useAuth } from "../../Context/authContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { LogOut } from "lucide-react";
 
 function LogoutButton() {
-  // const { signout } = useContext(AuthContext); -> 이 부분을 수정
-  const { logout } = useAuth(); // useAuth 훅에서 logout 함수를 가져옵니다.
+  const { logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 경로가 "/" 또는 "/main" 같은 메인 페이지인지 확인
+  const isMainPage = location.pathname === "/" || location.pathname === "/main";
 
   const handleLogout = () => {
-    // signout(); -> 함수 이름을 맞춥니다.
     logout();
-    navigate("/login"); // 로그아웃 후 로그인 페이지로 이동
+    navigate("/login");
   };
 
   return (
     <button
       onClick={handleLogout}
-      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+      className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors duration-200
+        ${isMainPage ? "bg-transparent text-white" : "bg-blue-300 text-white hover:bg-blue-400"}`}
     >
+      <LogOut className="w-4 h-4" />
       로그아웃
     </button>
   );
