@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, Home, Mic, BookOpen, User } from "lucide-react";
+import { Menu, X, Home, Mic, BookOpen } from "lucide-react";
 import LogoutButton from "../button/logoutButton";
+import { useAuth } from "../../Context/authContext";
 
-// NavLink 대신 간단한 링크 컴포넌트 (실제로는 import { NavLink } from "react-router-dom";)
 const CustomNavLink = ({ to, children, className, onClick, isActive }) => (
   <a href={to} className={className} onClick={onClick} data-active={isActive}>
     {children}
@@ -11,78 +11,82 @@ const CustomNavLink = ({ to, children, className, onClick, isActive }) => (
 
 function TopMenuComponent() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [isDarkPage, setIsDarkPage] = useState(true); // 현재 페이지가 어두운 배경인지
+  const [isDarkPage, setIsDarkPage] = useState(true);
   const [currentPath, setCurrentPath] = useState("/");
+  const { user, isLoading } = useAuth();
 
-  // 페이지 배경 감지 (실제로는 라우터에서 받아올 수 있음)
   useEffect(() => {
-    // 현재 경로 감지 (실제 구현에서는 useLocation 사용)
     const path = window.location.pathname || "/";
     setCurrentPath(path);
-
-    // 메인 페이지는 어두운 배경, 나머지는 밝은 배경으로 가정
     setIsDarkPage(path === "/" || path === "/main");
   }, []);
 
   const menuItems = [
     { to: "/translate", label: "양방향 수어 통역", icon: <Mic size={18} /> },
     { to: "/study", label: "학습하기", icon: <BookOpen size={18} /> },
-    { to: "/myPage", label: "마이페이지", icon: <User size={18} /> },
   ];
 
-  // 페이지별 스타일 설정
-  const getNavStyles = () => {
-    if (isDarkPage) {
-      return {
-        nav: "sticky top-0 left-0 w-full z-50 px-4 py-3 bg-black/20 backdrop-blur-md border-b border-white/10 shadow-lg",
-        logo: "flex items-center space-x-2 text-xl font-bold text-white",
-        logoIcon: "text-blue-400",
-        menuItem:
-          "flex items-center gap-2 text-sm px-4 py-2 rounded-full transition-all duration-200",
-        menuItemActive: "text-blue-400 bg-white/10 shadow-md",
-        menuItemInactive: "text-white/80 hover:text-blue-300 hover:bg-white/5",
-        mobileButton: "text-white",
-        mobileMenu:
-          "md:hidden mt-3 px-4 py-4 bg-black/80 backdrop-blur-lg rounded-b-xl shadow-xl space-y-4",
-        mobileItemActive: "text-blue-400 bg-white/10",
-        mobileItemInactive:
-          "text-white/80 hover:text-blue-300 hover:bg-white/5",
-      };
-    } else {
-      return {
-        nav: "sticky top-0 left-0 w-full z-50 px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-lg",
-        logo: "flex items-center space-x-2 text-xl font-bold text-gray-800",
-        logoIcon: "text-blue-600",
-        menuItem:
-          "flex items-center gap-2 text-sm px-4 py-2 rounded-full transition-all duration-200",
-        menuItemActive: "text-blue-600 bg-blue-50 shadow-md",
-        menuItemInactive: "text-gray-700 hover:text-blue-600 hover:bg-gray-50",
-        mobileButton: "text-gray-800",
-        mobileMenu:
-          "md:hidden mt-3 px-4 py-4 bg-white/95 backdrop-blur-lg rounded-b-xl shadow-xl space-y-4 border border-gray-200",
-        mobileItemActive: "text-blue-600 bg-blue-50",
-        mobileItemInactive:
-          "text-gray-700 hover:text-blue-600 hover:bg-gray-50",
-      };
-    }
-  };
+  const getNavStyles = () =>
+    isDarkPage
+      ? {
+          nav: "sticky top-0 left-0 w-full z-50 px-4 py-3 bg-black/20 backdrop-blur-md border-b border-white/10 shadow-lg",
+          logo: "flex items-center space-x-2 text-xl font-bold text-white",
+          logoIcon: "text-blue-400",
+          menuItem:
+            "flex items-center gap-2 text-sm px-4 py-2 rounded-full transition-all duration-200",
+          menuItemActive: "text-blue-400 bg-white/10 shadow-md",
+          menuItemInactive:
+            "text-white/80 hover:text-blue-300 hover:bg-white/5",
+          mobileButton: "text-white",
+          mobileMenu:
+            "md:hidden mt-3 px-4 py-4 bg-black/80 backdrop-blur-lg rounded-b-xl shadow-xl space-y-4",
+          mobileItemActive: "text-blue-400 bg-white/10",
+          mobileItemInactive:
+            "text-white/80 hover:text-blue-300 hover:bg-white/5",
+          nickname: "ml-4 cursor-pointer text-blue-300 hover:underline",
+        }
+      : {
+          nav: "sticky top-0 left-0 w-full z-50 px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-lg",
+          logo: "flex items-center space-x-2 text-xl font-bold text-gray-800",
+          logoIcon: "text-blue-600",
+          menuItem:
+            "flex items-center gap-2 text-sm px-4 py-2 rounded-full transition-all duration-200",
+          menuItemActive: "text-blue-600 bg-blue-50 shadow-md",
+          menuItemInactive:
+            "text-gray-700 hover:text-blue-600 hover:bg-gray-50",
+          mobileButton: "text-gray-800",
+          mobileMenu:
+            "md:hidden mt-3 px-4 py-4 bg-white/95 backdrop-blur-lg rounded-b-xl shadow-xl space-y-4 border border-gray-200",
+          mobileItemActive: "text-blue-600 bg-blue-50",
+          mobileItemInactive:
+            "text-gray-700 hover:text-blue-600 hover:bg-gray-50",
+          nickname: "ml-4 cursor-pointer text-blue-600 hover:underline",
+        };
 
   const styles = getNavStyles();
 
+  // 닉네임 클릭 시 마이페이지로 이동
+  const handleNicknameClick = (e) => {
+    e.preventDefault();
+    window.location.href = "/myPage";
+  };
+
   return (
     <nav className={styles.nav}>
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
-        {/* 로고 */}
-        <CustomNavLink
-          to="/"
-          className={styles.logo}
-          onClick={() => setMobileOpen(false)}
-        >
-          <Home size={22} className={styles.logoIcon} />
-          <span className="hidden sm:inline">수담</span>
-        </CustomNavLink>
+      <div className="max-w-7xl mx-auto flex items-center relative">
+        {/* 왼쪽: 로고 */}
+        <div className="flex flex-1 min-w-0">
+          <CustomNavLink
+            to="/"
+            className={styles.logo}
+            onClick={() => setMobileOpen(false)}
+          >
+            <Home size={22} className={styles.logoIcon} />
+            <span className="hidden sm:inline">수담</span>
+          </CustomNavLink>
+        </div>
 
-        {/* 데스크탑 메뉴 */}
+        {/* 가운데: 메뉴 */}
         <div className="hidden md:flex flex-1 justify-center gap-8">
           {menuItems.map((item) => {
             const isActive = currentPath === item.to;
@@ -95,7 +99,6 @@ function TopMenuComponent() {
                 }`}
                 onClick={() => {
                   setCurrentPath(item.to);
-                  // 페이지 이동 시 배경 타입 변경
                   setIsDarkPage(item.to === "/" || item.to === "/main");
                 }}
               >
@@ -106,13 +109,24 @@ function TopMenuComponent() {
           })}
         </div>
 
-        {/* 로그아웃 버튼 */}
-        <div className="hidden md:block">
+        {/* 오른쪽: 로그아웃 버튼 / 닉네임 환영 메세지 */}
+        <div className="hidden md:flex flex-1 justify-end items-center">
           <LogoutButton />
+          {!isLoading && user && (
+            <span
+              className={styles.nickname}
+              onClick={handleNicknameClick}
+              tabIndex={0}
+              role="button"
+              style={{ marginLeft: 12 }}
+            >
+              {user?.username || "사용자"}님 환영합니다!
+            </span>
+          )}
         </div>
 
-        {/* 모바일 메뉴 버튼 */}
-        <div className="md:hidden">
+        {/* 모바일 메뉴 버튼 (항상 오른쪽) */}
+        <div className="md:hidden absolute right-0 top-1/2 -translate-y-1/2">
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className={styles.mobileButton}
@@ -147,6 +161,17 @@ function TopMenuComponent() {
             );
           })}
           <LogoutButton />
+          {!isLoading && user && (
+            <span
+              className={styles.nickname}
+              onClick={handleNicknameClick}
+              tabIndex={0}
+              role="button"
+              style={{ display: "block", marginTop: 10 }}
+            >
+              {user?.username || "사용자"}님 환영합니다!
+            </span>
+          )}
         </div>
       )}
     </nav>
