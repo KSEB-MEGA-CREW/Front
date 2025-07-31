@@ -451,7 +451,7 @@ function MainPage() {
             서비스 소개
           </a>
           <a
-            href="dissolve1882@naver.com"
+            href="mailto:dissolve1882@naver.com"
             className="hover:text-cyan-300 underline underline-offset-4 transition"
           >
             문의처
