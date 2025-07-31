@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { authApi, GOOGLE_AUTH_URL } from "../../api/authApi";
 import { useAuth } from "../../Context/authContext";
+import VideoGuid from "../../components/videoGuide"; // videoGuid.jsx 파일 경로에 맞게 조정하세요
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -12,6 +13,7 @@ export default function LoginPage() {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showVideoGuid, setShowVideoGuid] = useState(false); // 동영상 팝업 상태
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,7 +24,6 @@ export default function LoginPage() {
   };
 
   const handleLogin = async (e) => {
-    // 현재 페이지 URL 저장
     sessionStorage.setItem("loginRedirect", window.location.pathname);
 
     e.preventDefault();
@@ -34,13 +35,11 @@ export default function LoginPage() {
       const response = await authApi.login(formData);
 
       if (response.success && response.data?.token) {
-        // login data 구조 수정
         login({
           token: response.data.token,
           user: response.data.userInfo,
         });
 
-        // 리다이렉트 처리 추가
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get("redirect") || "/";
         navigate(redirectTo, { replace: true });
@@ -65,19 +64,17 @@ export default function LoginPage() {
 
     console.log(`${provider} 소셜 로그인 시도:`, authUrl);
 
-    // 현재 페이지 정보를 세션 스토리지에 저장 (리다이렉션 후 복원용)
     const currentUrl = window.location.pathname + window.location.search;
     sessionStorage.setItem("loginRedirect", currentUrl);
 
-    // 소셜 로그인 페이지로 이동
     window.location.href = authUrl;
   };
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
-    const error = searchParams.get("error");
+    const errorParam = searchParams.get("error");
 
-    if (error) {
+    if (errorParam) {
       const errorMessages = {
         no_email: "이메일 정보를 가져올 수 없습니다.",
         auth_failed: "소셜 로그인에 실패했습니다.",
@@ -86,7 +83,7 @@ export default function LoginPage() {
         server_error: "서버 오류가 발생했습니다.",
       };
 
-      setError(errorMessages[error] || "알 수 없는 오류가 발생했습니다.");
+      setError(errorMessages[errorParam] || "알 수 없는 오류가 발생했습니다.");
     }
   }, []);
 
@@ -100,6 +97,14 @@ export default function LoginPage() {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
+
+  // 팝업 열기/닫기 핸들러
+  const handleShowVideoGuid = () => {
+    setShowVideoGuid(true);
+  };
+  const handleCloseVideoGuid = () => {
+    setShowVideoGuid(false);
+  };
 
   const backgroundStyle = {
     backgroundImage: "url('/assets/image.png')",
@@ -164,7 +169,6 @@ export default function LoginPage() {
             opacity: 0.6;
           }
         }
-
         @keyframes float {
           0% {
             transform: translateY(0px);
@@ -210,12 +214,12 @@ export default function LoginPage() {
 
         <div className="w-px bg-white opacity-30 my-16"></div>
 
+        {/* 오른쪽 로그인 박스 */}
         <div className="flex-1 flex items-center justify-center pr-24">
           <div
             className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 w-96 shadow-2xl border border-white/10 hover:shadow-3xl transition-all duration-300"
             style={{ animation: "float 6s ease-in-out infinite" }}
           >
-            {/* ✅ 프로필 아이콘 - 로그인 박스 내부 */}
             <div className="flex justify-center mb-8">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
                 <svg
@@ -234,7 +238,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* 로그인 폼 */}
             <form onSubmit={handleLogin} className="space-y-6">
               <input
                 name="email"
@@ -274,18 +277,27 @@ export default function LoginPage() {
                 {loading ? "로그인 중..." : "로그인"}
               </button>
 
-              <div className="text-sm text-center text-white/80">
-                계정이 없으신가요?{" "}
-                <Link to="/signup" className="underline hover:text-white">
-                  회원가입
-                </Link>
+              {/* 회원가입 + 설명 가이드 버튼 */}
+              <div className="text-sm text-center text-white/80 space-y-2">
+                <div>
+                  계정이 없으신가요?{" "}
+                  <Link to="/signup" className="underline hover:text-white">
+                    회원가입
+                  </Link>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleShowVideoGuid}
+                  className="underline hover:text-white text-white/80"
+                >
+                  설명 가이드
+                </button>
               </div>
             </form>
 
             {/* 소셜 로그인 버튼 */}
             <div className="mt-6 border-t border-white/20 pt-6">
               <div className="flex justify-center space-x-6">
-                {/* Google Login */}
                 <button
                   onClick={() => handleSocialLogin("google")}
                   className="p-3 hover:bg-white/10 rounded-full transition-all duration-200"
@@ -310,18 +322,7 @@ export default function LoginPage() {
                   </svg>
                 </button>
 
-                {/* Kakao Login => 추후 연결 예정
-                <button
-                  onClick={() => handleSocialLogin("kakao")}
-                  className="p-3 hover:bg-white/10 rounded-full transition-all duration-200"
-                >
-                  <svg className="w-10 h-10" viewBox="0 0 24 24">
-                    <path
-                      fill="#FEE500"
-                      d="M12 2C5.9 2 1 6.1 1 11c0 2.6 1.4 4.9 3.7 6.5L3 22l5.1-2.5c1.1.2 2.2.3 3.4.3 6.1 0 11-4.1 11-9S18.1 2 12 2z"
-                    />
-                  </svg>
-                </button> */}
+                {/* 카카오톡 로그인 버튼 주석처리 상태 유지 */}
               </div>
             </div>
 
@@ -337,6 +338,9 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+
+      {/* 동영상 팝업 모달 */}
+      {showVideoGuid && <VideoGuid onClose={handleCloseVideoGuid} />}
     </div>
   );
 }
