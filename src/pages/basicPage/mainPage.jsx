@@ -169,90 +169,8 @@ function MainPage() {
         />
       </div>
 
-      {/* 별/파티클 효과 */}
-      {!reduceMotion && (
-        <>
-          <div className="fixed inset-0 pointer-events-none z-5" aria-hidden>
-            {stars.map((star) => (
-              <div
-                key={star.id}
-                className="absolute animate-twinkle"
-                style={{
-                  left: `${star.x}%`,
-                  top: `${star.y}%`,
-                  width: `${star.size}px`,
-                  height: `${star.size}px`,
-                  background:
-                    "radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(147,51,234,0.4) 50%, transparent 100%)",
-                  borderRadius: "50%",
-                  animationDelay: `${star.twinkleSpeed}s`,
-                  animationDuration: `${2 + star.twinkleSpeed}s`,
-                }}
-              />
-            ))}
-          </div>
-          <div className="fixed inset-0 pointer-events-none z-6" aria-hidden>
-            {particles.map((particle) => (
-              <div
-                key={particle.id}
-                className="absolute animate-float rounded-full"
-                style={{
-                  left: `${particle.x}%`,
-                  top: `${particle.y}%`,
-                  width: `${particle.size}px`,
-                  height: `${particle.size}px`,
-                  background:
-                    "linear-gradient(45deg, rgba(59,130,246,0.6), rgba(147,51,234,0.6))",
-                  animationDelay: `${particle.speed}s`,
-                }}
-              />
-            ))}
-          </div>
-          {/* 궤도 애니메이션 */}
-          <div
-            className="fixed inset-0 pointer-events-none z-8 flex items-center justify-center"
-            aria-hidden
-          >
-            <div className="relative">
-              <div className="animate-orbit-slow">
-                <div className="w-3 h-3 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full shadow-lg shadow-blue-400/50"></div>
-              </div>
-              <div className="animate-orbit-fast">
-                <div className="w-2 h-2 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full shadow-lg shadow-cyan-400/50"></div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* 마우스 오로라 효과 */}
-      {!reduceMotion && (
-        <div className="fixed inset-0 pointer-events-none z-9" aria-hidden>
-          <div
-            className="absolute w-96 h-96 rounded-full transition-all duration-1000 ease-out"
-            style={{
-              left: `${mousePosition.x}%`,
-              top: `${mousePosition.y}%`,
-              transform: "translate(-50%, -50%)",
-              background: `radial-gradient(circle, 
-                rgba(100, 130, 246, ${
-                  0.1 + Math.sin(Date.now() * 0.001) * 0.05
-                }) 30%,
-                rgba(147, 100, 234, ${
-                  0.08 + Math.cos(Date.now() * 0.0015) * 0.04
-                }) 50%,
-                rgba(236, 100, 200, ${
-                  0.05 + Math.sin(Date.now() * 0.002) * 0.03
-                }) 60%,
-                transparent 100%
-              )`,
-              filter: "blur(40px)",
-              opacity: 0.6,
-            }}
-          />
-        </div>
-      )}
-
+     
+     
       {/* 애니메이션 축소/해제 토글 */}
       <button
         className="fixed bottom-7 right-7 z-50 rounded-xl bg-white/80 px-4 py-2 shadow-lg text-sm font-medium opacity-80 hover:opacity-100 transition"
@@ -272,7 +190,7 @@ function MainPage() {
       >
      
         <h1
-          className="text-5xl md:text-6xl font-bold text-white drop-shadow-2xl mb-12 transition-all duration-700 animate-pulse-glow"
+          className="text-5xl md:text-6xl font-bold text-white drop-shadow-2xl mb-15 transition-all duration-700 animate-pulse-glow"
           style={{
             transform: `scale(${1 - scrollProgress * 0.002})`,
           }}
@@ -371,7 +289,7 @@ function MainPage() {
 
         
         {/* 실시간(?) 통계/후기 */}
-        <div className="flex flex-col items-center mb-6">
+        <div className="flex flex-col items-center mb-24">
           <span className="text-white/70 text-base font-medium mb-1">
             오늘{" "}
             <strong className="text-cyan-300 text-xl">
@@ -576,92 +494,7 @@ function MainPage() {
         <div>© {new Date().getFullYear()} 수담. All rights reserved.</div>
       </footer>
 
-      {/* CSS 애니메이션 정의 */}
-      <style jsx>{`
-        @keyframes twinkle {
-          0%,
-          100% {
-            opacity: 0.3;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.2);
-          }
-        }
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          33% {
-            transform: translateY(-10px) rotate(120deg);
-          }
-          66% {
-            transform: translateY(5px) rotate(240deg);
-          }
-        }
-        @keyframes shootingStar {
-          0% {
-            transform: translateX(-100px) translateY(-100px) rotate(45deg);
-            opacity: 0;
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            transform: translateX(100vw) translateY(100vh) rotate(45deg);
-            opacity: 0;
-          }
-        }
-        @keyframes pulseGlow {
-          0%,
-          100% {
-            box-shadow: 0 0 20px rgba(147, 51, 234, 0.3);
-          }
-          50% {
-            box-shadow: 0 0 40px rgba(147, 51, 234, 0.6),
-              0 0 60px rgba(59, 130, 246, 0.4);
-          }
-        }
-        @keyframes orbitSlow {
-          0% {
-            transform: rotate(0deg) translateX(200px) rotate(0deg);
-          }
-          100% {
-            transform: rotate(360deg) translateX(200px) rotate(-360deg);
-          }
-        }
-        @keyframes orbitFast {
-          0% {
-            transform: rotate(0deg) translateX(150px) rotate(0deg);
-          }
-          100% {
-            transform: rotate(-360deg) translateX(150px) rotate(360deg);
-          }
-        }
-        .animate-twinkle {
-          animation: twinkle 2s ease-in-out infinite;
-        }
-        .animate-float {
-          animation: float 6s ease-in-out infinite;
-        }
-        .animate-shooting-star {
-          animation: shootingStar 3s linear infinite;
-        }
-        .animate-pulse-glow {
-          animation: pulseGlow 4s ease-in-out infinite;
-        }
-        .animate-orbit-slow {
-          animation: orbitSlow 20s linear infinite;
-        }
-        .animate-orbit-fast {
-          animation: orbitFast 15s linear infinite;
-        }
-      `}</style>
+      
     </div>
   );
 }
