@@ -189,7 +189,7 @@ export default function LoginPage() {
               className="text-8xl font-thin mb-8 tracking-widest"
               style={{ fontFamily: "Georgia, serif" }}
             >
-              수담
+              수담, 手談
             </h1>
             <p
               className="text-3xl font-light mb-6 tracking-wide"
