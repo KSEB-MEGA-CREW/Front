@@ -44,7 +44,7 @@ export default function PrivacyPage() {
 7. 정책 변경에 관한 사항
 본 개인정보처리방침은 법령 또는 회사 정책에 따라 변경될 수 있으며, 변경 시 홈페이지를 통해 공지합니다.
 
-문의사항은 support@sudam.com 으로 연락해 주시기 바랍니다.`}
+문의사항은 dissolve1882@naver.com 으로 연락해 주시기 바랍니다.`}
           </p>
         </section>
       </main>

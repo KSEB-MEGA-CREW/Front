@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import Calendar from "react-calendar";
 
 // 날짜를 'YYYY-MM-DD' 형식으로 변환하는 헬퍼 함수

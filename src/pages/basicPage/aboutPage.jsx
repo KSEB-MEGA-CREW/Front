@@ -41,10 +41,10 @@ export default function AboutPage() {
             주세요.
           </p>
           <a
-            href="mailto:support@sudam.com"
+            href="mailto:dissolve1882@naver.com"
             className="text-cyan-400 hover:underline"
           >
-            support@sudam.com
+            dissolve1882@naver.com
           </a>
         </section>
       </main>
