@@ -1,5 +1,5 @@
 import React from "react";
-import { useAuth } from "../../Context/authContext";
+import { useAuth } from "../Context/authContext";
 
 // 아이콘을 컴포넌트 내에 SVG로 직접 추가하여 별도 라이브러리 설치가 필요 없습니다.
 const UserIcon = () => (
@@ -78,9 +78,7 @@ const UserProfile = () => {
           <div className="w-16 h-16 rounded-full bg-slate-100 mx-auto flex items-center justify-center border-2 border-white shadow-md">
             <UserIcon />
           </div>
-          <h2 className="text-xl font-bold text-slate-800 mt-3">
-            내 정보
-          </h2>
+          <h2 className="text-xl font-bold text-slate-800 mt-3">내 정보</h2>
           <p className="text-slate-500 text-sm">
             {user?.username || "사용자"}님 환영합니다!
           </p>
