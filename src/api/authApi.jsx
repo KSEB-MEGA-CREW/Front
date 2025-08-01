@@ -135,6 +135,14 @@ export const quizApi = {
 
     return response;
   },
+  // 정답률(Accuracy) 데이터 가져오기
+  getWeeklyAccuracy: async () => {
+    // API 엔드포인트는 실제 서버와 맞춰주세요!
+    const response = await apiRequest("/api/accuracy/weekly", {
+      method: "GET",
+    });
+    return response;
+  },
 };
 
 // 구글 OAuth2 URL - 구글 로그인 url에 맞게 수정

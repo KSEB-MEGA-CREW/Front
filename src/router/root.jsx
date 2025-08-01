@@ -13,6 +13,7 @@ import OAuth2RedirectHandler from "../pages/loginPage/OAuth2RedirectHandler";
 import AuthCallback from "../components/authCallback";
 import AboutPage from "../pages/basicPage/aboutPage";
 import PrivacyPage from "../pages/basicPage/privacyPage";
+import GoodPage from "../pages/basicPage/goodPage";
 
 <p></p>;
 
@@ -72,6 +73,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <PrivacyPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/good",
+    element: (
+      <ProtectedRoute>
+        <GoodPage />
       </ProtectedRoute>
     ),
   },

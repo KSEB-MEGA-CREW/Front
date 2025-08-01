@@ -109,7 +109,6 @@ function MyPage() {
                 {user?.username || "사용자"}님 환영합니다!
               </p>
             </div>
-
             {/* 정보 필드 */}
             <div className="space-y-6">
               <div className="flex flex-col">
