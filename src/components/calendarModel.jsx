@@ -1,5 +1,6 @@
 import Calendar from "react-calendar";
 import React, { useState } from "react";
+import 'react-calendar/dist/Calendar.css';
 
 // 날짜를 'YYYY-MM-DD' 형식으로 변환하는 헬퍼 함수
 const formatDate = (date) => {
@@ -34,11 +35,9 @@ function getMonthDates(date) {
   return dates;
 }
 
-function CalendarModal({ isOpen, onClose, quizHistory }) {
+function CalendarModel({ quizHistory = {} }) {
   const [view, setView] = useState("month"); // "month" 또는 "week"
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  if (!isOpen) return null;
 
   // 월 단위 타일 색깔 지정
   const getTileClassName = ({ date, view: calView }) => {
@@ -111,134 +110,118 @@ function CalendarModal({ isOpen, onClose, quizHistory }) {
   const maxCorrect = Math.max(...weekCorrectCounts, 5);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 transition-opacity"
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-lg p-6 mx-4 bg-gray-800 rounded-xl shadow-lg"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="text-2xl font-bold text-white mb-4 text-center">
+    <div className="w-full h-full bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+      <div className="p-4 h-full flex flex-col">
+        <h2 className="text-xl font-bold text-white mb-3 text-center">
           퀴즈 기록
         </h2>
 
         {/* 월/주 전환 버튼 */}
-        <div className="mb-3 flex justify-center space-x-4">
+        <div className="mb-3 flex justify-center space-x-2">
           <button
-            className={`px-4 py-2 rounded ${
+            className={`px-3 py-1 text-sm rounded ${
               view === "month"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-600 text-gray-300"
             }`}
             onClick={() => setView("month")}
           >
-            월별 보기
+            월별
           </button>
           <button
-            className={`px-4 py-2 rounded ${
+            className={`px-3 py-1 text-sm rounded ${
               view === "week"
                 ? "bg-blue-600 text-white"
                 : "bg-gray-600 text-gray-300"
             }`}
             onClick={() => setView("week")}
           >
-            주별 보기
+            주별
           </button>
         </div>
 
         {/* 월별 평균 정답률 상단 출력 (월별 뷰일 때만) */}
         {view === "month" && (
-          <div className="mb-4 text-lg text-gray-300 font-semibold text-center">
-            {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 평균
-            정답률:{" "}
+          <div className="mb-3 text-sm text-gray-300 font-semibold text-center">
+            {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 평균:{" "}
             <span className="text-white font-bold">
               {monthPercentage !== null
-                ? monthPercentage.toFixed(2) + "%"
+                ? monthPercentage.toFixed(1) + "%"
                 : "기록 없음"}
             </span>
           </div>
         )}
 
-        {view === "month" && (
-          <Calendar
-            locale="ko-KR"
-            tileClassName={getTileClassName}
-            formatDay={(locale, date) => date.getDate()}
-            onClickDay={(value) => setSelectedDate(value)}
-            value={selectedDate}
-            view="month"
-          />
-        )}
+        <div className="flex-grow overflow-hidden">
+          {view === "month" && (
+            <div className="h-full">
+              <Calendar
+                locale="ko-KR"
+                tileClassName={getTileClassName}
+                formatDay={(locale, date) => date.getDate()}
+                onClickDay={(value) => setSelectedDate(value)}
+                value={selectedDate}
+                view="month"
+                className="w-full h-full text-white"
+              />
+            </div>
+          )}
 
-        {view === "week" && (
-          <div className="bg-gray-700 p-4 rounded mt-2">
-            {/* 주별 맞춘 횟수 막대그래프 */}
-            <div className="mb-2 flex justify-between px-1 text-xs text-gray-300 font-semibold">
-              {weekDays.map((day) => (
-                <span key={day} className="flex-1 text-center">
-                  {day}
-                </span>
-              ))}
+          {view === "week" && (
+            <div className="bg-gray-700 p-3 rounded h-full">
+              {/* 주별 맞춘 횟수 막대그래프 */}
+              <div className="mb-2 flex justify-between px-1 text-xs text-gray-300 font-semibold">
+                {weekDays.map((day) => (
+                  <span key={day} className="flex-1 text-center">
+                    {day}
+                  </span>
+                ))}
+              </div>
+              <div className="flex justify-between items-end h-20 px-1">
+                {weekCorrectCounts.map((cnt, idx) => (
+                  <div key={idx} className="flex flex-col items-center flex-1">
+                    {/* 막대 */}
+                    <div
+                      className="w-4 bg-green-600 rounded-sm"
+                      style={{
+                        height:
+                          maxCorrect > 0
+                            ? `${Math.round((cnt / maxCorrect) * 60) || 4}px`
+                            : "4px",
+                      }}
+                    ></div>
+                    {/* 값 라벨 */}
+                    <span className="mt-1 text-white text-xs">{cnt}</span>
+                  </div>
+                ))}
+              </div>
+              {/* 주별 정답률 출력 (퍼센트) */}
+              <div className="text-center text-white text-sm font-semibold mt-3">
+                주별 정답률:{" "}
+                {weekPercentage !== null ? weekPercentage + "%" : "기록 없음"}
+              </div>
             </div>
-            <div className="flex justify-between items-end h-28 px-1">
-              {weekCorrectCounts.map((cnt, idx) => (
-                <div key={idx} className="flex flex-col items-center flex-1">
-                  {/* 막대 */}
-                  <div
-                    className="w-5 bg-green-600"
-                    style={{
-                      height:
-                        maxCorrect > 0
-                          ? `${Math.round((cnt / maxCorrect) * 90) || 6}px`
-                          : "6px",
-                      borderRadius: "6px",
-                      transition: "height 0.2s",
-                    }}
-                  ></div>
-                  {/* 값 라벨 */}
-                  <span className="mt-1 text-white text-xs">{cnt}</span>
-                </div>
-              ))}
-            </div>
-            {/* 주별 정답률 출력 (퍼센트) */}
-            <div className="text-center text-white text-base font-semibold mt-4">
-              주별 정답률:{" "}
-              {weekPercentage !== null ? weekPercentage + "%" : "기록 없음"}
-            </div>
-            <button
-              onClick={() => setSelectedDate(new Date())}
-              className="mt-3 text-sm underline text-gray-300"
-            >
-              오늘 주로 이동
-            </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* 색상 legend */}
-        <div className="mt-6 flex justify-center items-center space-x-6 text-sm text-gray-300">
+        <div className="mt-3 flex justify-center items-center space-x-3 text-xs text-gray-300">
           <div className="flex items-center">
-            <span className="w-4 h-4 bg-green-700 rounded-sm mr-2"></span>
-            <span>정답률 80% 이상</span>
+            <span className="w-3 h-3 bg-green-700 rounded-sm mr-1"></span>
+            <span>80%+</span>
           </div>
           <div className="flex items-center">
-            <span className="w-4 h-4 bg-yellow-600 rounded-sm mr-2"></span>
-            <span>정답률 50% 이상</span>
+            <span className="w-3 h-3 bg-yellow-600 rounded-sm mr-1"></span>
+            <span>50%+</span>
           </div>
           <div className="flex items-center">
-            <span className="w-4 h-4 bg-red-700 rounded-sm mr-2"></span>
-            <span>정답률 50% 미만</span>
+            <span className="w-3 h-3 bg-red-700 rounded-sm mr-1"></span>
+            <span>50%-</span>
           </div>
         </div>
-        <button
-          onClick={onClose}
-          className="w-full mt-6 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
-        >
-          닫기
-        </button>
       </div>
     </div>
   );
 }
 
-export default CalendarModal;
+export default CalendarModel;
