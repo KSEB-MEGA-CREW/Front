@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 // 실제 컴포넌트들 임포트
 import UserProfile from '../../components/userProfile';
