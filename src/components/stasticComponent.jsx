@@ -60,7 +60,7 @@ const GrapeComponent = () => {
   }
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg w-full max-w-2xl mx-auto">
+    <div className="w-full">
       <h2 className="text-xl font-bold text-gray-800 mb-4">주간 정답률</h2>
 
       {/* 차트 영역: 막대 그래프 */}
