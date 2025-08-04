@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-// 변경점: 카카오, 네이버 인증 URL을 추가로 import 합니다.
 import {
   authApi,
   GOOGLE_AUTH_URL,
@@ -8,7 +7,7 @@ import {
   NAVER_AUTH_URL,
 } from "../../api/authApi";
 import { useAuth } from "../../Context/authContext";
-import VideoGuid from "../../components/videoGuide"; // videoGuid.jsx 파일 경로에 맞게 조정하세요
+import VideoGuid from "../../components/videoGuide";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -19,7 +18,7 @@ export default function LoginPage() {
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showVideoGuid, setShowVideoGuid] = useState(false); // 동영상 팝업 상태
+  const [showVideoGuid, setShowVideoGuid] = useState(false);
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -34,7 +33,6 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
     try {
-      console.log("로그인 시도:", formData);
       const response = await authApi.login(formData);
       if (response.success && response.data?.token) {
         login({
@@ -48,17 +46,14 @@ export default function LoginPage() {
         setError(response.message || "로그인에 실패했습니다.");
       }
     } catch (error) {
-      console.error("로그인 오류:", error);
       setError(error.message || "로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
   };
 
-  // 변경점: 여러 소셜 로그인을 처리할 수 있도록 수정
   const handleSocialLogin = (provider) => {
     let authUrl;
-
     switch (provider) {
       case "google":
         authUrl = GOOGLE_AUTH_URL;
@@ -73,13 +68,10 @@ export default function LoginPage() {
         setError(`${provider} 로그인 URL이 설정되지 않았습니다.`);
         return;
     }
-
     if (!authUrl) {
       setError(`${provider} 로그인 URL이 설정되지 않았습니다.`);
       return;
     }
-
-    console.log(`${provider} 소셜 로그인 시도:`, authUrl);
     const currentUrl = window.location.pathname + window.location.search;
     sessionStorage.setItem("loginRedirect", currentUrl);
     window.location.href = authUrl;
@@ -114,7 +106,6 @@ export default function LoginPage() {
   const handleShowVideoGuid = () => setShowVideoGuid(true);
   const handleCloseVideoGuid = () => setShowVideoGuid(false);
 
-  // --- 이하 스타일 관련 코드는 변경 없음 ---
   const backgroundStyle = {
     backgroundImage: "url('/assets/image.png')",
     backgroundSize: "cover",
@@ -151,10 +142,9 @@ export default function LoginPage() {
     zIndex: 2,
     pointerEvents: "none",
   };
-  // --- 이상 스타일 관련 코드는 변경 없음 ---
 
   return (
-    <div style={backgroundStyle}>
+    <div style={backgroundStyle} className="overflow-y-auto">
       <style jsx="true">{`
         @keyframes twinkle {
           0% {
@@ -179,28 +169,29 @@ export default function LoginPage() {
           }
         }
       `}</style>
-
       <div style={starsStyle}></div>
       <div style={overlayStyle}></div>
-
-      <div className="flex w-full h-full relative z-10">
+      {/* 반응형: 모바일에선 세로(flex-col), 데스크탑에선 가로(md:flex-row)로 배치 */}
+      <div className="flex flex-col md:flex-row w-full min-h-full relative z-10">
         {/* 왼쪽 소개 섹션 */}
-        <div className="flex-1 flex items-center justify-center pl-24">
+        {/* 반응형: 모바일 패딩(p-8), 데스크탑 패딩(md:pl-24), 텍스트 정렬 변경(text-center md:text-left) */}
+        <div className="flex-1 flex items-center justify-center p-8 md:p-0 md:pl-24 text-center md:text-left">
           <div className="text-white">
+            {/* 반응형: 모바일/데스크탑 텍스트 크기 변경 */}
             <h1
-              className="text-8xl font-thin mb-8 tracking-widest"
+              className="text-6xl md:text-8xl font-thin mb-6 md:mb-8 tracking-widest"
               style={{ fontFamily: "Georgia, serif" }}
             >
               수담, 手談
             </h1>
             <p
-              className="text-3xl font-light mb-6 tracking-wide"
+              className="text-2xl md:text-3xl font-light mb-4 md:mb-6 tracking-wide"
               style={{ fontFamily: "Georgia, serif" }}
             >
               "소통의 장벽을 허물다."
             </p>
             <div
-              className="text-xl leading-relaxed opacity-90 font-light text-left max-w-2xl"
+              className="text-lg md:text-xl leading-relaxed opacity-90 font-light max-w-2xl"
               style={{ fontFamily: "Georgia, serif" }}
             >
               <p>누구나 자유롭게 이야기하고 이해받을 수 있도록,</p>
@@ -210,12 +201,15 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <div className="w-px bg-white opacity-30 my-16"></div>
+        {/* 반응형: 모바일에선 숨기고(hidden) 데스크탑에선 보임(md:block) */}
+        <div className="hidden md:block w-px bg-white opacity-30 my-16"></div>
 
         {/* 오른쪽 로그인 박스 */}
-        <div className="flex-1 flex items-center justify-center pr-24">
+        {/* 반응형: 모바일 패딩(p-8), 데스크탑 패딩(md:pr-24) */}
+        <div className="flex-1 flex items-center justify-center p-8 md:p-0 md:pr-24">
+          {/* 반응형: 모바일 너비(w-full max-w-sm), 데스크탑 너비(md:w-96) */}
           <div
-            className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 w-96 shadow-2xl border border-white/10 hover:shadow-3xl transition-all duration-300"
+            className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 w-full max-w-sm md:w-96 shadow-2xl border border-white/10 hover:shadow-3xl transition-all duration-300"
             style={{ animation: "float 6s ease-in-out infinite" }}
           >
             <div className="flex justify-center mb-8">
@@ -277,6 +271,7 @@ export default function LoginPage() {
 
               <div className="text-sm text-center text-white/80 space-y-2">
                 <div>
+                  {" "}
                   계정이 없으신가요?{" "}
                   <Link to="/signup" className="underline hover:text-white">
                     회원가입
@@ -292,28 +287,20 @@ export default function LoginPage() {
               </div>
             </form>
 
-            {/* 변경점: 소셜 로그인 버튼 섹션 수정 */}
-            {/* 변경점: 소셜 로그인 버튼 섹션 수정 */}
             <div className="mt-6 border-t border-white/20 pt-6">
-              {/* flex: 가로 정렬, justify-center: 중앙 배치, space-x-4: 버튼 사이 간격 */}
               <div className="flex justify-center space-x-4">
-                {/* Google 로그인 버튼 */}
                 <button
                   onClick={() => handleSocialLogin("google")}
                   className="transition-transform duration-200 hover:scale-105"
                 >
                   <img src="/google.png" alt="구글 로그인" className="h-12" />
                 </button>
-
-                {/* Kakao 로그인 버튼 */}
                 <button
                   onClick={() => handleSocialLogin("kakao")}
                   className="transition-transform duration-200 hover:scale-105"
                 >
                   <img src="/kakao.png" alt="카카오 로그인" className="h-12" />
                 </button>
-
-                {/* Naver 로그인 버튼 */}
                 <button
                   onClick={() => handleSocialLogin("naver")}
                   className="transition-transform duration-200 hover:scale-105"
@@ -322,7 +309,6 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
-            {/* --- 변경 종료 --- */}
 
             <div className="mt-4 text-center">
               <a
@@ -335,7 +321,6 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-
       {showVideoGuid && <VideoGuid onClose={handleCloseVideoGuid} />}
     </div>
   );
