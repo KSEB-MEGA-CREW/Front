@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { authApi, GOOGLE_AUTH_URL } from "../../api/authApi";
+// 변경점: 카카오, 네이버 인증 URL을 추가로 import 합니다.
+import {
+  authApi,
+  GOOGLE_AUTH_URL,
+  KAKAO_AUTH_URL,
+  NAVER_AUTH_URL,
+} from "../../api/authApi";
 import { useAuth } from "../../Context/authContext";
 import VideoGuid from "../../components/videoGuide"; // videoGuid.jsx 파일 경로에 맞게 조정하세요
 
@@ -17,7 +23,6 @@ export default function LoginPage() {
 
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-
     if (error) {
       setError("");
     }
@@ -25,21 +30,17 @@ export default function LoginPage() {
 
   const handleLogin = async (e) => {
     sessionStorage.setItem("loginRedirect", window.location.pathname);
-
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       console.log("로그인 시도:", formData);
       const response = await authApi.login(formData);
-
       if (response.success && response.data?.token) {
         login({
           token: response.data.token,
           user: response.data.userInfo,
         });
-
         const urlParams = new URLSearchParams(window.location.search);
         const redirectTo = urlParams.get("redirect") || "/";
         navigate(redirectTo, { replace: true });
@@ -54,8 +55,24 @@ export default function LoginPage() {
     }
   };
 
+  // 변경점: 여러 소셜 로그인을 처리할 수 있도록 수정
   const handleSocialLogin = (provider) => {
-    const authUrl = GOOGLE_AUTH_URL;
+    let authUrl;
+
+    switch (provider) {
+      case "google":
+        authUrl = GOOGLE_AUTH_URL;
+        break;
+      case "kakao":
+        authUrl = KAKAO_AUTH_URL;
+        break;
+      case "naver":
+        authUrl = NAVER_AUTH_URL;
+        break;
+      default:
+        setError(`${provider} 로그인 URL이 설정되지 않았습니다.`);
+        return;
+    }
 
     if (!authUrl) {
       setError(`${provider} 로그인 URL이 설정되지 않았습니다.`);
@@ -63,17 +80,14 @@ export default function LoginPage() {
     }
 
     console.log(`${provider} 소셜 로그인 시도:`, authUrl);
-
     const currentUrl = window.location.pathname + window.location.search;
     sessionStorage.setItem("loginRedirect", currentUrl);
-
     window.location.href = authUrl;
   };
 
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const errorParam = searchParams.get("error");
-
     if (errorParam) {
       const errorMessages = {
         no_email: "이메일 정보를 가져올 수 없습니다.",
@@ -82,7 +96,6 @@ export default function LoginPage() {
         no_token: "토큰을 찾을 수 없습니다.",
         server_error: "서버 오류가 발생했습니다.",
       };
-
       setError(errorMessages[errorParam] || "알 수 없는 오류가 발생했습니다.");
     }
   }, []);
@@ -98,14 +111,10 @@ export default function LoginPage() {
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
 
-  // 팝업 열기/닫기 핸들러
-  const handleShowVideoGuid = () => {
-    setShowVideoGuid(true);
-  };
-  const handleCloseVideoGuid = () => {
-    setShowVideoGuid(false);
-  };
+  const handleShowVideoGuid = () => setShowVideoGuid(true);
+  const handleCloseVideoGuid = () => setShowVideoGuid(false);
 
+  // --- 이하 스타일 관련 코드는 변경 없음 ---
   const backgroundStyle = {
     backgroundImage: "url('/assets/image.png')",
     backgroundSize: "cover",
@@ -119,13 +128,8 @@ export default function LoginPage() {
     zIndex: 0,
     transition: "background-position 0.4s ease-out",
   };
-
   const overlayStyle = {
-    background: `
-      radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%,
-        rgba(255, 255, 255, 0.15) 0%,
-        rgba(120, 119, 198, 0.07) 20%,
-        transparent 50%)`,
+    background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(255, 255, 255, 0.15) 0%, rgba(120, 119, 198, 0.07) 20%, transparent 50%)`,
     transition: "background 0.4s ease",
     width: "100%",
     height: "100%",
@@ -135,18 +139,11 @@ export default function LoginPage() {
     zIndex: 1,
     pointerEvents: "none",
   };
-
   const starsStyle = {
     position: "absolute",
     width: "100%",
     height: "100%",
-    background: `
-      radial-gradient(2px 2px at 20px 30px, #eee, transparent),
-      radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent),
-      radial-gradient(1px 1px at 90px 40px, #fff, transparent),
-      radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent),
-      radial-gradient(2px 2px at 160px 30px, #ddd, transparent)
-    `,
+    background: `radial-gradient(2px 2px at 20px 30px, #eee, transparent), radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent), radial-gradient(2px 2px at 160px 30px, #ddd, transparent)`,
     backgroundRepeat: "repeat",
     backgroundSize: "200px 100px",
     animation: "twinkle 4s ease-in-out infinite alternate",
@@ -154,6 +151,7 @@ export default function LoginPage() {
     zIndex: 2,
     pointerEvents: "none",
   };
+  // --- 이상 스타일 관련 코드는 변경 없음 ---
 
   return (
     <div style={backgroundStyle}>
@@ -277,7 +275,6 @@ export default function LoginPage() {
                 {loading ? "로그인 중..." : "로그인"}
               </button>
 
-              {/* 회원가입 + 설명 가이드 버튼 */}
               <div className="text-sm text-center text-white/80 space-y-2">
                 <div>
                   계정이 없으신가요?{" "}
@@ -295,38 +292,38 @@ export default function LoginPage() {
               </div>
             </form>
 
-            {/* 소셜 로그인 버튼 */}
+            {/* 변경점: 소셜 로그인 버튼 섹션 수정 */}
+            {/* 변경점: 소셜 로그인 버튼 섹션 수정 */}
             <div className="mt-6 border-t border-white/20 pt-6">
-              <div className="flex justify-center space-x-6">
+              {/* flex: 가로 정렬, justify-center: 중앙 배치, space-x-4: 버튼 사이 간격 */}
+              <div className="flex justify-center space-x-4">
+                {/* Google 로그인 버튼 */}
                 <button
                   onClick={() => handleSocialLogin("google")}
-                  className="p-3 hover:bg-white/10 rounded-full transition-all duration-200"
+                  className="transition-transform duration-200 hover:scale-105"
                 >
-                  <svg className="w-10 h-10" viewBox="0 0 48 48">
-                    <path
-                      fill="#FFC107"
-                      d="M43.6 20.5H42V20H24v8h11.3C33.4 32.1 29.2 35 24 35c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 0.9 6.9 2.4l5.7-5.7C33.6 6.2 29.1 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"
-                    />
-                    <path
-                      fill="#FF3D00"
-                      d="M6.3 14.6l6.6 4.8C14.1 16.1 18.7 13 24 13c2.6 0 5 0.9 6.9 2.4l5.7-5.7C33.6 6.2 29.1 4 24 4c-7.3 0-13.6 4.1-17 10.2z"
-                    />
-                    <path
-                      fill="#4CAF50"
-                      d="M24 44c5.1 0 9.8-1.9 13.4-5.1l-6.2-5.1c-2 1.4-4.5 2.2-7.2 2.2-5.1 0-9.4-3.3-11-7.9l-6.6 5.1C10.4 39.8 16.7 44 24 44z"
-                    />
-                    <path
-                      fill="#1976D2"
-                      d="M43.6 20.5H42V20H24v8h11.3C34.7 32.3 29.8 36 24 36c-6.1 0-11-4.9-11-11s4.9-11 11-11c2.6 0 5 0.9 6.9 2.4l5.7-5.7C33.6 6.2 29.1 4 24 4c-11 0-20 9-20 20s9 20 20 20c11 0 20-9 20-20 0-1.3-.1-2.7-.4-4z"
-                    />
-                  </svg>
+                  <img src="/google.png" alt="구글 로그인" className="h-12" />
                 </button>
 
-                {/* 카카오톡 로그인 버튼 주석처리 상태 유지 */}
+                {/* Kakao 로그인 버튼 */}
+                <button
+                  onClick={() => handleSocialLogin("kakao")}
+                  className="transition-transform duration-200 hover:scale-105"
+                >
+                  <img src="/kakao.png" alt="카카오 로그인" className="h-12" />
+                </button>
+
+                {/* Naver 로그인 버튼 */}
+                <button
+                  onClick={() => handleSocialLogin("naver")}
+                  className="transition-transform duration-200 hover:scale-105"
+                >
+                  <img src="/naver.png" alt="네이버 로그인" className="h-12" />
+                </button>
               </div>
             </div>
+            {/* --- 변경 종료 --- */}
 
-            {/* 비밀번호 찾기 */}
             <div className="mt-4 text-center">
               <a
                 href="#"
@@ -339,7 +336,6 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* 동영상 팝업 모달 */}
       {showVideoGuid && <VideoGuid onClose={handleCloseVideoGuid} />}
     </div>
   );
