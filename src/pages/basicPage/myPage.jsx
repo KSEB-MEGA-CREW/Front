@@ -9,26 +9,23 @@ import BasicLayout from "../../layouts/basicLayout";
 const MyPage = () => {
   return (
     <BasicLayout>
-      <div className="w-full min-h-screen p-4 bg-gray-100">
-        <div className="w-full" style={{ height: 'calc(100vh - 2rem)' }}>
-          <div className="h-full grid grid-cols-2 gap-4">
-            {/* 왼쪽 열 */}
-            <div className="flex flex-col gap-16 h-full">
-              {/* UserProfile - 위쪽 */}
-              <div style={{ height: '30%' }}>
-                <UserProfile />
-              </div>
-              
-              {/* CalendarModel - 아래쪽 */}
-              <div style={{ height: 'calc(70% - 1rem)' }}>
-                <CalendarModel />
-              </div>
-            </div>
-            
-            {/* 오른쪽 열 - StatisticComponent */}
-            <div className="h-full">
-              <StasticComponent />
-            </div>
+      <div className="min-h-screen bg-gray-50 p-4">
+        <div className="max-w-7xl mx-auto">
+          {/* 헤더 */}
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">마이페이지</h1>
+            <p className="text-gray-600 mt-2">개인 정보와 활동 현황을 확인하세요</p>
+          </div>
+
+          {/* 상단: 사용자 프로필 (가로 전체) */}
+          <div className="mb-6">
+            <UserProfile />
+          </div>
+
+          {/* 하단: 캘린더와 통계를 가로로 배치 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <CalendarModel />
+            <StasticComponent />
           </div>
         </div>
       </div>
@@ -37,3 +34,4 @@ const MyPage = () => {
 };
 
 export default MyPage;
+
