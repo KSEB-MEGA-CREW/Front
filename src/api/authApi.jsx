@@ -148,6 +148,13 @@ export const quizApi = {
 // 구글 OAuth2 URL - 구글 로그인 url에 맞게 수정
 export const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 
+// 카카오 OAuth2 URL - 카카오 로그인 url에 맞게 수정
+// 현재는 구글과 동일하게 설정되어 있지만, 실제 카카오 OAuth2 URL로 변경해야 합니다.
+export const KAKAO_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
+
+// 네이버 OAuth2 URL - 네이버 로그인 url에 맞게 수정
+// 현재는 구글과 동일하게 설정되어 있지만, 실제 네이버 OAuth2 URL로 변경해야 합니다.
+export const NAVER_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 // token 유효성 검사를 여기서 처리
 export const validateToken = async () => {
   const token = localStorage.getItem("token");
