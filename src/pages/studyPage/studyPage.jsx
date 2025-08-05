@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { FaCheckCircle, FaTimesCircle, FaCalendarAlt } from "react-icons/fa";
 import { quizApi } from "../../api/authApi";
-import {useAuth} from "../../Context/authContext";
+import { useAuth } from "../../Context/authContext";
 
 // [수정 1] 분리된 달력 모달 컴포넌트를 import 합니다.
 import CalendarModal from "../../components/calendarModel"; // 파일 경로에 맞게 수정하세요.
 import BasicLayout from "../../layouts/basicLayout";
 
 function StudyWord() {
-  const {user} = useAuth(); // 사용자 정보 추가 -> 사용자별 데이터 저장 및 처리를 위함
+  const { user } = useAuth(); // 사용자 정보 추가 -> 사용자별 데이터 저장 및 처리를 위함
   const [quizList, setQuizList] = useState([]);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -41,72 +41,72 @@ function StudyWord() {
   }, [isFinished]);
 
   const saveQuizResult = async () => {
-    if(!user?.id) return;
+    if (!user?.id) return;
 
     const correctAnswers = answerResult.filter((r) => r.isCorrect).length; // 함수가 아니라 속성을 사용해서 정답 개수를 올바르게 저장
     const totalQuestions = answerResult.length;
 
     // 카테고리별 정답 수 계산
     const categoryCorrectCounts = {};
-    answerResult.forEach(result => {
-      if(result.quiz.category){
-        if(!categoryCorrectCounts[result.quiz.category]){
+    answerResult.forEach((result) => {
+      if (result.quiz.category) {
+        if (!categoryCorrectCounts[result.quiz.category]) {
           categoryCorrectCounts[result.quiz.category] = 0;
         }
-        if(result.isCorrect){
+        if (result.isCorrect) {
           categoryCorrectCounts[result.quiz.category]++;
         }
       }
     });
-    try{
+    try {
       // 백엔드에 퀴즈 결과 저장(quizApi.saveQuizResult 사용) -> 일단 localStorage엔 저장하지 않음
       await quizApi.saveQuizResult({
         userId: user.id,
         correctCount: correctAnswers,
-        categoryCorrectCounts: categoryCorrectCounts
+        categoryCorrectCounts: categoryCorrectCounts,
       });
 
-      console.log('퀴즈 결과 백엔드 저장 성공');
-    } catch(error){
-      console.log('퀴즈 결과 저장 실패:', error);
+      console.log("퀴즈 결과 백엔드 저장 성공");
+    } catch (error) {
+      console.log("퀴즈 결과 저장 실패:", error);
     }
   };
 
   // --- 기존 퀴즈 로직 (fetchQuestions, handleChoice, handleRetry)은 수정 없이 그대로 둡니다. ---
   const fetchQuestions = async () => {
-  setIsLoading(true);
-  setQuizList([]);
-  try {
-    const response = await quizApi.getQuiz();
-    
-    // 백엔드 ApiResponse 구조에 맞춰 수정
-    if (response && response.success && Array.isArray(response.data)) {
-      setQuizList(response.data.slice(0, 5));
-    } else if (Array.isArray(response)) {
-      // 호환성을 위한 기존 구조 지원
-      setQuizList(response.slice(0, 5));
-    } else {
-      console.error("퀴즈 데이터 형식이 올바르지 않습니다:", response);
-      setQuizList([]);
-    }
-  } catch (error) {
-    console.error("퀴즈를 불러오는 중 오류 발생:", error);
-    
-    // 에러 타입별 사용자 메시지 처리
-    if (error.message.includes('인증')) {
-      alert('로그인이 필요합니다.');
-      // 필요시 로그인 페이지로 리다이렉트 추가하기
-    } else if (error.message.includes('제한')) {
-      alert('일일 퀴즈 생성 제한을 초과했습니다.');
-    } else {
-      alert('퀴즈를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.');
-    }
-    
+    setIsLoading(true);
     setQuizList([]);
-  } finally {
-    setIsLoading(false);
-  }
+    try {
+      const response = await quizApi.getQuiz();
+      console.log("퀴즈 데이터:", response);
 
+      // 백엔드 ApiResponse 구조에 맞춰 수정
+      if (response && response.success && Array.isArray(response.data)) {
+        setQuizList(response.data.slice(0, 5));
+      } else if (Array.isArray(response)) {
+        // 호환성을 위한 기존 구조 지원
+        setQuizList(response.slice(0, 5));
+      } else {
+        console.error("퀴즈 데이터 형식이 올바르지 않습니다:", response);
+        setQuizList([]);
+      }
+    } catch (error) {
+      console.error("퀴즈를 불러오는 중 오류 발생:", error);
+
+      // 에러 타입별 사용자 메시지 처리
+      if (error.message.includes("인증")) {
+        alert("로그인이 필요합니다.");
+        // 필요시 로그인 페이지로 리다이렉트 추가하기
+      } else if (error.message.includes("제한")) {
+        alert("일일 퀴즈 생성 제한을 초과했습니다.");
+      } else {
+        alert("퀴즈를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
+
+      setQuizList([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChoice = (idx) => {
@@ -172,13 +172,15 @@ function StudyWord() {
                     <strong className="font-bold">
                       {result.quiz.word || result.quiz.signDescription}
                     </strong>
-                    {!result.isCorrect && (
-                      <span className="text-sm opacity-80 ml-4">
-                        정답:{" "}
-                        {result.quiz.choices.find((c) => c.answer).word ||
-                          result.quiz.choices.find((c) => c.answer).meaning}
-                      </span>
-                    )}
+                    {
+                      <div className="text-right">
+                        <span className="text-sm opacity-80 ml-4">
+                          정답:{" "}
+                          {result.quiz.choices.find((c) => c.answer).word ||
+                            result.quiz.choices.find((c) => c.answer).meaning}
+                        </span>
+                      </div>
+                    }
                   </span>
                 </div>
               ))}
