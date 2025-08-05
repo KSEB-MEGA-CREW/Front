@@ -2,7 +2,7 @@ import TopMenuComponent from "../components/menu/topMenu";
 
 function BasicLayout({ children }) {
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100 text-white">
+    <div>
       <TopMenuComponent />
 
       {/* TopMenu가 fixed일 경우를 고려해 위쪽 padding */}

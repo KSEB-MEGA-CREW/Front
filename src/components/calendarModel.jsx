@@ -110,9 +110,9 @@ function CalendarModel({ quizHistory = {} }) {
   const maxCorrect = Math.max(...weekCorrectCounts, 5);
 
   return (
-    <div className="w-full h-full bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+    <div className="w-full h-full bg-white overflow-hidden">
       <div className="p-4 h-full flex flex-col">
-        <h2 className="text-xl font-bold text-white mb-3 text-center">
+        <h2 className="text-xl font-bold text-gray-800 mb-3 text-center">
           퀴즈 기록
         </h2>
 
@@ -142,9 +142,9 @@ function CalendarModel({ quizHistory = {} }) {
 
         {/* 월별 평균 정답률 상단 출력 (월별 뷰일 때만) */}
         {view === "month" && (
-          <div className="mb-3 text-sm text-gray-300 font-semibold text-center">
+          <div className="mb-3 text-sm text-gray-600 font-semibold text-center">
             {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 평균:{" "}
-            <span className="text-white font-bold">
+            <span className="text-gray-800 font-bold">
               {monthPercentage !== null
                 ? monthPercentage.toFixed(1) + "%"
                 : "기록 없음"}
@@ -154,23 +154,25 @@ function CalendarModel({ quizHistory = {} }) {
 
         <div className="flex-grow overflow-hidden">
           {view === "month" && (
-            <div className="h-full">
-              <Calendar
-                locale="ko-KR"
-                tileClassName={getTileClassName}
-                formatDay={(locale, date) => date.getDate()}
-                onClickDay={(value) => setSelectedDate(value)}
-                value={selectedDate}
-                view="month"
-                className="w-full h-full text-white"
-              />
+            <div className="h-full flex items-center justify-center">
+              <div className="w-full max-w-md mx-auto">
+                <Calendar
+                  locale="ko-KR"
+                  tileClassName={getTileClassName}
+                  formatDay={(locale, date) => date.getDate()}
+                  onClickDay={(value) => setSelectedDate(value)}
+                  value={selectedDate}
+                  view="month"
+                  className="w-full text-gray-800 mx-auto"
+                />
+              </div>
             </div>
           )}
 
           {view === "week" && (
-            <div className="bg-gray-700 p-3 rounded h-full">
+            <div className="bg-gray-100 p-3 rounded h-full">
               {/* 주별 맞춘 횟수 막대그래프 */}
-              <div className="mb-2 flex justify-between px-1 text-xs text-gray-300 font-semibold">
+              <div className="mb-2 flex justify-between px-1 text-xs text-gray-600 font-semibold">
                 {weekDays.map((day) => (
                   <span key={day} className="flex-1 text-center">
                     {day}
@@ -191,12 +193,12 @@ function CalendarModel({ quizHistory = {} }) {
                       }}
                     ></div>
                     {/* 값 라벨 */}
-                    <span className="mt-1 text-white text-xs">{cnt}</span>
+                    <span className="mt-1 text-gray-800 text-xs">{cnt}</span>
                   </div>
                 ))}
               </div>
               {/* 주별 정답률 출력 (퍼센트) */}
-              <div className="text-center text-white text-sm font-semibold mt-3">
+              <div className="text-center text-gray-800 text-sm font-semibold mt-3">
                 주별 정답률:{" "}
                 {weekPercentage !== null ? weekPercentage + "%" : "기록 없음"}
               </div>
@@ -205,7 +207,7 @@ function CalendarModel({ quizHistory = {} }) {
         </div>
 
         {/* 색상 legend */}
-        <div className="mt-3 flex justify-center items-center space-x-3 text-xs text-gray-300">
+        <div className="mt-3 flex justify-center items-center space-x-3 text-xs text-gray-600">
           <div className="flex items-center">
             <span className="w-3 h-3 bg-green-700 rounded-sm mr-1"></span>
             <span>80%+</span>
