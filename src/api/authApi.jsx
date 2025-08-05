@@ -130,7 +130,7 @@ export const quizApi = {
     // api 호출 비동기 처리
     
     try{
-      const reponse = await apiRequest("/api/quiz", {
+      const response = await apiRequest("/api/quiz", {
         method: "POST",
         headers:{ // localStorage에서 토큰 가져와서 post
           'Authorization' : `Bearer ${localStorage.getItem('token')}`
@@ -149,7 +149,7 @@ export const quizApi = {
         method: "POST",
         body: JSON.stringify(resultData)
       });
-      return reponse;
+      return response;
     }catch(error){
       console.error('퀴즈 결과 저장 오류:', error);
       throw error;
