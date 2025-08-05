@@ -43,7 +43,7 @@ function StudyWord() {
   const saveQuizResult = async () => {
     if(!user?.id) return;
 
-    const correctAnswers = answerResult.filter((r) => r.isCorrect). length; // 함수가 아니라 속성을 사용해서 정답 개수를 올바르게 저장
+    const correctAnswers = answerResult.filter((r) => r.isCorrect).length; // 함수가 아니라 속성을 사용해서 정답 개수를 올바르게 저장
     const totalQuestions = answerResult.length;
 
     // 카테고리별 정답 수 계산
