@@ -126,16 +126,36 @@ export const authApi = {
 };
 
 export const quizApi = {
-  getQuiz: async (quizRequest) => {
+  getQuiz: async () => {
     // api 호출 비동기 처리
-    const response = await apiRequest("/api/quiz", {
-      method: "POST",
-      body: JSON.stringify(quizRequest),
-    });
-
-    return response;
+    
+    try{
+      const response = await apiRequest("/api/quiz", {
+        method: "POST",
+        headers:{ // localStorage에서 토큰 가져와서 post
+          'Authorization' : `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      return response.data; // ApiResponse 구조에 맞춰 수정
+    } catch(error){
+      console.error('퀴즈 조회 오류:',error);
+      throw error;
+    }
   },
-  // 정답률(Accuracy) 데이터 가져오기
+  // 퀴즈 결과 저장 API 추가
+  saveQuizResult: async (resultData) => {
+    try{
+      const response = await apiRequest("/api/quiz/result", {
+        method: "POST",
+        body: JSON.stringify(resultData)
+      });
+      return response;
+    }catch(error){
+      console.error('퀴즈 결과 저장 오류:', error);
+      throw error;
+    }
+  },
+  // 정답률(Accuracy) 데이터 가져오기 => 이거 아직 백엔드에 없습니다!!! 전달 및 확인 부탁!!!
   getWeeklyAccuracy: async () => {
     // API 엔드포인트는 실제 서버와 맞춰주세요!
     const response = await apiRequest("/api/accuracy/weekly", {
