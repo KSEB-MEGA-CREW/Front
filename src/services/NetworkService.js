@@ -1,5 +1,5 @@
 import { API_CONFIG } from "../constants/videoConfig";
-
+import { performanceLogger } from "../utils/performanceUtils";
 // 백엔드 통신
 
 export class NetworkService {
@@ -7,20 +7,29 @@ export class NetworkService {
         this.baseURL = API_CONFIG.BASE_URL;
         this.controller = new AbortController();
         this.retryCount = 0;
+        this.requestCount = 0;
     }
 
-    // JWT 토큰 가져오기
     getAuthToken() {
         return localStorage.getItem('token');
     }
 
+
     // 프레임 전송 요청 <- 백엔드 FrameController와 연동
     async sendFrame(frameRequest) {
+        const requestId = `network_request_${++this.requestCount}`;
+        performanceLogger.startTimer(requestId);
+
+        const requestStartTime = Date.now();
+
         try {
             const token = this.getAuthToken();
             if (!token) {
                 throw new Error('인증 토큰이 없습니다.');
             }
+
+            // 요청 시작 로그
+            console.log(`📡 [${new Date().toISOString().split('T')[1].slice(0, -1)}] 프레임 전송 시작 (Frame #${frameRequest.frameIndex})`);
 
             const response = await fetch(`${this.baseURL}${API_CONFIG.ENDPOINTS.ANALYZE_FRAME}`,
                 {
@@ -34,7 +43,12 @@ export class NetworkService {
                 }
             );
 
+            const networkTime = performanceLogger.endTimer(requestId);
+            const responseTime = Date.now() - requestStartTime;
+
             if (!response.ok) {
+                this.logError(response.status, frameRequest.frameIndex, networkTime);
+
                 if (response.status === 401) {
                     throw new Error('인증이 만료되었습니다.');
                 } else if (response.status === 403) {
@@ -47,12 +61,44 @@ export class NetworkService {
 
             const result = await response.json();
             this.retryCount = 0; // 성공 시 재시도 카운트 리셋
+
+
+            // 성공 로그
+            performanceLogger.logPerformance(
+                '✅ 네트워크 요청',
+                networkTime,
+                {
+                    frameIndex: frameRequest.frameIndex,
+                    status: response.status,
+                    responseTime
+                }
+            );
+
+            performanceLogger.addMetric('networkRequest', networkTime, {
+                frameIndex: frameRequest.frameIndex,
+                status: response.status,
+                responseTime,
+                success: true
+            });
+
             return result;
         } catch (error) {
+            const networkTime = performanceLogger.endTimer(requestId);
+
+
             if (error.name === 'AbortError') {
                 console.log('Request aborted');
                 return null;
             }
+
+            // 에러 로그
+            console.error(`❌ 네트워크 오류 (Frame #${frameRequest.frameIndex}):`, error.message);
+
+            performanceLogger.addMetric('networkRequest', networkTime, {
+                frameIndex: frameRequest.frameIndex,
+                error: error.message,
+                success: false
+            });
 
             // 재시도 로직
             if (this.retryCount < API_CONFIG.MAX_RETRIES &&
@@ -66,6 +112,11 @@ export class NetworkService {
 
             throw error;
         }
+    }
+
+    logError(status, frameIndex, duration) {
+        const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
+        console.error(`❌ [${timestamp}] HTTP ${status} 오류 (Frame #${frameIndex}) - ${Math.round(duration)}ms`);
     }
 
     // 재시도 가능한 에러인지 확인
@@ -95,5 +146,6 @@ export class NetworkService {
         this.controller.abort();
         this.controller = new AbortController();
         this.retryCount = 0;
+        console.log('🛑 모든 네트워크 요청 중단');
     }
 }
