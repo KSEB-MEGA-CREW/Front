@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { FaCheckCircle, FaTimesCircle, FaCalendarAlt } from "react-icons/fa";
-import { quizApi } from "../../api/authApi";
+import { useAuth, quizApi } from "../../api/authApi";
 
 // [수정 1] 분리된 달력 모달 컴포넌트를 import 합니다.
 import CalendarModal from "../../components/calendarModel"; // 파일 경로에 맞게 수정하세요.
 import BasicLayout from "../../layouts/basicLayout";
 
 function StudyWord() {
+  const {user} = useAuth(); // 사용자 정보 추가 -> 사용자별 데이터 저장 및 처리를 위함
   const [quizList, setQuizList] = useState([]);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -38,35 +39,40 @@ function StudyWord() {
     }
   }, [isFinished]);
 
-  const saveQuizResult = () => {
-    const formatDate = (date) => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      return `${year}-${month}-${day}`;
-    };
-    const today = formatDate(new Date());
-    const correctAnswers = answerResult.filter((r) => r.isCorrect).length;
+  const saveQuizResult = async () => {
+    if(!user?.id) return;
+
+    const correctAnswers = answerResult.filter((r) => r.isCorrect). length; // 함수가 아니라 속성을 사용해서 정답 개수를 올바르게 저장
     const totalQuestions = answerResult.length;
 
-    try {
-      const newHistory = { ...quizHistory };
-      const todayHistory = newHistory[today] || { correct: 0, total: 0 };
-      todayHistory.correct += correctAnswers;
-      todayHistory.total += totalQuestions;
-      newHistory[today] = todayHistory;
-
-      localStorage.setItem("quizHistory", JSON.stringify(newHistory));
-      setQuizHistory(newHistory);
-    } catch (error) {
-      console.error("퀴즈 기록 저장에 실패했습니다:", error);
+    // 카테고리별 정답 수 계산
+    const categoryCorrectCounts = {};
+    answerResult.forEach(result => {
+      if(result.quiz.category){
+        if(!categoryCorrectCounts[result.quiz.category]){
+          categoryCorrectCounts[result.quiz.category] = 0;
+        }
+        if(result.isCorrect){
+          categoryCorrectCounts[result.quiz.category]++;
+        }
+      }
+    });
+    try{
+      // 백엔드에 퀴즈 결과 저장 -> 일단 localStorage엔 저장하지 않음
+      await quizApi.saveQuizResult({
+        userId: user.id,
+        correctCount: correctAnswers,
+        categoryCorrectCounts: categoryCorrectCounts
+      });
+    } catch(error){
+      console.log('퀴즈 결과 저장 실패:', error);
     }
   };
 
   // --- 기존 퀴즈 로직 (fetchQuestions, handleChoice, handleRetry)은 수정 없이 그대로 둡니다. ---
   const fetchQuestions = async () => {
     setIsLoading(true);
-    setQuizList([]);
+
     try {
       const response = await quizApi.getQuiz({});
       if (Array.isArray(response)) {
@@ -77,6 +83,7 @@ function StudyWord() {
       }
     } catch (error) {
       console.error("퀴즈를 불러오는 중 오류 발생:", error);
+      setQuizList([]);
     } finally {
       setIsLoading(false);
     }
