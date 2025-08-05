@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { FaCheckCircle, FaTimesCircle, FaCalendarAlt } from "react-icons/fa";
-import { useAuth, quizApi } from "../../api/authApi";
+import { quizApi } from "../../api/authApi";
+import {useAuth} from "../../Context/authContext";
 
 // [수정 1] 분리된 달력 모달 컴포넌트를 import 합니다.
 import CalendarModal from "../../components/calendarModel"; // 파일 경로에 맞게 수정하세요.
