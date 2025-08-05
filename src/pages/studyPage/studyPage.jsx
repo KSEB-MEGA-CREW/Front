@@ -58,12 +58,14 @@ function StudyWord() {
       }
     });
     try{
-      // 백엔드에 퀴즈 결과 저장 -> 일단 localStorage엔 저장하지 않음
+      // 백엔드에 퀴즈 결과 저장(quizApi.saveQuizResult 사용) -> 일단 localStorage엔 저장하지 않음
       await quizApi.saveQuizResult({
         userId: user.id,
         correctCount: correctAnswers,
         categoryCorrectCounts: categoryCorrectCounts
       });
+
+      console.log('퀴즈 결과 백엔드 저장 성공');
     } catch(error){
       console.log('퀴즈 결과 저장 실패:', error);
     }
@@ -71,26 +73,39 @@ function StudyWord() {
 
   // --- 기존 퀴즈 로직 (fetchQuestions, handleChoice, handleRetry)은 수정 없이 그대로 둡니다. ---
   const fetchQuestions = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await quizApi.getQuiz({});
-      if (Array.isArray(response)) {
-        setQuizList(response.slice(0, 5));
-      } else {
-        console.error("퀴즈 데이터 형식이 올바르지 않습니다:", response);
-        setQuizList([]);
-      }
-    } catch (error) {
-      console.error("퀴즈를 불러오는 중 오류 발생:", error);
+  setIsLoading(true);
+  setQuizList([]);
+  try {
+    const response = await quizApi.getQuiz();
+    
+    // 백엔드 ApiResponse 구조에 맞춰 수정
+    if (response && response.success && Array.isArray(response.data)) {
+      setQuizList(response.data.slice(0, 5));
+    } else if (Array.isArray(response)) {
+      // 호환성을 위한 기존 구조 지원
+      setQuizList(response.slice(0, 5));
+    } else {
+      console.error("퀴즈 데이터 형식이 올바르지 않습니다:", response);
       setQuizList([]);
-    } finally {
-      setIsLoading(false);
     }
-    setCurrent(0);
-    setSelected(null);
-    setAnswerResult([]);
-    setIsFinished(false);
+  } catch (error) {
+    console.error("퀴즈를 불러오는 중 오류 발생:", error);
+    
+    // 에러 타입별 사용자 메시지 처리
+    if (error.message.includes('인증')) {
+      alert('로그인이 필요합니다.');
+      // 필요시 로그인 페이지로 리다이렉트 추가하기
+    } else if (error.message.includes('제한')) {
+      alert('일일 퀴즈 생성 제한을 초과했습니다.');
+    } else {
+      alert('퀴즈를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }
+    
+    setQuizList([]);
+  } finally {
+    setIsLoading(false);
+  }
+
   };
 
   const handleChoice = (idx) => {
