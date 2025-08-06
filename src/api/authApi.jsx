@@ -158,13 +158,20 @@ export const quizApi = {
   // quizApi.js의 getUserQuizHistory
   getUserQuizHistory: async (year, month, userId) => {
     try {
-      const response = await apiRequest(
+      const data = await apiRequest(
         `/api/quiz/quiz-stats/monthly/${year}/${month}/user/${userId}`,
         {
           method: "GET",
         }
       );
-      return response; // 여기서 data에 배열이 오길 기대함
+
+      const calendarData = Object.entries(data).map(([date, accuracy]) => ({
+        date,
+        accuracy,
+      }));
+
+      return calendarData; // 배열로 변환하여 반환
+      // 또는 객체 그대로 사용/ 여기서 data에 배열이 오길 기대함
     } catch (error) {
       console.error("월 퀴즈 정보 조회:", error);
       throw error; // 에러가 발생하면 Promise.reject로 넘어감

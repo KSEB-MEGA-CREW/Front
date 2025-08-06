@@ -31,6 +31,7 @@ function CalendarModal({ isOpen, onClose, userId }) {
           }
           // 서버 응답 구조에 따라 result 또는 result.data로 처리
           const actualData = result.data || result;
+
           if (!Array.isArray(actualData)) {
             throw new Error(
               "서버 응답이 배열이 아닙니다: " + JSON.stringify(result)
