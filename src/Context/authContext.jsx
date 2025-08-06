@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = ({ token, user }) => {
     if (!token || !user) {
-      cconsole.error("Login failed: Invalid auth data");
+      console.error("Login failed: Invalid auth data");
       return;
     }
 
