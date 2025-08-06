@@ -1,8 +1,9 @@
+import React, { useState, useEffect } from "react";
 import Calendar from "react-calendar";
-import React, { useState } from "react";
-import 'react-calendar/dist/Calendar.css';
+import "react-calendar/dist/Calendar.css";
+import { quizApi } from "../api/authApi"; // api 폴더 위치에 따라 경로 조정
 
-// 날짜를 'YYYY-MM-DD' 형식으로 변환하는 헬퍼 함수
+// 날짜 포맷팅 함수는 그대로
 const formatDate = (date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -10,220 +11,125 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// 한 주 날짜 배열 생성 (주 시작일 기준)
-function getWeekDates(startDate) {
-  const dates = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(startDate);
-    d.setDate(d.getDate() + i);
-    dates.push(d);
+function CalendarModal({ isOpen, onClose, userId }) {
+  const [activeDate, setActiveDate] = useState(new Date());
+  const [quizHistory, setQuizHistory] = useState({});
+
+  useEffect(() => {
+    if (isOpen) {
+      const fetchMonthlyData = async () => {
+        const year = activeDate.getFullYear();
+        const month = activeDate.getMonth() + 1;
+
+        try {
+          const result = await quizApi.getUserQuizHistory(year, month, userId);
+          // result가 undefined면 조기 반환
+          if (!result) {
+            console.error("API 응답이 비정상적입니다:", result);
+            setQuizHistory({});
+            return;
+          }
+          // 서버 응답 구조에 따라 result 또는 result.data로 처리
+          const actualData = result.data || result;
+          if (!Array.isArray(actualData)) {
+            throw new Error(
+              "서버 응답이 배열이 아닙니다: " + JSON.stringify(result)
+            );
+          }
+          const historyMap = actualData.reduce((acc, record) => {
+            const recordDate = record.date || record.data;
+            if (recordDate) {
+              acc[recordDate] = { accuracy: record.accuracy };
+            }
+            return acc;
+          }, {});
+          setQuizHistory(historyMap);
+        } catch (error) {
+          console.error(
+            "퀴즈 기록을 불러오는 데 실패했습니다.",
+            error,
+            error.response
+          );
+          setQuizHistory({});
+        }
+      };
+
+      fetchMonthlyData();
+    }
+  }, [activeDate, isOpen, userId]);
+
+  // 모달이 열려있지 않으면 아무것도 렌더링하지 않음
+  if (!isOpen) {
+    return null;
   }
-  return dates;
-}
 
-// 한 달의 모든 날짜 반환 (해당 월 1일~말일 Date 배열)
-function getMonthDates(date) {
-  const target = new Date(date);
-  const year = target.getFullYear();
-  const month = target.getMonth();
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month + 1, 0);
-  const dates = [];
-  for (let d = first; d <= last; d.setDate(d.getDate() + 1)) {
-    dates.push(new Date(d));
-  }
-  return dates;
-}
-
-function CalendarModel({ quizHistory = {} }) {
-  const [view, setView] = useState("month"); // "month" 또는 "week"
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
-  // 월 단위 타일 색깔 지정
-  const getTileClassName = ({ date, view: calView }) => {
-    if (calView === "month") {
+  // 각 날짜 타일에 적용할 Tailwind CSS 클래스를 반환하는 함수 (수정됨)
+  const getTileClassName = ({ date, view }) => {
+    // 월(month) 뷰에서만 클래스를 적용
+    if (view === "month") {
       const dateString = formatDate(date);
       const dayData = quizHistory[dateString];
-      if (dayData) {
-        const percentage = (dayData.correct / dayData.total) * 100;
+
+      if (dayData && dayData.accuracy > 0) {
+        // 데이터가 있고, 정답률이 0보다 클 때만 색상 표시
+        const percentage = dayData.accuracy;
+        // 정답률에 따라 다른 배경색 클래스를 반환
         if (percentage >= 80)
-          return "!bg-green-700 !text-white hover:!bg-green-600";
+          return "!bg-green-700 !text-white hover:!bg-green-600 rounded-lg";
         if (percentage >= 50)
-          return "!bg-yellow-600 !text-white hover:!bg-yellow-500";
-        return "!bg-red-700 !text-white hover:!bg-red-600";
+          return "!bg-yellow-600 !text-white hover:!bg-yellow-500 rounded-lg";
+        return "!bg-red-700 !text-white hover:!bg-red-600 rounded-lg";
       }
     }
-    return null;
+    return null; // 데이터가 없으면 기본 스타일 적용
   };
-
-  // 주 단위 날짜 배열, 평균 등 계산
-  const getStartOfWeek = (date) => {
-    const d = new Date(date);
-    const day = d.getDay(); // 0(일)~6(토)
-    d.setDate(d.getDate() - day);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  };
-
-  const startOfWeek = getStartOfWeek(selectedDate);
-  const weekDates = getWeekDates(startOfWeek);
-
-  // 주별 맞춘 문제 개수, 일요일~토요일 순서
-  const weekCorrectCounts = weekDates.map((day) => {
-    const key = formatDate(day);
-    const data = quizHistory[key];
-    return data ? data.correct : 0;
-  });
-
-  // 주별 푼 문제 개수, 일요일~토요일 순서
-  const weekTotalCounts = weekDates.map((day) => {
-    const key = formatDate(day);
-    const data = quizHistory[key];
-    return data ? data.total : 0;
-  });
-
-  // 주별 정답률 = 맞춘 수 합 / 전체 수 합 * 100
-  const weekTotalCorrect = weekCorrectCounts.reduce((sum, v) => sum + v, 0);
-  const weekTotalSolved = weekTotalCounts.reduce((sum, v) => sum + v, 0);
-  const weekPercentage = weekTotalSolved
-    ? Math.round((weekTotalCorrect / weekTotalSolved) * 100)
-    : null;
-
-  // 월별 평균 정답률
-  const monthDates = getMonthDates(selectedDate);
-  let monthTotalCorrect = 0,
-    monthTotalSolved = 0;
-  monthDates.forEach((date) => {
-    const key = formatDate(date);
-    const d = quizHistory[key];
-    if (d) {
-      monthTotalCorrect += d.correct;
-      monthTotalSolved += d.total;
-    }
-  });
-  const monthPercentage =
-    monthTotalSolved > 0 ? (monthTotalCorrect / monthTotalSolved) * 100 : null;
-
-  // 주 요일 이름
-  const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
-  // y축(최대 맞춘 수) 자동 스케일
-  const maxCorrect = Math.max(...weekCorrectCounts, 5);
 
   return (
-    <div className="w-full h-full bg-white overflow-hidden">
-      <div className="p-4 h-full flex flex-col">
-        <h2 className="text-xl font-bold text-gray-800 mb-3 text-center">
+    // 모달 오버레이
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 transition-opacity"
+      onClick={onClose} // 배경 클릭 시 모달 닫기
+    >
+      {/* 모달 컨텐츠 */}
+      <div
+        className="relative w-full max-w-lg p-6 mx-4 bg-gray-800 rounded-xl shadow-lg"
+        onClick={(e) => e.stopPropagation()} // 컨텐츠 클릭 시 닫기 방지
+      >
+        <h2 className="text-2xl font-bold text-white mb-4 text-center">
           퀴즈 기록
         </h2>
-
-        {/* 월/주 전환 버튼 */}
-        <div className="mb-3 flex justify-center space-x-2">
-          <button
-            className={`px-3 py-1 text-sm rounded ${
-              view === "month"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-600 text-gray-300"
-            }`}
-            onClick={() => setView("month")}
-          >
-            월별
-          </button>
-          <button
-            className={`px-3 py-1 text-sm rounded ${
-              view === "week"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-600 text-gray-300"
-            }`}
-            onClick={() => setView("week")}
-          >
-            주별
-          </button>
-        </div>
-
-        {/* 월별 평균 정답률 상단 출력 (월별 뷰일 때만) */}
-        {view === "month" && (
-          <div className="mb-3 text-sm text-gray-600 font-semibold text-center">
-            {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 평균:{" "}
-            <span className="text-gray-800 font-bold">
-              {monthPercentage !== null
-                ? monthPercentage.toFixed(1) + "%"
-                : "기록 없음"}
-            </span>
-          </div>
-        )}
-
-        <div className="flex-grow overflow-hidden">
-          {view === "month" && (
-            <div className="h-full flex items-center justify-center">
-              <div className="w-full max-w-md mx-auto">
-                <Calendar
-                  locale="ko-KR"
-                  tileClassName={getTileClassName}
-                  formatDay={(locale, date) => date.getDate()}
-                  onClickDay={(value) => setSelectedDate(value)}
-                  value={selectedDate}
-                  view="month"
-                  className="w-full text-gray-800 mx-auto"
-                />
-              </div>
-            </div>
-          )}
-
-          {view === "week" && (
-            <div className="bg-gray-100 p-3 rounded h-full">
-              {/* 주별 맞춘 횟수 막대그래프 */}
-              <div className="mb-2 flex justify-between px-1 text-xs text-gray-600 font-semibold">
-                {weekDays.map((day) => (
-                  <span key={day} className="flex-1 text-center">
-                    {day}
-                  </span>
-                ))}
-              </div>
-              <div className="flex justify-between items-end h-20 px-1">
-                {weekCorrectCounts.map((cnt, idx) => (
-                  <div key={idx} className="flex flex-col items-center flex-1">
-                    {/* 막대 */}
-                    <div
-                      className="w-4 bg-green-600 rounded-sm"
-                      style={{
-                        height:
-                          maxCorrect > 0
-                            ? `${Math.round((cnt / maxCorrect) * 60) || 4}px`
-                            : "4px",
-                      }}
-                    ></div>
-                    {/* 값 라벨 */}
-                    <span className="mt-1 text-gray-800 text-xs">{cnt}</span>
-                  </div>
-                ))}
-              </div>
-              {/* 주별 정답률 출력 (퍼센트) */}
-              <div className="text-center text-gray-800 text-sm font-semibold mt-3">
-                주별 정답률:{" "}
-                {weekPercentage !== null ? weekPercentage + "%" : "기록 없음"}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 색상 legend */}
-        <div className="mt-3 flex justify-center items-center space-x-3 text-xs text-gray-600">
+        <Calendar
+          locale="ko-KR" // 한국어 설정
+          tileClassName={getTileClassName} // 날짜별 동적 클래스 적용
+          formatDay={(locale, date) => date.getDate()} // 날짜에서 '일' 제거
+          // 사용자가 월을 변경할 때 activeDate 상태를 업데이트
+          onActiveStartDateChange={({ activeStartDate }) =>
+            setActiveDate(activeStartDate)
+          }
+        />
+        <div className="mt-6 flex justify-center items-center space-x-6 text-sm text-gray-300">
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-green-700 rounded-sm mr-1"></span>
-            <span>80%+</span>
+            <span className="w-4 h-4 bg-green-700 rounded-sm mr-2"></span>
+            <span>정답률 80% 이상</span>
           </div>
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-yellow-600 rounded-sm mr-1"></span>
-            <span>50%+</span>
+            <span className="w-4 h-4 bg-yellow-600 rounded-sm mr-2"></span>
+            <span>정답률 50% 이상</span>
           </div>
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-red-700 rounded-sm mr-1"></span>
-            <span>50%-</span>
+            <span className="w-4 h-4 bg-red-700 rounded-sm mr-2"></span>
+            <span>정답률 50% 미만</span>
           </div>
         </div>
+        <button
+          onClick={onClose}
+          className="w-full mt-6 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+        >
+          닫기
+        </button>
       </div>
     </div>
   );
 }
 
-export default CalendarModel;
+export default CalendarModal;

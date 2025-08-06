@@ -1,17 +1,18 @@
-import React, {createContext, useState, useEffect, useContext} from "react";
-import {authApi, validateToken} from '../api/authApi';
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { authApi, validateToken } from "../api/authApi";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if(!context){
-    throw new Error('useAuth must be used within an AuthProvider.');
+  console.log("useAuth context:", context); // 디버깅용 로그
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider.");
   }
   return context;
 };
 
-export const AuthProvider = ({children}) => {
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true); // 초기 로딩 상태
@@ -19,28 +20,28 @@ export const AuthProvider = ({children}) => {
   // 초기화 시 토큰 확인
   useEffect(() => {
     const initializeAuth = async () => {
-      try{
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+      try {
+        const storedToken = localStorage.getItem("token");
+        const storedUser = localStorage.getItem("user");
 
-        if(storedToken && storedUser){
+        if (storedToken && storedUser) {
           // 토큰 유효성 검증
-          
+
           const isValid = await validateToken();
-          if(isValid){
+          if (isValid) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
-          }else{
+          } else {
             // 토큰이 유효하지 않으면 로컬스토리지 정리
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
           }
         }
-      } catch(error){
-        console.log('Auth 초기화 오류:', error);
+      } catch (error) {
+        console.log("Auth 초기화 오류:", error);
         // 에러 발생 시 로컬 스토리지 정리
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
       } finally {
         setLoading(false);
       }
@@ -49,23 +50,23 @@ export const AuthProvider = ({children}) => {
     initializeAuth();
   }, []);
 
-  const login = ({token, user}) => {
-    if(!token || !user){
-      cconsole.error('Login failed: Invalid auth data');
+  const login = ({ token, user }) => {
+    if (!token || !user) {
+      cconsole.error("Login failed: Invalid auth data");
       return;
     }
 
     setToken(token);
     setUser(user);
-    localStorage.setItem('token',token);
-    localStorage.setItem('user',JSON.stringify(user));
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     authApi.logout();
   };
 
@@ -76,20 +77,11 @@ export const AuthProvider = ({children}) => {
     loading,
     login,
     logout,
-    isAuthenticated: !!token && !!user
+    isAuthenticated: !!token && !!user,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-
-
-
-
 
 // import { createContext, useState, useEffect, useContext } from "react";
 // import { useCookies } from "react-cookie";
