@@ -159,7 +159,7 @@ export const quizApi = {
   getUserQuizHistory: async (year, month, userId) => {
     try {
       const response = await apiRequest(
-        `/quiz-stats/monthly/${year}/${month}/user/${userId}`,
+        `/api/quiz/quiz-stats/monthly/${year}/${month}/user/${userId}`,
         {
           method: "GET",
         }
