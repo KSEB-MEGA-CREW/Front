@@ -14,12 +14,5 @@ export const API_CONFIG = {
     ENDPOINTS: {
         ANALYZE_FRAME: '/api/signlanguage/analyze',
         HEALTH_CHECK: '/api/signlanguage/health'
-    },
-    TIMEOUT: 5000,
-    MAX_RETRIES: 3
+    }
 };
-
-export const SESSION_CONFIG = {
-    GENERATE_UUID: () => crypto.randomUUID(),
-    TIMEOUT_MINUTES: 30
-}

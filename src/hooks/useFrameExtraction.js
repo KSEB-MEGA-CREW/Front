@@ -1,9 +1,10 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import { FrameProcessor } from '../services/FrameProcessor';
-import { VIDEO_CONFIG, SESSION_CONFIG } from "../constants/videoConfig";
+import { VIDEO_CONFIG } from "../constants/videoConfig";
 import { useSignLanguageAPI } from "./useSignLanguageAPI";
-import { useAuth } from "../Context/authContext";
 import { performanceLogger, FPSCalculator } from "../utils/performanceUtils";
+import { v4 as uuidv4 } from 'uuid';
+import { useAuth } from "../Context/authContext";
 
 // 프레임 추출 로직 -> useSignLanguageAPI hook 활용
 
@@ -11,15 +12,19 @@ export const useFrameExtraction = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [result, setResult] = useState(null);
     const [error, setError] = useState(null);
-    const [sessionId] = useState(SESSION_CONFIG.GENERATE_UUID());
-    // UUID는 고유 ID, 중복될 확률 거의 없음
-
-    // useAuth 훅에서 user 추출
     const { user } = useAuth();
+
+    // UUID는 고유 ID, 중복될 확률 거의 없음
+    // Universally Unique Identifier
+    // 분산 환경을 지원 및 보안 강화
+    // UUID 한 번만 생성하고 유지
+    const sessionId = useMemo(() => uuidv4(), []);
 
     const frameProcessor = useRef(new FrameProcessor());
     const intervalRef = useRef(null);
     const lastSubmissionTime = useRef(0);
+
+    // 성능 측정용
     const fpsCalculator = useRef(new FPSCalculator());
     const sessionStartTime = useRef(null);
 
@@ -32,8 +37,11 @@ export const useFrameExtraction = () => {
 
     // frame extraction starts
     const startFrameExtraction = useCallback((videoElement) => {
-        if (!videoElement || isProcessing || !user?.id) { // user check 추가
-            // console.warn("video Element Error")
+        if (!videoElement || isProcessing) return;
+
+        // user 인증 확인 추가
+        if (!user?.id) {
+            setError('사용자 인증이 필요합니다.');
             return;
         }
 
@@ -43,9 +51,11 @@ export const useFrameExtraction = () => {
         frameProcessor.current.resetFrameIndex();
         sessionStartTime.current = Date.now();
 
+        const cycleStartTime = Date.now();
+
         console.log('🚀 === 프레임 추출 세션 시작 ===');
         console.log(`📊 세션 ID: ${sessionId}`);
-        console.log(`👤 사용자 ID: ${user.id}`);
+        // console.log(`👤 사용자 ID: ${user.id}`);
         console.log(`⚙️  설정: ${VIDEO_CONFIG.CANVAS_WIDTH}x${VIDEO_CONFIG.CANVAS_HEIGHT}, ${VIDEO_CONFIG.FRAME_INTERVAL}ms 간격`);
         console.log('================================\n');
 
@@ -69,7 +79,7 @@ export const useFrameExtraction = () => {
                 // frame extraction -> 백엔드 FrameRequest 구조에 맞춤
                 const frameRequest = frameProcessor.current.extractFrame(
                     videoElement,
-                    sessionId
+                    sessionId // 생성된 sessionId 사용
                 );
 
                 // 백엔드(API)로 비동기 전송
@@ -80,7 +90,6 @@ export const useFrameExtraction = () => {
 
                 // FPS 계산
                 fpsCalculator.current.tick();
-
 
                 if (extractResult?.success) {
                     // frame 추출 후 전송 성공 응답 처리
@@ -108,6 +117,10 @@ export const useFrameExtraction = () => {
                 console.error('Frame processing error:', err);
                 setError(err.message);
 
+                // 사이클 시간 계산 수정
+                const cycleEndTime = Date.now();
+                console.log(`Cycle time: ${cycleEndTime - cycleStartTime}ms`);
+
                 // 인증 오류 시 처리 중단
                 if (err.message.includes('인증')) {
                     stopFrameExtraction();
@@ -121,7 +134,7 @@ export const useFrameExtraction = () => {
             }
 
         }, VIDEO_CONFIG.FRAME_INTERVAL);
-    }, [isProcessing, sessionId, submitFrame, clearError, user?.id]); // user.id 추가
+    }, [isProcessing, sessionId, submitFrame, clearError]);
 
     // 프레임 추출 중단
     const stopFrameExtraction = useCallback(() => {
@@ -142,7 +155,6 @@ export const useFrameExtraction = () => {
             performanceLogger.printReport();
             console.log('===============================\n');
         }
-
     }, []);
 
     // 정리 cleanup
@@ -167,7 +179,7 @@ export const useFrameExtraction = () => {
         isProcessing,
         result,
         error,
-        sessionId,
+        sessionId, // 디버깅용으로 노출 -> 운영시 제거
         startFrameExtraction,
         stopFrameExtraction,
         cleanup
