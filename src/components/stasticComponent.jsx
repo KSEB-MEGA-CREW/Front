@@ -41,6 +41,22 @@ const GrapeComponent = () => {
     fetchData();
   }, []); // 컴포넌트가 처음 마운트될 때 한 번만 실행합니다.
 
+  // 정답률에 따른 원의 색상 결정
+  const getCircleColor = (accuracy) => {
+    if (accuracy >= 90) return 'bg-green-500';
+    if (accuracy >= 80) return 'bg-blue-500';
+    if (accuracy >= 70) return 'bg-yellow-500';
+    if (accuracy >= 60) return 'bg-orange-500';
+    return 'bg-red-500';
+  };
+
+  // 정답률에 따른 원의 크기 결정
+  const getCircleSize = (accuracy) => {
+    const minSize = 40; // 최소 크기
+    const maxSize = 80; // 최대 크기
+    return minSize + (accuracy / 100) * (maxSize - minSize);
+  };
+
   // 로딩 중일 때 표시할 UI
   if (loading) {
     return (
@@ -63,24 +79,34 @@ const GrapeComponent = () => {
     <div className="w-full">
       <h2 className="text-xl font-bold text-gray-800 mb-4">주간 정답률</h2>
 
-      {/* 차트 영역: 막대 그래프 */}
-      <div className="flex justify-between items-end w-full h-64 border-b-2 border-gray-200">
-        {weeklyData.map((item, index) => (
-          <div
-            key={index}
-            className="flex-1 px-2 h-full relative flex justify-center items-end group"
-          >
-            {/* 막대 위에 표시될 정답률 텍스트 (마우스 호버 시 보임) */}
-            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-sm font-medium text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              {item.accuracy}%
-            </span>
-            {/* 실제 막대 */}
+      {/* 원형 차트 영역 */}
+      <div className="flex justify-between items-center w-full h-64 py-8">
+        {weeklyData.map((item, index) => {
+          const size = getCircleSize(item.accuracy);
+          return (
             <div
-              className="w-full bg-blue-400 rounded-t-lg transition-all duration-300 ease-in-out group-hover:bg-blue"
-              style={{ height: `${item.accuracy}%` }}
-            ></div>
-          </div>
-        ))}
+              key={index}
+              className="flex-1 flex flex-col items-center justify-center group relative"
+            >
+              {/* 정답률을 나타내는 원 */}
+              <div
+                className={`${getCircleColor(item.accuracy)} rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 ease-in-out group-hover:scale-110 shadow-lg cursor-pointer`}
+                style={{ 
+                  width: `${size}px`, 
+                  height: `${size}px`,
+                  fontSize: `${Math.max(12, size * 0.25)}px`
+                }}
+              >
+                {item.accuracy}%
+              </div>
+
+              {/* 호버 시 추가 정보 표시 */}
+              <div className="absolute -top-12 bg-gray-800 text-white px-2 py-1 rounded text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap z-10">
+                정답률: {item.accuracy}%
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* X축 레이블 영역: 요일 및 날짜 */}
@@ -95,6 +121,30 @@ const GrapeComponent = () => {
             </p>
           </div>
         ))}
+      </div>
+
+      {/* 범례 */}
+      <div className="flex justify-center items-center space-x-4 mt-6 text-xs">
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+          <span className="text-gray-600">90% 이상</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+          <span className="text-gray-600">80-89%</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+          <span className="text-gray-600">70-79%</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+          <span className="text-gray-600">60-69%</span>
+        </div>
+        <div className="flex items-center space-x-1">
+          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+          <span className="text-gray-600">60% 미만</span>
+        </div>
       </div>
 
       <div className="flex justify-end mt-4">

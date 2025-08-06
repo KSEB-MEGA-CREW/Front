@@ -1,37 +1,36 @@
-import React from "react";
-
-// 실제 컴포넌트들 임포트
+import React from 'react';
 import UserProfile from '../../components/userProfile';
 import CalendarModel from '../../components/calendarModel';
-import StasticComponent from '../../components/stasticComponent'
-import BasicLayout from "../../layouts/basicLayout";
+import StatisticComponent from '../../components/stasticComponent';
+import BasicLayout from '../../layouts/basicLayout'; // ✅ 여기 중요!
 
-const MyPage = () => {
+export default function MyPage() {
   return (
     <BasicLayout>
-      <div className="min-h-screen bg-gray-50 p-4">
-        <div className="max-w-7xl mx-auto">
-          {/* 헤더 */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">마이페이지</h1>
-            <p className="text-gray-600 mt-2">개인 정보와 활동 현황을 확인하세요</p>
-          </div>
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* 왼쪽 - 프로필 섹션 */}
+          <UserProfile />
 
-          {/* 상단: 사용자 프로필 (가로 전체) */}
-          <div className="mb-6">
-            <UserProfile />
-          </div>
+          {/* 오른쪽 - 대시보드 */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* 대시보드 헤더 */}
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                대시보드 <span className="text-lg font-normal text-gray-500">수담과 성장 중!</span>
+              </h1>
+            </div>
 
-          {/* 하단: 캘린더와 통계를 가로로 배치 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* 통계 컴포넌트 */}
+            <StatisticComponent />
+
+            {/* 월별 캘린더 */}
             <CalendarModel />
-            <StasticComponent />
           </div>
         </div>
       </div>
     </BasicLayout>
   );
-};
-
-export default MyPage;
-
+}
