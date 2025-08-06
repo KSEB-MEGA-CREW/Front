@@ -1,11 +1,18 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useMemo,
+} from "react";
 import { authApi, validateToken } from "../api/authApi";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  console.log("useAuth context:", context); // 디버깅용 로그
+  // console.log("useAuth context:", context); // 디버깅용 로그
+  console.trace("useAuth가 호출되었습니다.");
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider.");
   }
@@ -70,15 +77,18 @@ export const AuthProvider = ({ children }) => {
     authApi.logout();
   };
 
-  const value = {
-    user,
-    token,
-    isLoading: loading,
-    loading,
-    login,
-    logout,
-    isAuthenticated: !!token && !!user,
-  };
+  // ✅ value 객체를 useMemo로 감싸줍니다.
+  const value = useMemo(
+    () => ({
+      user,
+      token,
+      loading,
+      login,
+      logout,
+      isAuthenticated: !!token && !!user,
+    }),
+    [user, token, loading]
+  ); // 의존성 배열에 관련 상태를 넣어줍니다.
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
