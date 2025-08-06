@@ -20,6 +20,13 @@ export const useSignLanguageAPI = () => {
             throw new Error('사용자 인증이 필요합니다.');
         }
 
+        // 현재 NetworkService의 sendFrame(frameRequest, token) <- 토큰이 별도 파라미터로 필요
+        // 이를 위해 토큰 가져오기
+        const token = localStorage.getItem('token');
+        if (!token) {
+            throw new Error('인증 토큰이 없습니다.');
+        }
+
         setIsSubmitting(true);
         setError(null);
 
@@ -30,7 +37,7 @@ export const useSignLanguageAPI = () => {
                 userId: user.id
             };
 
-            const result = await networkService.current.sendFrame(requestWithUserId);
+            const result = await networkService.current.sendFrame(requestWithUserId, token);
             setLastResult(result);
             return result;
 

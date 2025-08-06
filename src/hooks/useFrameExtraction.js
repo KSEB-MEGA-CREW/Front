@@ -37,7 +37,15 @@ export const useFrameExtraction = () => {
 
     // frame extraction starts
     const startFrameExtraction = useCallback((videoElement) => {
-        if (!videoElement || isProcessing) return;
+        console.log("=== startFrameExtraction 호출됨 ===");
+        console.log("videoElement:", videoElement);
+        console.log("videoElement.videoWidth:", videoElement?.videoWidth);
+        console.log("isProcessing:", isProcessing);
+
+        if (!videoElement || isProcessing) {
+            console.log("=== 조건 불만족으로 리턴 ===");
+            return;
+        }
 
         // user 인증 확인 추가
         if (!user?.id) {
@@ -63,6 +71,8 @@ export const useFrameExtraction = () => {
         performanceLogger.clearMetrics();
 
         intervalRef.current = setInterval(async () => {
+            console.log("=== Interval 실행됨 ==="); // 이 로그가 나오는지 확인
+
             try {
                 const now = Date.now();
 

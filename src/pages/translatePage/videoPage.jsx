@@ -37,10 +37,17 @@ const VideoPage = () => {
 
     // toggle logic 단순화
     const toggleRecording = () => {
+        console.log("=== toggleRecording 클릭됨 ===");
+        console.log("isProcessing:", isProcessing);
+        console.log("videoRef.current:", videoRef.current);
+        console.log("isCameraReady:", isCameraReady);
+
         if(!isProcessing) {
+            console.log("=== startFrameExtraction 호출 시도 ===");
             setStatusMessage("수화 인식 시작");
             startFrameExtraction(videoRef.current); // sessionId 전달하지 않음
         } else{
+            console.log("=== stopFrameExtraction 호출 ===");
             stopFrameExtraction();
             setStatusMessage("수화 인식 중단");
         }
