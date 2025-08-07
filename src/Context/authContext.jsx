@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem("token");
         const storedUser = localStorage.getItem("user");
 
+        console.log(storedToken, storedUser); // 디버깅용 로그
         if (storedToken && storedUser) {
           // 토큰 유효성 검증
 
