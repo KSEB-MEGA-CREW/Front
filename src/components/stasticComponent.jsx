@@ -131,7 +131,7 @@ const StasticComponent = () => {
               >
                 {/* 정답률을 나타내는 원 */}
                 <div
-                  className={`${getCircleColor(item.accuracy)} rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 ease-in-out group-hover:scale-110 shadow-lg cursor-pointer relative overflow-hidden`}
+                  className={`${getCircleColor(item.accuracy)} rounded-full flex items-center justify-center text-gray-400 font-bold transition-all duration-300 ease-in-out group-hover:scale-110 shadow-lg cursor-pointer relative overflow-hidden`}
                   style={{ 
                     width: `${size}px`, 
                     height: `${size}px`,
