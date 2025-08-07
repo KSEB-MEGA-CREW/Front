@@ -21,44 +21,43 @@ const ACCURACY_LEVELS = [
 // 모든 range 값들의 배열
 const allRanges = ACCURACY_LEVELS.map((l) => l.range);
 
-function CalendarModal({ isOpen, onClose, userId }) {
+function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
   const [activeDate, setActiveDate] = useState(new Date());
   const [quizHistory, setQuizHistory] = useState({});
+  const [loading, setLoading] = useState(true);
   // ✅ 필터링 상태를 Set으로 관리하여 여러 범위를 동시에 선택/해제
   const [activeRanges, setActiveRanges] = useState(new Set(allRanges));
 
   useEffect(() => {
-    if (isOpen) {
-      // 컴포넌트가 열릴 때마다 모든 필터를 활성화 상태로 초기화
-      setActiveRanges(new Set(allRanges));
+    // 컴포넌트가 마운트될 때마다 모든 필터를 활성화 상태로 초기화
+    setActiveRanges(new Set(allRanges));
 
-      const fetchMonthlyData = async () => {
-        // ... (데이터 로딩 로직은 이전과 동일)
-        const year = activeDate.getFullYear();
-        const month = activeDate.getMonth() + 1;
-        try {
-          const result = await quizApi.getUserQuizHistory(year, month, userId);
-          const actualData = result?.data || result || [];
-          if (!Array.isArray(actualData)) {
-            setQuizHistory({});
-            return;
-          }
-          const historyMap = actualData.reduce((acc, record) => {
-            if (record.date) acc[record.date] = { accuracy: record.accuracy };
-            return acc;
-          }, {});
-          console.log("퀴즈 기록 로딩 완료:", historyMap);
-          setQuizHistory(historyMap);
-        } catch (error) {
-          console.error("퀴즈 기록 로딩 실패:", error);
+    const fetchMonthlyData = async () => {
+      setLoading(true);
+      const year = activeDate.getFullYear();
+      const month = activeDate.getMonth() + 1;
+      try {
+        const result = await quizApi.getUserQuizHistory(year, month, userId);
+        const actualData = result?.data || result || [];
+        if (!Array.isArray(actualData)) {
           setQuizHistory({});
+          return;
         }
-      };
-      fetchMonthlyData();
-    }
-  }, [activeDate, isOpen, userId]);
-
-  if (!isOpen) return null;
+        const historyMap = actualData.reduce((acc, record) => {
+          if (record.date) acc[record.date] = { accuracy: record.accuracy };
+          return acc;
+        }, {});
+        console.log("퀴즈 기록 로딩 완료:", historyMap);
+        setQuizHistory(historyMap);
+      } catch (error) {
+        console.error("퀴즈 기록 로딩 실패:", error);
+        setQuizHistory({});
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMonthlyData();
+  }, [activeDate, userId]);
 
   const year = activeDate.getFullYear();
   const month = activeDate.getMonth();
@@ -111,7 +110,7 @@ function CalendarModal({ isOpen, onClose, userId }) {
       tiles.push(
         <div
           key={day}
-          className={`w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold transition-all duration-200 ${colorClass}`}
+          className={`w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold transition-all duration-200 text-white ${colorClass}`}
         >
           {day}
         </div>
@@ -126,98 +125,186 @@ function CalendarModal({ isOpen, onClose, userId }) {
     );
   };
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
-      onClick={onClose}
-    >
-      <div
-        className="relative w-full max-w-2xl p-6 mx-4 bg-gray-900 rounded-xl shadow-lg text-white"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* 헤더 부분 (이전과 동일) */}
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">월간 학습 기록</h2>
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => changeMonth(-1)}
-              className="p-1 rounded-md hover:bg-gray-700 text-lg"
-            >
-              {" "}
-              &lt;{" "}
-            </button>
-            <span className="font-semibold text-lg">
-              {activeDate.getFullYear()}년 {activeDate.getMonth() + 1}월
-            </span>
-            <button
-              onClick={() => changeMonth(1)}
-              className="p-1 rounded-md hover:bg-gray-700 text-lg"
-            >
-              {" "}
-              &gt;{" "}
-            </button>
+  // 모달 모드이면서 열려있지 않을 때는 렌더링하지 않음
+  if (isModal && !isOpen) return null;
+
+  // 로딩 상태
+  if (loading) {
+    const LoadingContent = (
+      <div className="flex justify-center items-center h-80">
+        <div className="flex flex-col items-center space-y-3">
+          <div className="animate-spin w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full"></div>
+          <span className="text-sm text-gray-500">달력을 불러오는 중...</span>
+        </div>
+      </div>
+    );
+
+    if (isModal) {
+      return (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+          onClick={onClose}
+        >
+          <div
+            className="relative w-full max-w-2xl p-6 mx-4 bg-gray-900 rounded-xl shadow-lg text-white"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="text-xl font-bold text-white mb-6">월간 학습 기록</h2>
+            {LoadingContent}
           </div>
         </div>
-
-        <div className="grid grid-cols-7 text-center text-xs text-gray-400 mb-2">
-          <span>일</span>
-          <span>월</span>
-          <span>화</span>
-          <span>수</span>
-          <span>목</span>
-          <span>금</span>
-          <span>토</span>
+      );
+    } else {
+      return (
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <h2 className="text-lg font-bold text-gray-900 mb-6">연간 학습</h2>
+          {LoadingContent}
         </div>
+      );
+    }
+  }
 
-        <div className="grid grid-cols-7 gap-2 justify-items-center">
-          {renderCalendarGrid()}
-        </div>
-
-        <hr className="my-6 border-gray-700" />
-
-        {/* ✅ 토글 기능이 적용된 범례 */}
-        <div className="flex justify-center items-center flex-wrap gap-2 text-xs">
-          <span className="text-gray-400 mr-2">정답률:</span>
-          {ACCURACY_LEVELS.map((level) => {
-            const isActive = activeRanges.has(level.range);
-            return (
-              <div
-                key={level.range}
-                onClick={() => handleLegendToggle(level.range)}
-                className={`flex items-center cursor-pointer p-1 rounded-md transition-opacity ${
-                  isActive ? "opacity-100" : "opacity-40 hover:opacity-70"
-                }`}
-              >
-                <div className={`w-4 h-4 rounded-sm mr-2 ${level.color}`}></div>
-                <span>{level.label}</span>
-              </div>
-            );
-          })}
-        </div>
-        <div className="flex justify-center gap-4 mt-2">
+  // 메인 달력 컨텐츠
+  const CalendarContent = (
+    <>
+      {/* 헤더 부분 */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className={`text-lg font-bold ${isModal ? 'text-white' : 'text-gray-900'}`}>
+          {isModal ? '월간 학습 기록' : '연간 학습'}
+        </h2>
+        <div className="flex items-center space-x-4">
           <button
-            onClick={() => setActiveRanges(new Set(allRanges))}
-            className="text-xs text-blue-400 hover:underline"
+            onClick={() => changeMonth(-1)}
+            className={`p-2 rounded-lg transition-colors ${
+              isModal 
+                ? 'hover:bg-gray-700 text-white' 
+                : 'hover:bg-gray-100 text-gray-600'
+            }`}
           >
-            전체 선택
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
           </button>
+          <span className={`text-lg font-semibold min-w-[100px] text-center ${
+            isModal ? 'text-white' : 'text-gray-900'
+          }`}>
+            {activeDate.getFullYear()}년 {activeDate.getMonth() + 1}월
+          </span>
           <button
-            onClick={() => setActiveRanges(new Set())}
-            className="text-xs text-blue-400 hover:underline"
+            onClick={() => changeMonth(1)}
+            className={`p-2 rounded-lg transition-colors ${
+              isModal 
+                ? 'hover:bg-gray-700 text-white' 
+                : 'hover:bg-gray-100 text-gray-600'
+            }`}
           >
-            전체 해제
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
           </button>
         </div>
+      </div>
 
+      {/* 요일 헤더 */}
+      <div className={`grid grid-cols-7 text-center text-sm mb-4 ${
+        isModal ? 'text-gray-400' : 'text-gray-500'
+      }`}>
+        <span>일</span>
+        <span>월</span>
+        <span>화</span>
+        <span>수</span>
+        <span>목</span>
+        <span>금</span>
+        <span>토</span>
+      </div>
+
+      {/* 달력 그리드 */}
+      <div className="grid grid-cols-7 gap-2 justify-items-center mb-6">
+        {renderCalendarGrid()}
+      </div>
+
+      <hr className={`my-6 ${isModal ? 'border-gray-700' : 'border-gray-200'}`} />
+
+      {/* ✅ 토글 기능이 적용된 범례 */}
+      <div className="flex justify-center items-center flex-wrap gap-2 text-xs mb-4">
+        <span className={`mr-2 ${isModal ? 'text-gray-400' : 'text-gray-500'}`}>정답률:</span>
+        {ACCURACY_LEVELS.map((level) => {
+          const isActive = activeRanges.has(level.range);
+          return (
+            <div
+              key={level.range}
+              onClick={() => handleLegendToggle(level.range)}
+              className={`flex items-center cursor-pointer p-2 rounded-md transition-opacity ${
+                isModal 
+                  ? 'hover:bg-gray-700' 
+                  : 'hover:bg-gray-50'
+              } ${isActive ? "opacity-100" : "opacity-40 hover:opacity-70"}`}
+            >
+              <div className={`w-3 h-3 rounded-sm mr-2 ${level.color}`}></div>
+              <span className={isModal ? 'text-white' : 'text-gray-600'}>{level.label}</span>
+            </div>
+          );
+        })}
+      </div>
+      
+      <div className="flex justify-center gap-4 mb-4">
+        <button
+          onClick={() => setActiveRanges(new Set(allRanges))}
+          className={`text-xs hover:underline ${
+            isModal 
+              ? 'text-blue-400 hover:text-blue-300' 
+              : 'text-blue-600 hover:text-blue-700'
+          }`}
+        >
+          전체 선택
+        </button>
+        <button
+          onClick={() => setActiveRanges(new Set())}
+          className={`text-xs hover:underline ${
+            isModal 
+              ? 'text-blue-400 hover:text-blue-300' 
+              : 'text-blue-600 hover:text-blue-700'
+          }`}
+        >
+          전체 해제
+        </button>
+      </div>
+
+      {/* 모달일 때만 닫기 버튼 표시 */}
+      {isModal && onClose && (
         <button
           onClick={onClose}
-          className="w-full mt-6 px-4 py-3 bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg transition-colors"
+          className="w-full mt-6 px-4 py-3 bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg transition-colors text-white"
         >
           닫기
         </button>
+      )}
+    </>
+  );
+
+  // 모달 모드일 때는 오버레이와 함께 렌더링
+  if (isModal) {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+        onClick={onClose}
+      >
+        <div
+          className="relative w-full max-w-2xl p-6 mx-4 bg-gray-900 rounded-xl shadow-lg text-white"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {CalendarContent}
+        </div>
       </div>
+    );
+  }
+
+  // 일반 임베드 모드
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      {CalendarContent}
     </div>
   );
 }
 
-export default CalendarModal;
+export default CalendarModel;

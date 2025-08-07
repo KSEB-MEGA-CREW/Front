@@ -1,11 +1,11 @@
 import React from "react";
 import { useAuth } from "../Context/authContext";
 
-// 아이콘을 컴포넌트 내에 SVG로 직접 추가하여 별도 라이브러리 설치가 필요 없습니다.
+// 아이콘 컴포넌트들
 const UserIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-10 w-10 text-slate-500"
+    className="h-12 w-12 text-blue-500"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -22,7 +22,7 @@ const UserIcon = () => (
 const EditIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    className="h-5 w-5 mr-2"
+    className="h-4 w-4"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -42,77 +42,64 @@ const UserProfile = () => {
   // 로딩 상태
   if (isLoading) {
     return (
-      <div className="w-full h-full flex justify-center items-center bg-white rounded-lg">
-        <svg
-          className="animate-spin -ml-1 mr-3 h-8 w-8 text-indigo-500"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          ></circle>
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-          ></path>
-        </svg>
-        <span className="text-sm font-semibold text-gray-600">
-          정보를 불러오는 중...
-        </span>
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
+        <div className="flex flex-col items-center justify-center h-full space-y-3">
+          <div className="animate-spin w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full"></div>
+          <span className="text-sm text-gray-500">정보를 불러오는 중...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full bg-white rounded-lg shadow-lg overflow-hidden">
-      <div className="p-6 h-full flex flex-col">
-        {/* 프로필 아바타 영역 */}
-        <div className="text-center mb-6">
-          <div className="w-16 h-16 rounded-full bg-slate-100 mx-auto flex items-center justify-center border-2 border-white shadow-md">
-            <UserIcon />
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 h-full">
+      <div className="flex flex-col h-full">
+        {/* 헤더 */}
+        <div className="text-center mb-8">
+          <div className="relative inline-block">
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-50 rounded-full flex items-center justify-center border-4 border-white shadow-lg">
+              <UserIcon />
+            </div>
+            {/* 온라인 상태 표시 */}
+            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-400 rounded-full border-3 border-white"></div>
           </div>
-          <h2 className="text-xl font-bold text-slate-800 mt-3">내 정보</h2>
-          <p className="text-slate-500 text-sm">
-            {user?.username || "사용자"}님 환영합니다!
-          </p>
+          <h2 className="text-lg font-bold text-gray-900 mt-4">
+            {user?.username || "박우인"}
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">@{user?.email?.split('@')[0] || "amy0408201777"}</p>
         </div>
 
-        {/* 정보 필드 */}
-        <div className="space-y-4 flex-grow">
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-indigo-600">
-              닉네임
-            </span>
-            <p className="text-base text-slate-800 font-medium mt-1">
-              {user?.username || "정보 없음"}
-            </p>
+        {/* 통계 정보 */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <p className="text-lg font-bold text-gray-900">-</p>
+            <p className="text-xs text-gray-500 mt-1">학습한 퀴즈</p>
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-indigo-600">
-              이메일
-            </span>
-            <p className="text-base text-slate-800 font-medium mt-1">
-              {user?.email || "정보 없음"}
-            </p>
+          <div className="text-center p-3 bg-gray-50 rounded-xl">
+            <p className="text-lg font-bold text-gray-900">-</p>
+            <p className="text-xs text-gray-500 mt-1">평균평점</p>
           </div>
         </div>
 
-        {/* 구분선 */}
-        <hr className="my-4 border-slate-200" />
+        
 
-        {/* 액션 버튼 영역 */}
-        <div className="mt-auto">
-          <button className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-            <EditIcon />
-            정보 수정
-          </button>
+        {/* 하단 영역 */}
+        <div className="mt-auto space-y-4">
+          <div className="p-4 bg-blue-50 rounded-xl">
+            <h3 className="text-sm font-semibold text-gray-900 mb-2">최근 학습 퀴즈</h3>
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <p className="text-xs text-gray-600">정답률을 확인하세요</p>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-xs text-gray-400 mb-3">소속 인증</p>
+            <button className="w-full inline-flex items-center justify-center px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+              <EditIcon />
+              <span className="ml-2">정보 수정</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
