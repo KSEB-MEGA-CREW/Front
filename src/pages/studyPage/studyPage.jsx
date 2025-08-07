@@ -62,14 +62,12 @@ function StudyWord() {
       console.log("API로부터 받은 전체 응답:", response);
 
       if (response && response.success && Array.isArray(response.data)) {
-        // 비디오 URL 테스트를 위한 목업 데이터 추가
-        const quizDataWithVideo = response.data.map((q) => ({
+        const processedQuizzes = response.data.map((q) => ({
           ...q,
-          // 여기에 테스트용 비디오 URL을 직접 넣습니다.
-          videoUrl:
-            "https://sldict.korean.go.kr/multimedia/multimedia_files/convert/20200825/735416/MOV000246252_700X466.mp4",
+          videoUrl: q.subDescription || null,
+          textQuiz: q.signDescription,
         }));
-        setQuizList(quizDataWithVideo.slice(0, 5));
+        setQuizList(processedQuizzes.slice(0, 5));
       } else {
         console.error(
           "퀴즈 데이터 형식이 올바르지 않거나 조회에 실패했습니다:",
@@ -140,15 +138,7 @@ function StudyWord() {
     return (
       <BasicLayout>
         <div className="min-h-screen flex flex-col items-center bg-[#11151b] px-2 py-8">
-          <div className="w-full max-w-2xl flex justify-end mb-4">
-            <button
-              onClick={() => setIsCalendarOpen(true)}
-              className="text-gray-400 hover:text-white transition p-2"
-              aria-label="달력 보기"
-            >
-              <FaCalendarAlt size={24} />
-            </button>
-          </div>
+          <div className="w-full max-w-2xl flex justify-end mb-4"></div>
           <div className="w-full max-w-2xl flex flex-col gap-2 mb-8">
             {answerResult.map((result, i) => (
               <div
@@ -168,7 +158,7 @@ function StudyWord() {
                 </span>
                 <span className="flex-1">
                   <strong className="font-bold">
-                    {result.quiz.word || result.quiz.signDescription}
+                    {result.quiz.signDescription}
                   </strong>
                   <div className="text-right">
                     <span className="text-sm opacity-80 ml-4">
@@ -188,11 +178,6 @@ function StudyWord() {
             다시 풀기
           </button>
         </div>
-        {/* <CalendarModal
-          isOpen={isCalendarOpen}
-          onClose={() => setIsCalendarOpen(false)}
-          userId={user?.id}
-        /> */}
       </BasicLayout>
     );
   }
@@ -205,30 +190,38 @@ function StudyWord() {
       <div className="min-h-screen flex flex-col items-center bg-[#11151b] px-4 py-8 relative">
         <div className="w-full max-w-1xl flex flex-col items-center relative">
           <div className="absolute right-0 top-0 flex items-center space-x-4">
-            <div className="text-gray-400 text-base font-semibold">
+            <div className="text-gray-400 text-2xl font-semibold">
               {current + 1} / {quizList.length}
             </div>
           </div>
 
-          {/* ✅ 수어 비디오 출력 영역 */}
-          <div className="w-full max-w-xl mb-8 aspect-video bg-black rounded-lg overflow-hidden">
-            <video
-              key={quiz.videoUrl}
-              className="w-full h-full object-contain"
-              controls
-              autoPlay
-              muted
-              loop
-            >
-              <source src={quiz.videoUrl} type="video/mp4" />
-              브라우저가 비디오 재생을 지원하지 않습니다.
-            </video>
+          {/* ✅ 변경된 부분: 퀴즈 콘텐츠를 하나의 고정 높이 컨테이너로 감싸서 레이아웃 쉬프트 방지 */}
+          <div className="w-full max-w-3xl h-[324px] mb-8 bg-[#11151b] rounded-lg flex items-center justify-center overflow-hidden p-4">
+            {quiz.videoUrl ? (
+              // 비디오가 있을 경우
+              <video
+                key={quiz.videoUrl}
+                className="w-full h-full object-contain"
+                controls
+                autoPlay
+                muted
+                loop
+              >
+                <source src={quiz.videoUrl} type="video/mp4" />
+                브라우저가 비디오 재생을 지원하지 않습니다.
+              </video>
+            ) : (
+              // 비디오가 없을 경우 (텍스트 퀴즈)
+              <p className="text-gray-200 text-2xl leading-relaxed text-center">
+                {quiz.textQuiz}
+              </p>
+            )}
           </div>
 
-          {/* ✅ 수어에 대한 설명 텍스트를 제거했습니다. */}
-          {/* 비디오를 보여주고 선택지에서 정답을 고르는 형식으로 변경 */}
           <div className="w-full text-center text-gray-300 text-base mb-6 tracking-wide pt-10">
-            위 수어 동작이 의미하는 단어는 무엇인가요?
+            {quiz.videoUrl
+              ? "위 수어 동작이 의미하는 단어는 무엇인가요?"
+              : "위 설명이 의미하는 단어는 무엇인가요?"}
           </div>
 
           <div className="w-full flex flex-col gap-3">
@@ -264,11 +257,6 @@ function StudyWord() {
           </div>
         </div>
       </div>
-      {/* <CalendarModal
-        isOpen={isCalendarOpen}
-        onClose={() => setIsCalendarOpen(false)}
-        userId={user?.id}
-      /> */}
     </BasicLayout>
   );
 }
