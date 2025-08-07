@@ -7,6 +7,7 @@ export const VIDEO_CONFIG = {
     CANVAS_HEIGHT: 480,
     QUALITY: 0.8, // JPEG 품질
     MAX_FILE_SIZE: 50 * 1024, // 50KB
+    MAX_RETRIES: 3
 };
 
 export const API_CONFIG = {

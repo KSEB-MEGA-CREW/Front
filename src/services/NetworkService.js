@@ -6,141 +6,149 @@ import { performanceLogger } from "../utils/performanceUtils";
  */
 export class NetworkService {
     constructor() {
+
         this.baseURL = API_CONFIG.BASE_URL;
+
         this.controller = new AbortController();
-        this.requestCount = 0;
+
+        this.retryCount = 0;
+
     }
 
-    /**
-     * ✅ [수정] 중앙화된 요청 및 재시도 처리기. private 메서드처럼 사용합니다.
-     * @param {string} endpoint - API 엔드포인트
-     * @param {object} options - fetch API에 전달될 옵션 객체
-     * @param {string} token - 인증 토큰
-     * @returns {Promise<any>} API 응답 데이터
-     */
-    async _fetchWithRetry(endpoint, options, token) {
-        const requestId = `network_request_${++this.requestCount}`;
-        performanceLogger.startTimer(requestId);
 
-        for (let attempt = 1; attempt <= API_CONFIG.MAX_RETRIES + 1; attempt++) {
+
+    // JWT 토큰 가져오기
+
+    getAuthToken() {
+
+        return localStorage.getItem('token');
+
+    }
+
+
+
+    // 프레임 전송 요청 <- 백엔드 FrameController와 연동
+
+    async sendFrame(frameRequest) {
+
+        const MAX_RETRIES = API_CONFIG.MAX_RETRIES || 3; // 설정 파일에서 가져오거나 기본값 설정
+
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
-                if (!token) {
-                    throw new Error('인증 토큰이 제공되지 않았습니다.');
-                }
+                const token = this.getAuthToken();
+                if (!token) throw new Error('인증 토큰이 없습니다.');
 
-                const response = await fetch(`${this.baseURL}${endpoint}`, {
-                    ...options,
+                const response = await fetch(`${this.baseURL}${API_CONFIG.ENDPOINTS.ANALYZE_FRAME}`, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        ...options.headers,
-                        'Authorization': `Bearer ${token}`,
+                        'Authorization': `Bearer ${token}`
                     },
-                    signal: this.controller.signal,
+                    body: JSON.stringify(frameRequest),
+                    signal: this.controller.signal
                 });
 
-                if (!response.ok) {
-                    // ✅ [수정] HTTP 상태 코드를 기반으로 한 커스텀 에러 생성
-                    const errorData = await response.text();
-                    const error = new Error(`HTTP ${response.status}: ${errorData || response.statusText}`);
-                    error.status = response.status;
-                    throw error;
+                if (response.ok) {
+                    return await response.json(); // 성공 시 즉시 결과 반환
                 }
 
-                const networkTime = performanceLogger.endTimer(requestId);
-                console.log(`✅ [${new Date().toISOString().split('T')[1].slice(0, -1)}] 요청 성공 (소요 시간: ${Math.round(networkTime)}ms)`);
-                performanceLogger.logPerformance('네트워크 요청 성공', networkTime, { endpoint, status: response.status });
-
-                return await response.json();
+                // 실패 시, 재시도 여부를 결정하기 위해 에러를 발생시킴
+                const error = new Error();
+                error.status = response.status; // 에러 객체에 상태 코드 포함
+                throw error;
 
             } catch (error) {
-                const networkTime = performanceLogger.endTimer(requestId);
-                console.error(`❌ [시도 ${attempt}] 네트워크 오류:`, error.message);
-                performanceLogger.addMetric('networkRequestError', networkTime, { endpoint, attempt, error: error.message });
-
-                // 마지막 시도이거나, 재시도하면 안 되는 에러인 경우, 에러를 던지고 종료
-                if (attempt > API_CONFIG.MAX_RETRIES || !this._shouldRetry(error)) {
-                    throw error;
+                if (error.name === 'AbortError') {
+                    console.log('Request aborted');
+                    return null;
                 }
 
-                const delayTime = 1000 * Math.pow(2, attempt - 1); // Exponential backoff
-                console.log(`🔌 ${delayTime}ms 후 재시도... (${attempt}/${API_CONFIG.MAX_RETRIES})`);
-                await this._delay(delayTime);
+                // 마지막 시도이거나, 재시도 불가능한 에러인 경우
+                if (attempt === MAX_RETRIES || !this.shouldRetry(error)) {
+                    // 최종적으로 처리할 에러 메시지 생성 및 throw
+                    const finalError = this.createFinalError(error);
+                    throw finalError;
+                }
+
+                // 재시도 전 지연
+                console.log(`Retrying request (${attempt}/${MAX_RETRIES})`);
+                const delayTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+                await this.delay(delayTime);
             }
         }
+
     }
 
-    /**
-     * ✅ [수정] 프레임 전송 요청. 토큰을 인자로 받습니다.
-     * @param {object} frameRequest - 프레임 데이터
-     * @param {string} token - 인증 토큰
-     * @returns {Promise<any>} 분석 결과
-     */
-    async sendFrame(frameRequest, token) {
-        console.log(`📡 [${new Date().toISOString().split('T')[1].slice(0, -1)}] 프레임 전송 시작 (Frame #${frameRequest.frameIndex})`);
 
-        // ✅ 요청 전 상세 로그 추가
-        console.log('=== NetworkService 요청 상세 정보 ===');
-        console.log('URL:', `${this.baseURL}${API_CONFIG.ENDPOINTS.ANALYZE_FRAME}`);
-        console.log('Token 존재:', !!token);
-        console.log('frameRequest:', frameRequest);
-        console.log('=====================================');
 
-        try {
-            const response = await this._fetchWithRetry(
-                API_CONFIG.ENDPOINTS.ANALYZE_FRAME,
-                {
-                    method: 'POST',
-                    body: JSON.stringify(frameRequest),
-                },
-                token
-            );
+    // 재시도 가능한 에러인지 확인
 
-            console.log('✅ 네트워크 요청 성공:', response);
-            return response;
+    shouldRetry(error) {
 
-        } catch (error) {
-            console.error('❌ 네트워크 요청 실패:', error);
-            throw error;
-        }
+        // 5xx 서버 에러, 429(요청 한도 초과), 네트워크 에러 등 재시도
+        const retryableStatusCodes = [429, 500, 502, 503, 504];
+
+        // error.status가 없으면 네트워크 에러로 간주하여 재시도
+        if (!error.status) return true;
+
+        return retryableStatusCodes.includes(error.status);
     }
 
-    /**
-     * ✅ [수정] HTTP 상태코드와 에러 타입으로 재시도 여부 판단
-     * @param {Error} error - 발생한 에러 객체
-     * @returns {boolean} 재시도 가능 여부
-     */
-    _shouldRetry(error) {
-        if (error.name === 'AbortError') {
-            return false;
-        }
-        // 5xx 서버 에러는 재시도
-        if (error.status && error.status >= 500 && error.status <= 599) {
-            return true;
-        }
-        // 네트워크 연결 실패 관련 에러 (TypeError: Failed to fetch)
-        if (error instanceof TypeError) {
-            return true;
-        }
-        // 그 외 클라이언트 에러(4xx) 등은 재시도하지 않음
-        return false;
+    // 최종적으로 던질 에러 객체를 생성하는 헬퍼 함수
+    createFinalError(error) {
+        const errorMessages = {
+            401: '인증이 만료되었습니다.',
+            403: '세션 접근 권한이 없습니다.',
+            400: '프레임 데이터가 유효하지 않습니다.',
+            429: '요청 한도를 초과했습니다.',
+            500: '서버 내부 오류가 발생했습니다.',
+            503: '서비스를 일시적으로 사용할 수 없습니다.'
+        };
+        const message = errorMessages[error.status] || `An unexpected error occurred.`;
+        return new Error(message);
     }
 
-    _delay(ms) {
+
+
+    // 지연 함수
+
+    delay(ms) {
+
         return new Promise(resolve => setTimeout(resolve, ms));
+
     }
+
+
+
+    // 헬스체크
 
     async healthCheck() {
+
         try {
+
             const response = await fetch(`${this.baseURL}${API_CONFIG.ENDPOINTS.HEALTH_CHECK}`);
+
             return response.ok;
+
         } catch {
+
             return false;
+
         }
+
     }
 
+
+
+    // 요청 취소
+
     abort() {
+
         this.controller.abort();
+
         this.controller = new AbortController();
-        console.log('🛑 모든 네트워크 요청 중단');
+
+        this.retryCount = 0;
+
     }
 }
