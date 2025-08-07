@@ -16,7 +16,7 @@ const ACCURACY_LEVELS = [
   { range: "41-60", label: "41-60점", color: "bg-green-500" },
   { range: "61-80", label: "61-80점", color: "bg-green-600" },
   { range: "81-99", label: "81-99점", color: "bg-green-700" },
-  { range: "100", label: "100점", color: "bg-green-900" },
+  { range: "100", label: "100점", color: "bg-green-800" },
 ];
 // 모든 range 값들의 배열
 const allRanges = ACCURACY_LEVELS.map((l) => l.range);
