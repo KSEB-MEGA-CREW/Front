@@ -58,7 +58,7 @@ const StasticComponent = () => {
     fetchData();
   }, []);
 
-  // 정답률에 따른 원의 색상 결정
+  // 정답률에 따라 원의 색상을 결정 (배경색을 직접 변경)
   const getCircleColor = (accuracy) => {
     if (accuracy >= 90) return 'bg-emerald-500';
     if (accuracy >= 80) return 'bg-blue-500';
@@ -67,7 +67,7 @@ const StasticComponent = () => {
     return 'bg-red-500';
   };
 
-  // 정답률에 따른 원의 크기 결정 (더 세련된 크기 조정)
+  // 정답률에 따라 원의 크기를 결정 (원래 크기로 복구)
   const getCircleSize = (accuracy) => {
     const minSize = 50;
     const maxSize = 90;
@@ -115,7 +115,7 @@ const StasticComponent = () => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold text-gray-900">주간 학습</h2>
         <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
-          2주차 단원 성취 중!
+          이번주 사용자님의 성취!
         </span>
       </div>
 
@@ -174,38 +174,7 @@ const StasticComponent = () => {
         </div>
       </div>
 
-      {/* 통계 정보 */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="text-center">
-          <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2">
-            <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-          </div>
-          <p className="text-lg font-bold text-gray-900">0</p>
-          <p className="text-xs text-gray-500">문제</p>
-        </div>
-        <div className="text-center">
-          <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2">
-            <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-          </div>
-          <p className="text-lg font-bold text-gray-900">0분</p>
-          <p className="text-xs text-gray-500">시간</p>
-        </div>
-        <div className="text-center">
-          <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2">
-            <div className="w-4 h-4 bg-gray-300 rounded-full"></div>
-          </div>
-          <p className="text-lg font-bold text-gray-900">0</p>
-          <p className="text-xs text-gray-500">정답</p>
-        </div>
-        <div className="text-center">
-          <div className="flex items-center justify-center w-8 h-8 mx-auto mb-2">
-            <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-          </div>
-          <p className="text-lg font-bold text-gray-900">0</p>
-          <p className="text-xs text-gray-500">완료</p>
-        </div>
-      </div>
-
+     
       {/* 범례 */}
       <div className="flex justify-center items-center space-x-4 text-xs">
         <div className="flex items-center space-x-1">
