@@ -205,13 +205,13 @@ function StudyWord() {
             <div className="text-gray-400 text-base font-semibold">
               {current + 1} / {quizList.length}
             </div>
-            <button
+            {/* <button
               onClick={() => setIsCalendarOpen(true)}
               className="text-gray-400 hover:text-white transition"
               aria-label="달력 보기"
             >
               <FaCalendarAlt size={22} />
-            </button>
+            </button> */}
           </div>
           <div className="w-full text-center text-gray-300 text-base mb-6 tracking-wide pt-10">
             {quiz.word ? "아래 단어의 뜻은?" : "아래 뜻의 단어는?"}
@@ -254,11 +254,11 @@ function StudyWord() {
           </div>
         </div>
       </div>
-      <CalendarModal
+      {/* <CalendarModal
         isOpen={isCalendarOpen}
         onClose={() => setIsCalendarOpen(false)}
         userId={user?.id}
-      />
+      /> */}
     </BasicLayout>
   );
 }

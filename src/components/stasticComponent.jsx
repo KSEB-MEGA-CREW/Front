@@ -115,7 +115,7 @@ const StasticComponent = () => {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold text-gray-900">주간 학습</h2>
         <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
-          이번주 사용자님의 성취!
+          이번주 사용자님의 성취입니다!
         </span>
       </div>
 
