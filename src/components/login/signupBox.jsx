@@ -172,8 +172,12 @@ const SignUpBox = () => {
           <label className="block text-white/70 mb-1 font-semibold">
             청각상태
           </label>
-          <div className="flex space-x-4">
-            <label className="flex items-center space-x-2 text-white/80">
+          <div className="flex flex-col space-y-3">
+            {" "}
+            {/* 위아래 줄거리 3단위 */}
+            <label className="flex items-center space-x-2 text-white/80 pb-1">
+              {" "}
+              {/* 위쪽 청인 */}
               <input
                 type="radio"
                 name="hearing"
@@ -182,9 +186,11 @@ const SignUpBox = () => {
                 onChange={handleInputChange}
                 required
               />
-              <span>난청(60-89dB)</span>
+              <span>청인: 소리를 듣는 데 어려움이 없는 사람</span>
             </label>
-            <label className="flex items-center space-x-2 text-white/80">
+            <label className="flex items-center space-x-2 text-white/80 pt-1">
+              {" "}
+              {/* 아래쪽 농인 */}
               <input
                 type="radio"
                 name="hearing"
@@ -192,7 +198,7 @@ const SignUpBox = () => {
                 checked={formData.hearing === "deaf"}
                 onChange={handleInputChange}
               />
-              <span>농(90dB 이상)</span>
+              <span>농인: 소리를 듣는 데 어려움을 겪는 사람</span>
             </label>
           </div>
         </div>

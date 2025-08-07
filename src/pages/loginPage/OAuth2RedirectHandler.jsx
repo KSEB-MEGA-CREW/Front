@@ -52,6 +52,8 @@ function OAuth2RedirectHandler() {
       if (response.ok) {
         const userResponse = await response.json();
         if (userResponse.success) {
+          // 명시적으로 저장
+
           login({ token, user: userResponse.data });
           navigate("/", { replace: true });
         }
@@ -60,30 +62,6 @@ function OAuth2RedirectHandler() {
       }
     };
 
-    const handleSessionLogin = async () => {
-      // 세션 기반 OAuth2 성공 엔드포인트 호출
-      const response = await fetch(
-        "http://localhost:8080/api/auth/oauth2/success",
-        {
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.data.token) {
-          const { token, userInfo } = result.data;
-          localStorage.setItem("token", token);
-          login({ token, user: userInfo });
-          navigate("/", { replace: true });
-        }
-      } else {
-        throw new Error("OAuth2 로그인 처리 실패");
-      }
-    };
 
     const getErrorMessage = (error) => {
       switch (error) {

@@ -1,8 +1,6 @@
-import Calendar from "react-calendar";
-import React, { useState } from "react";
-import 'react-calendar/dist/Calendar.css';
+import React, { useState, useEffect } from "react";
+import { quizApi } from "../api/authApi";
 
-// 날짜를 'YYYY-MM-DD' 형식으로 변환하는 헬퍼 함수
 const formatDate = (date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -10,220 +8,215 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// 한 주 날짜 배열 생성 (주 시작일 기준)
-function getWeekDates(startDate) {
-  const dates = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(startDate);
-    d.setDate(d.getDate() + i);
-    dates.push(d);
-  }
-  return dates;
-}
+// ✅ 색상 및 범례 정보. range를 고유 식별자로 사용
+const ACCURACY_LEVELS = [
+  { range: "0", label: "0점", color: "bg-gray-700" },
+  { range: "1-20", label: "1-20점", color: "bg-green-300" },
+  { range: "21-40", label: "21-40점", color: "bg-green-400" },
+  { range: "41-60", label: "41-60점", color: "bg-green-500" },
+  { range: "61-80", label: "61-80점", color: "bg-green-600" },
+  { range: "81-99", label: "81-99점", color: "bg-green-700" },
+  { range: "100", label: "100점", color: "bg-green-800" },
+];
+// 모든 range 값들의 배열 (useMemo로 최적화 가능하지만 상수이므로 생략)
+const allRanges = ACCURACY_LEVELS.map((l) => l.range);
 
-// 한 달의 모든 날짜 반환 (해당 월 1일~말일 Date 배열)
-function getMonthDates(date) {
-  const target = new Date(date);
-  const year = target.getFullYear();
-  const month = target.getMonth();
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month + 1, 0);
-  const dates = [];
-  for (let d = first; d <= last; d.setDate(d.getDate() + 1)) {
-    dates.push(new Date(d));
-  }
-  return dates;
-}
+function CalendarModal({ isOpen, onClose, userId }) {
+  const [activeDate, setActiveDate] = useState(new Date());
+  const [quizHistory, setQuizHistory] = useState({});
+  // ✅ 필터링 상태를 Set으로 관리하여 여러 범위를 동시에 선택/해제
+  const [activeRanges, setActiveRanges] = useState(new Set(allRanges));
 
-function CalendarModel({ quizHistory = {} }) {
-  const [view, setView] = useState("month"); // "month" 또는 "week"
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  useEffect(() => {
+    if (isOpen) {
+      // 컴포넌트가 열릴 때마다 모든 필터를 활성화 상태로 초기화
+      setActiveRanges(new Set(allRanges));
 
-  // 월 단위 타일 색깔 지정
-  const getTileClassName = ({ date, view: calView }) => {
-    if (calView === "month") {
-      const dateString = formatDate(date);
-      const dayData = quizHistory[dateString];
-      if (dayData) {
-        const percentage = (dayData.correct / dayData.total) * 100;
-        if (percentage >= 80)
-          return "!bg-green-700 !text-white hover:!bg-green-600";
-        if (percentage >= 50)
-          return "!bg-yellow-600 !text-white hover:!bg-yellow-500";
-        return "!bg-red-700 !text-white hover:!bg-red-600";
-      }
+      const fetchMonthlyData = async () => {
+        // ... (데이터 로딩 로직은 이전과 동일)
+        const year = activeDate.getFullYear();
+        const month = activeDate.getMonth() + 1;
+        try {
+          const result = await quizApi.getUserQuizHistory(year, month, userId);
+          const actualData = result?.data || result || [];
+          if (!Array.isArray(actualData)) {
+            setQuizHistory({});
+            return;
+          }
+          const historyMap = actualData.reduce((acc, record) => {
+            if (record.date) acc[record.date] = { accuracy: record.accuracy };
+            return acc;
+          }, {});
+          setQuizHistory(historyMap);
+        } catch (error) {
+          console.error("퀴즈 기록 로딩 실패:", error);
+          setQuizHistory({});
+        }
+      };
+      fetchMonthlyData();
     }
+  }, [activeDate, isOpen, userId]);
+
+  if (!isOpen) return null;
+
+  const year = activeDate.getFullYear();
+  const month = activeDate.getMonth();
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  const getAccuracyRange = (accuracy) => {
+    if (accuracy <= 0) return "0"; // -1과 0을 함께 처리
+    if (accuracy > 0 && accuracy <= 20) return "1-20";
+    if (accuracy > 20 && accuracy <= 40) return "21-40";
+    if (accuracy > 40 && accuracy <= 60) return "41-60";
+    if (accuracy > 60 && accuracy <= 80) return "61-80";
+    if (accuracy > 80 && accuracy < 100) return "81-99";
+    if (accuracy === 100) return "100";
     return null;
   };
 
-  // 주 단위 날짜 배열, 평균 등 계산
-  const getStartOfWeek = (date) => {
-    const d = new Date(date);
-    const day = d.getDay(); // 0(일)~6(토)
-    d.setDate(d.getDate() - day);
-    d.setHours(0, 0, 0, 0);
-    return d;
+  // ✅ 범례 클릭 시 해당 범위를 Set에서 추가하거나 제거하는 토글 핸들러
+  const handleLegendToggle = (range) => {
+    setActiveRanges((prevRanges) => {
+      const newRanges = new Set(prevRanges);
+      if (newRanges.has(range)) {
+        newRanges.delete(range);
+      } else {
+        newRanges.add(range);
+      }
+      return newRanges;
+    });
   };
 
-  const startOfWeek = getStartOfWeek(selectedDate);
-  const weekDates = getWeekDates(startOfWeek);
-
-  // 주별 맞춘 문제 개수, 일요일~토요일 순서
-  const weekCorrectCounts = weekDates.map((day) => {
-    const key = formatDate(day);
-    const data = quizHistory[key];
-    return data ? data.correct : 0;
-  });
-
-  // 주별 푼 문제 개수, 일요일~토요일 순서
-  const weekTotalCounts = weekDates.map((day) => {
-    const key = formatDate(day);
-    const data = quizHistory[key];
-    return data ? data.total : 0;
-  });
-
-  // 주별 정답률 = 맞춘 수 합 / 전체 수 합 * 100
-  const weekTotalCorrect = weekCorrectCounts.reduce((sum, v) => sum + v, 0);
-  const weekTotalSolved = weekTotalCounts.reduce((sum, v) => sum + v, 0);
-  const weekPercentage = weekTotalSolved
-    ? Math.round((weekTotalCorrect / weekTotalSolved) * 100)
-    : null;
-
-  // 월별 평균 정답률
-  const monthDates = getMonthDates(selectedDate);
-  let monthTotalCorrect = 0,
-    monthTotalSolved = 0;
-  monthDates.forEach((date) => {
-    const key = formatDate(date);
-    const d = quizHistory[key];
-    if (d) {
-      monthTotalCorrect += d.correct;
-      monthTotalSolved += d.total;
+  const renderCalendarGrid = () => {
+    const tiles = [];
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      tiles.push(
+        <div key={`empty-${i}`} className="w-10 h-10 rounded-md"></div>
+      );
     }
-  });
-  const monthPercentage =
-    monthTotalSolved > 0 ? (monthTotalCorrect / monthTotalSolved) * 100 : null;
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateString = formatDate(new Date(year, month, day));
+      const dayData = quizHistory[dateString];
+      const accuracy = dayData?.accuracy ?? -1; // 데이터 없으면 -1 처리
 
-  // 주 요일 이름
-  const weekDays = ["일", "월", "화", "수", "목", "금", "토"];
-  // y축(최대 맞춘 수) 자동 스케일
-  const maxCorrect = Math.max(...weekCorrectCounts, 5);
+      const currentRange = getAccuracyRange(accuracy);
+      const level = ACCURACY_LEVELS.find((l) => l.range === currentRange);
+
+      // ✅ 필터링 로직: activeRanges Set에 현재 날짜의 범위가 포함되어 있는지 확인
+      const isVisible = activeRanges.has(currentRange);
+      const colorClass = isVisible ? level?.color : ACCURACY_LEVELS[0].color; // 비활성화 시 0점 색상
+
+      tiles.push(
+        <div
+          key={day}
+          className={`w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold transition-all duration-200 ${colorClass}`}
+        >
+          {day}
+        </div>
+      );
+    }
+    return tiles;
+  };
+
+  const changeMonth = (offset) => {
+    setActiveDate(
+      new Date(activeDate.getFullYear(), activeDate.getMonth() + offset, 1)
+    );
+  };
 
   return (
-    <div className="w-full h-full bg-white overflow-hidden">
-      <div className="p-4 h-full flex flex-col">
-        <h2 className="text-xl font-bold text-gray-800 mb-3 text-center">
-          퀴즈 기록
-        </h2>
-
-        {/* 월/주 전환 버튼 */}
-        <div className="mb-3 flex justify-center space-x-2">
-          <button
-            className={`px-3 py-1 text-sm rounded ${
-              view === "month"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-600 text-gray-300"
-            }`}
-            onClick={() => setView("month")}
-          >
-            월별
-          </button>
-          <button
-            className={`px-3 py-1 text-sm rounded ${
-              view === "week"
-                ? "bg-blue-600 text-white"
-                : "bg-gray-600 text-gray-300"
-            }`}
-            onClick={() => setView("week")}
-          >
-            주별
-          </button>
-        </div>
-
-        {/* 월별 평균 정답률 상단 출력 (월별 뷰일 때만) */}
-        {view === "month" && (
-          <div className="mb-3 text-sm text-gray-600 font-semibold text-center">
-            {selectedDate.getFullYear()}년 {selectedDate.getMonth() + 1}월 평균:{" "}
-            <span className="text-gray-800 font-bold">
-              {monthPercentage !== null
-                ? monthPercentage.toFixed(1) + "%"
-                : "기록 없음"}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+      onClick={onClose}
+    >
+      <div
+        className="relative w-full max-w-2xl p-6 mx-4 bg-gray-900 rounded-xl shadow-lg text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 헤더 부분 (이전과 동일) */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">월간 학습 기록</h2>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => changeMonth(-1)}
+              className="p-1 rounded-md hover:bg-gray-700 text-lg"
+            >
+              {" "}
+              &lt;{" "}
+            </button>
+            <span className="font-semibold text-lg">
+              {activeDate.getFullYear()}년 {activeDate.getMonth() + 1}월
             </span>
-          </div>
-        )}
-
-        <div className="flex-grow overflow-hidden">
-          {view === "month" && (
-            <div className="h-full flex items-center justify-center">
-              <div className="w-full max-w-md mx-auto">
-                <Calendar
-                  locale="ko-KR"
-                  tileClassName={getTileClassName}
-                  formatDay={(locale, date) => date.getDate()}
-                  onClickDay={(value) => setSelectedDate(value)}
-                  value={selectedDate}
-                  view="month"
-                  className="w-full text-gray-800 mx-auto"
-                />
-              </div>
-            </div>
-          )}
-
-          {view === "week" && (
-            <div className="bg-gray-100 p-3 rounded h-full">
-              {/* 주별 맞춘 횟수 막대그래프 */}
-              <div className="mb-2 flex justify-between px-1 text-xs text-gray-600 font-semibold">
-                {weekDays.map((day) => (
-                  <span key={day} className="flex-1 text-center">
-                    {day}
-                  </span>
-                ))}
-              </div>
-              <div className="flex justify-between items-end h-20 px-1">
-                {weekCorrectCounts.map((cnt, idx) => (
-                  <div key={idx} className="flex flex-col items-center flex-1">
-                    {/* 막대 */}
-                    <div
-                      className="w-4 bg-green-600 rounded-sm"
-                      style={{
-                        height:
-                          maxCorrect > 0
-                            ? `${Math.round((cnt / maxCorrect) * 60) || 4}px`
-                            : "4px",
-                      }}
-                    ></div>
-                    {/* 값 라벨 */}
-                    <span className="mt-1 text-gray-800 text-xs">{cnt}</span>
-                  </div>
-                ))}
-              </div>
-              {/* 주별 정답률 출력 (퍼센트) */}
-              <div className="text-center text-gray-800 text-sm font-semibold mt-3">
-                주별 정답률:{" "}
-                {weekPercentage !== null ? weekPercentage + "%" : "기록 없음"}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* 색상 legend */}
-        <div className="mt-3 flex justify-center items-center space-x-3 text-xs text-gray-600">
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-green-700 rounded-sm mr-1"></span>
-            <span>80%+</span>
-          </div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-yellow-600 rounded-sm mr-1"></span>
-            <span>50%+</span>
-          </div>
-          <div className="flex items-center">
-            <span className="w-3 h-3 bg-red-700 rounded-sm mr-1"></span>
-            <span>50%-</span>
+            <button
+              onClick={() => changeMonth(1)}
+              className="p-1 rounded-md hover:bg-gray-700 text-lg"
+            >
+              {" "}
+              &gt;{" "}
+            </button>
           </div>
         </div>
+
+        <div className="grid grid-cols-7 text-center text-xs text-gray-400 mb-2">
+          <span>일</span>
+          <span>월</span>
+          <span>화</span>
+          <span>수</span>
+          <span>목</span>
+          <span>금</span>
+          <span>토</span>
+        </div>
+
+        <div className="grid grid-cols-7 gap-2 justify-items-center">
+          {renderCalendarGrid()}
+        </div>
+
+        <hr className="my-6 border-gray-700" />
+
+        {/* ✅ 토글 기능이 적용된 범례 */}
+        <div className="flex justify-center items-center flex-wrap gap-2 text-xs">
+          <span className="text-gray-400 mr-2">정답률:</span>
+          {ACCURACY_LEVELS.map((level) => {
+            const isActive = activeRanges.has(level.range);
+            return (
+              <div
+                key={level.range}
+                onClick={() => handleLegendToggle(level.range)}
+                className={`flex items-center cursor-pointer p-1 rounded-md transition-opacity ${
+                  isActive ? "opacity-100" : "opacity-40 hover:opacity-70"
+                }`}
+              >
+                <div className={`w-4 h-4 rounded-sm mr-2 ${level.color}`}></div>
+                <span>{level.label}</span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="flex justify-center gap-4 mt-2">
+          <button
+            onClick={() => setActiveRanges(new Set(allRanges))}
+            className="text-xs text-blue-400 hover:underline"
+          >
+            전체 선택
+          </button>
+          <button
+            onClick={() => setActiveRanges(new Set())}
+            className="text-xs text-blue-400 hover:underline"
+          >
+            전체 해제
+          </button>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full mt-6 px-4 py-3 bg-blue-600 hover:bg-blue-700 font-semibold rounded-lg transition-colors"
+        >
+          닫기
+        </button>
       </div>
     </div>
   );
 }
 
-export default CalendarModel;
+export default CalendarModal;

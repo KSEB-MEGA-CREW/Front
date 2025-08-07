@@ -10,14 +10,10 @@ import {
 import TopMenuComponent from "../../components/menu/topMenu";
 
 function MainPage() {
-  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [reduceMotion, setReduceMotion] = useState(true);
   const [translationDemo, setTranslationDemo] = useState(false);
-  const [todayUsers, setTodayUsers] = useState(
-    230 + Math.floor(Math.random() * 70)
-  ); //현재는 랜덤 생성이지만 나중에 조회수 저장하기
+  const [todayUsers] = useState(230 + Math.floor(Math.random() * 70)); // 추후 API로 대체 예정
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -27,12 +23,6 @@ function MainPage() {
   }, []);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth) * 100,
-        y: (e.clientY / window.innerHeight) * 100,
-      });
-    };
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const windowHeight = window.innerHeight;
@@ -44,18 +34,11 @@ function MainPage() {
       );
     };
 
-    if (!reduceMotion) {
-      window.addEventListener("mousemove", handleMouseMove);
-    }
     window.addEventListener("scroll", handleScroll);
-
     return () => {
-      if (!reduceMotion) {
-        window.removeEventListener("mousemove", handleMouseMove);
-      }
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [reduceMotion]);
+  }, []);
 
   const features = [
     {

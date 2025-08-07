@@ -1,7 +1,6 @@
 // useNavigate 이용 (react-router-dom v6+)
 import { useNavigate } from "react-router-dom";
 import { Video } from 'lucide-react';
-import { Outlet } from "react-router-dom";
 
 // TranslatePage에 Outlet 추가해서 자식 컴포넌트가 렌더링되도록
 

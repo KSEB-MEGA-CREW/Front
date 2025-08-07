@@ -91,7 +91,7 @@ export const useVideoCapture = () => {
   // 카메라 정지
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks.forEach((track) => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
       setStream(null);
     }

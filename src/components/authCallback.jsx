@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../Context/authContext";
 
-const authCallback = () => {
+const AuthCallback = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { login } = useAuth();
@@ -11,20 +11,12 @@ const authCallback = () => {
     const API_BASE_URL =
       import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-    console.log("AuthCallback 컴포넌트 로드됨");
-    console.log("현재 URL:", window.location.href);
-    console.log("URL 파라미터:", searchParams.toString());
-
     const handleCallback = async () => {
       const token = searchParams.get("token");
       const error = searchParams.get("error");
 
-      console.log("Token:", token);
-      console.log("Error:", error);
-
       // 에러 처리 로직
       if (error) {
-        console.error("OAuth 에러:", error);
         // 에러 메시지를 사용자 친화적으로 변환
         const errorMessages = {
           no_email: "이메일 정보를 가져올 수 없습니다.",
@@ -58,6 +50,7 @@ const authCallback = () => {
             if (userResponse.success) {
               const userData = userResponse.data;
 
+              console.log("authCallback userData:", userData);
               // authContext login 메서드 호출
               login({
                 token,
@@ -110,4 +103,4 @@ const authCallback = () => {
   );
 };
 
-export default authCallback;
+export default AuthCallback;

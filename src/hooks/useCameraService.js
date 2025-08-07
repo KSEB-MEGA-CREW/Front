@@ -12,7 +12,7 @@ export const useCameraService = () => {
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
             setAvailableDevices(videoDevices);
             return videoDevices;
-        } catch (err) {
+        } catch {
             return [];
         }
     }, []);
