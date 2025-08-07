@@ -8,7 +8,7 @@ function OAuth2RedirectHandler() {
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  
   useEffect(() => {
     const handleOAuth2Redirect = async () => {
       try {

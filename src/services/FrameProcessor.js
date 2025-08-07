@@ -30,10 +30,13 @@ export class FrameProcessor {
         const frameData = dataURL.split(',')[1]; // Base64 부분만 추출
 
         // 파일 크기 체크 => 필요 시 추가
-        // const sizeInBytes = this.getBase64Size(frameData);
-        // if (sizeInBytes > VIDEO_CONFIG.MAX_FILE_SIZE) {
-        //     console.warn(`Frame size too large: ${sizeInBytes} bytes`);
-        // }
+        const sizeInBytes = this.getBase64Size(frameData);
+        if (sizeInBytes > VIDEO_CONFIG.MAX_FILE_SIZE) {
+            console.warn(`Frame size too large: ${sizeInBytes} bytes`);
+
+            // 자동 압축 처리
+            return this.compressFrame(videoElement, sessionId);
+        }
 
         const frameRequest = {
             frameData: frameData,
@@ -45,10 +48,45 @@ export class FrameProcessor {
         return frameRequest;
     }
 
+    // 압축 처리 메서드 추가
+    compressFrame(videoElement, sessionId) {
+        // 해상도를 절반으로 줄임
+        const smallCanvas = document.createElement('canvas');
+        const smallCtx = smallCanvas.getContext('2d');
+        smallCanvas.width = this.canvas.width / 2;
+        smallCanvas.height = this.canvas.height / 2;
+
+        smallCtx.drawImage(
+            videoElement,
+            0, 0,
+            smallCanvas.width,
+            smallCanvas.height
+        );
+
+        // 품질도 더 낮춤
+        const compressedDataURL = smallCanvas.toDataURL('image/jpeg', 0.3);
+        const compressedFrameData = compressedDataURL.split(',')[1];
+
+        const compressedSize = this.getBase64Size(compressedFrameData);
+        console.log(`🗜️ 압축된 프레임 크기: ${Math.round(compressedSize / 1024)}KB`);
+
+        // 임시 캔버스 정리
+        smallCanvas.remove();
+
+        const frameRequest = {
+            frameData: compressedFrameData,
+            timestamp: Date.now(),
+            sessionId: sessionId,
+            frameIndex: this.frameIndex++
+        };
+
+        return frameRequest;
+    }
+
     // Base64 크기 계산
-    // getBase64Size(base64String) {
-    //     return Math.round((base64String.length * 3) / 4);
-    // }
+    getBase64Size(base64String) {
+        return Math.round((base64String.length * 3) / 4);
+    }
 
     // frame index reset
     resetFrameIndex() {

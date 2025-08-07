@@ -45,7 +45,7 @@ const AuthCallback = () => {
 
           if (response.ok) {
             const userResponse = await response.json();
-
+            
             // 성공적인 응답 확인
             if (userResponse.success) {
               const userData = userResponse.data;
