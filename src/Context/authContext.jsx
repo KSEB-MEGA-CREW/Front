@@ -23,10 +23,17 @@ export const AuthProvider = ({children}) => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
 
+        console.log('Auth 초기화 시작:', {
+          hasToken: !!storedToken,
+          hasUser: !!storedUser
+        }); // 디버깅 로그
+
         if(storedToken && storedUser){
           // 토큰 유효성 검증
-          
-          const isValid = await validateToken();
+          // 토큰을 파라미터로 전달!!!
+          const isValid = await validateToken(storedToken);
+
+          console.log('토큰 검증 결과:', isValid); // 디버깅 로그
           if(isValid){
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
@@ -51,7 +58,7 @@ export const AuthProvider = ({children}) => {
 
   const login = ({token, user}) => {
     if(!token || !user){
-      cconsole.error('Login failed: Invalid auth data');
+      console.error('Login failed: Invalid auth data');
       return;
     }
 
@@ -69,9 +76,15 @@ export const AuthProvider = ({children}) => {
     authApi.logout();
   };
 
+  // 토큰 갱신 메서드 추가
+  const updateToken = (newToken) => {
+    setToken(newToken);
+    localStorage.setItem('token', newToken);
+  };
+
   const value = {
     user,
-    token,
+    token, // 토큰 명시적으로 제공
     isLoading: loading,
     loading,
     login,

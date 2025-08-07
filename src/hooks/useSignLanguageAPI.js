@@ -6,7 +6,7 @@ import { useAuth } from "../Context/authContext";
  * 수화 번역 API 통신 및 관련 상태를 관리하는 훅
  */
 export const useSignLanguageAPI = () => {
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const [lastResult, setLastResult] = useState(null);
@@ -22,7 +22,6 @@ export const useSignLanguageAPI = () => {
 
         // 현재 NetworkService의 sendFrame(frameRequest, token) <- 토큰이 별도 파라미터로 필요
         // 이를 위해 토큰 가져오기
-        const token = localStorage.getItem('token');
         if (!token) {
             throw new Error('인증 토큰이 없습니다.');
         }
@@ -47,7 +46,7 @@ export const useSignLanguageAPI = () => {
         } finally {
             setIsSubmitting(false);
         }
-    }, [user?.id]);
+    }, [user?.id, token]);
 
     const clearError = useCallback(() => {
         setError(null);

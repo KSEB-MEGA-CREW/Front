@@ -78,27 +78,30 @@ export class NetworkService {
     async sendFrame(frameRequest, token) {
         console.log(`📡 [${new Date().toISOString().split('T')[1].slice(0, -1)}] 프레임 전송 시작 (Frame #${frameRequest.frameIndex})`);
 
-        return this._fetchWithRetry(
-            API_CONFIG.ENDPOINTS.ANALYZE_FRAME,
-            {
-                method: 'POST',
-                body: JSON.stringify(frameRequest),
-            },
-            token
-        );
-    }
+        // ✅ 요청 전 상세 로그 추가
+        console.log('=== NetworkService 요청 상세 정보 ===');
+        console.log('URL:', `${this.baseURL}${API_CONFIG.ENDPOINTS.ANALYZE_FRAME}`);
+        console.log('Token 존재:', !!token);
+        console.log('frameRequest:', frameRequest);
+        console.log('=====================================');
 
-    /**
-     * ✅ [추가] 일관성을 위해 세션 생성 메서드도 추가
-     * @param {string} token - 인증 토큰
-     * @returns {Promise<any>} 세션 생성 결과
-     */
-    async createSession(token) {
-        return this._fetchWithRetry(
-            API_CONFIG.ENDPOINTS.CREATE_SESSION, // config에 세션 엔드포인트가 있다고 가정
-            { method: 'POST' },
-            token
-        );
+        try {
+            const response = await this._fetchWithRetry(
+                API_CONFIG.ENDPOINTS.ANALYZE_FRAME,
+                {
+                    method: 'POST',
+                    body: JSON.stringify(frameRequest),
+                },
+                token
+            );
+
+            console.log('✅ 네트워크 요청 성공:', response);
+            return response;
+
+        } catch (error) {
+            console.error('❌ 네트워크 요청 실패:', error);
+            throw error;
+        }
     }
 
     /**

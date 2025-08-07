@@ -169,18 +169,17 @@ export const quizApi = {
 export const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 
 // token 유효성 검사를 여기서 처리
-export const validateToken = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    return false;
-  }
-
+// 로직 수정 -> fetch 요청으로 처리
+export const validateToken = async (token) => {
   try {
-    const response = await authApi.getCurrentUser(); // 수정: authApi 사용
-    return response.success;
+    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    return response.ok;
   } catch (error) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
     return false;
   }
 };
