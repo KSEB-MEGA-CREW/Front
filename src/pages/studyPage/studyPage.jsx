@@ -5,7 +5,7 @@ import { useAuth } from "../../Context/authContext";
 import CalendarModal from "../../components/calendarModel";
 import BasicLayout from "../../layouts/basicLayout";
 
-function StudyPage() {
+function StudyWord() {
   const { user } = useAuth();
   const [quizList, setQuizList] = useState([]);
   const [current, setCurrent] = useState(0);
@@ -187,11 +187,11 @@ function StudyPage() {
             다시 풀기
           </button>
         </div>
-        <CalendarModal
+        {/* <CalendarModal
           isOpen={isCalendarOpen}
           onClose={() => setIsCalendarOpen(false)}
           userId={user?.id}
-        />
+        /> */}
       </BasicLayout>
     );
   }
@@ -272,4 +272,4 @@ function StudyPage() {
   );
 }
 
-export default StudyPage;
+export default StudyWord;
