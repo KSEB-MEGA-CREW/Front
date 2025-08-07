@@ -28,7 +28,7 @@ const AuthCallback = () => {
         const userFriendlyError =
           errorMessages[error] || "로그인 중 오류가 발생했습니다.";
         alert(userFriendlyError);
-        navigate("/login");
+        navigate("/auth");
         return;
       }
 
@@ -45,7 +45,7 @@ const AuthCallback = () => {
 
           if (response.ok) {
             const userResponse = await response.json();
-            
+
             // 성공적인 응답 확인
             if (userResponse.success) {
               const userData = userResponse.data;
@@ -76,11 +76,11 @@ const AuthCallback = () => {
           console.error("OAuth2 로그인 처리 오류:", error);
 
           alert(error.message || "로그인 중 문제가 발생했습니다.");
-          navigate("/login");
+          navigate("/auth");
         }
       } else {
         // token이 없는 경우
-        navigate("/login");
+        navigate("/auth");
       }
     };
 

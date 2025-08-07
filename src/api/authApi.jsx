@@ -15,9 +15,12 @@ const apiRequest = async (url, options = {}) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
+        //"Cache-Control": "no-cache",
+        //Pragma: "no-cache",
         ...getAuthHeaders(),
         ...headers,
       },
+      //credentials: "include",
       cache: "no-cache",
       ...restOptions,
     });
@@ -28,8 +31,8 @@ const apiRequest = async (url, options = {}) => {
       localStorage.removeItem("user");
       // 현재 페이지가 로그인 페이지면 리다이렉트하지 않음 => 굳이 리다이렉트할 필요가 없으므로
       // 현재 페이지가 로그인 페이지가 아닐 때만 리다이렉트
-      if (!window.location.pathname.includes("/login")) {
-        window.location.href = "/login";
+      if (!window.location.pathname.includes("/auth")) {
+        window.location.href = "/auth";
       }
       throw new Error("인증이 만료되었습니다.");
     }
@@ -62,6 +65,7 @@ const apiRequest = async (url, options = {}) => {
     if (error.name === "TypeError" && error.message.includes("fetch")) {
       throw new Error("네트워크 연결을 확인해주세요.");
     }
+    // debug용 console.log
     console.error("API 요청 오류:", error);
     throw error;
   }
@@ -69,21 +73,8 @@ const apiRequest = async (url, options = {}) => {
 
 // API 함수들
 export const authApi = {
-  // signup with input validation
+  // signup
   signup: async (signupRequest) => {
-    // 입력 값 검증
-    if (!signupRequest.email || !signupRequest.password) {
-      throw new Error("이메일과 비밀번호는 필수입니다.");
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupRequest.email)) {
-      throw new Error("유효한 이메일 형식이 아닙니다.");
-    }
-
-    if (signupRequest.password.length < 6) {
-      throw new Error("비밀번호는 6자 이상이어야 합니다.");
-    }
-
     try {
       const response = await apiRequest("/api/auth/signup", {
         method: "POST",
@@ -96,41 +87,22 @@ export const authApi = {
     }
   },
 
-  // login with input validation
+  // login
   login: async (loginRequest) => {
-    // 입력 값 검증
-    if (!loginRequest.email || !loginRequest.password) {
-      throw new Error("이메일과 비밀번호를 입력해주세요.");
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginRequest.email)) {
-      throw new Error("유효한 이메일 형식이 아닙니다.");
-    }
-
     try {
       const response = await apiRequest("/api/auth/login", {
         method: "POST",
         body: JSON.stringify(loginRequest),
       });
 
-      // token -> localStorage에 저장 (XSS 보안 고려)
+      // token -> localStorage에 저장
       if (response.success && response.data.token) {
-        // JWT 토큰 검증
-        try {
-          const payload = JSON.parse(atob(response.data.token.split(".")[1]));
-          if (payload.exp * 1000 < Date.now()) {
-            throw new Error("만료된 토큰입니다.");
-          }
-        } catch {
-          throw new Error("유효하지 않은 토큰입니다.");
-        }
-
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.userInfo));
       }
       return response;
     } catch (error) {
-      console.error("로그인 오류:", error);
+      console.log("로그인 오류:", error);
       throw error;
     }
   },
@@ -220,22 +192,14 @@ export const NAVER_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/naver`;
 // token 유효성 검사를 여기서 처리
 export const validateToken = async () => {
   const token = localStorage.getItem("token");
-  if (!token || token.trim() === "") {
+  if (!token) {
     return false;
   }
 
   try {
-    // JWT 단순 검증 (만료 시간 체크)
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    if (payload.exp * 1000 < Date.now()) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      return false;
-    }
-
-    const response = await authApi.getCurrentUser();
+    const response = await authApi.getCurrentUser(); // 수정: authApi 사용
     return response.success;
-  } catch {
+  } catch (error) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     return false;
