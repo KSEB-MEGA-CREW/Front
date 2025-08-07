@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { FrameProcessor } from '../services/FrameProcessor';
 import { VIDEO_CONFIG, SESSION_CONFIG } from "../constants/videoConfig";
 import { useSignLanguageAPI } from "./useSignLanguageAPI";
+import { useAuth } from "../Context/authContext";
 
 // 프레임 추출 로직 -> useSignLanguageAPI hook 활용
 
@@ -15,7 +16,8 @@ export const useFrameExtraction = () => {
     const intervalRef = useRef(null);
     const lastSubmissionTime = useRef(0);
 
-    // API 통신 훅 사용
+    // 인증 및 API 통신 훅 사용
+    const { user } = useAuth();
     const {
         submitFrame,
         error: apiError,
@@ -34,7 +36,7 @@ export const useFrameExtraction = () => {
         clearError();
         frameProcessor.current.resetFrameIndex();
 
-        console.log(`Starting frame extraction - SessionID: ${sessionId}, UserID: ${user.id}`);
+        console.log(`Starting frame extraction - SessionID: ${sessionId}, UserID: ${user?.id || 'unknown'}`);
 
         intervalRef.current = setInterval(async () => {
             try {
@@ -71,7 +73,7 @@ export const useFrameExtraction = () => {
                 }
             }
         }, VIDEO_CONFIG.FRAME_INTERVAL);
-    }, [isProcessing, sessionId, submitFrame, clearError]);
+    }, [isProcessing, sessionId, submitFrame, clearError, user, stopFrameExtraction]);
 
     // 프레임 추출 중단
     const stopFrameExtraction = useCallback(() => {

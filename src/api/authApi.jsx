@@ -69,8 +69,21 @@ const apiRequest = async (url, options = {}) => {
 
 // API 함수들
 export const authApi = {
-  // signup
+  // signup with input validation
   signup: async (signupRequest) => {
+    // 입력 값 검증
+    if (!signupRequest.email || !signupRequest.password) {
+      throw new Error('이메일과 비밀번호는 필수입니다.');
+    }
+    
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupRequest.email)) {
+      throw new Error('유효한 이메일 형식이 아닙니다.');
+    }
+    
+    if (signupRequest.password.length < 6) {
+      throw new Error('비밀번호는 6자 이상이어야 합니다.');
+    }
+
     try {
       const response = await apiRequest("/api/auth/signup", {
         method: "POST",
@@ -83,16 +96,35 @@ export const authApi = {
     }
   },
 
-  // login
+  // login with input validation
   login: async (loginRequest) => {
+    // 입력 값 검증
+    if (!loginRequest.email || !loginRequest.password) {
+      throw new Error('이메일과 비밀번호를 입력해주세요.');
+    }
+    
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginRequest.email)) {
+      throw new Error('유효한 이메일 형식이 아닙니다.');
+    }
+
     try {
       const response = await apiRequest("/api/auth/login", {
         method: "POST",
         body: JSON.stringify(loginRequest),
       });
 
-      // token -> localStorage에 저장
+      // token -> localStorage에 저장 (XSS 보안 고려)
       if (response.success && response.data.token) {
+        // JWT 토큰 검증
+        try {
+          const payload = JSON.parse(atob(response.data.token.split('.')[1]));
+          if (payload.exp * 1000 < Date.now()) {
+            throw new Error('만료된 토큰입니다.');
+          }
+        } catch {
+          throw new Error('유효하지 않은 토큰입니다.');
+        }
+        
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.userInfo));
       }
@@ -188,12 +220,20 @@ export const NAVER_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/naver`;
 // token 유효성 검사를 여기서 처리
 export const validateToken = async () => {
   const token = localStorage.getItem("token");
-  if (!token) {
+  if (!token || token.trim() === '') {
     return false;
   }
 
   try {
-    const response = await authApi.getCurrentUser(); // 수정: authApi 사용
+    // JWT 단순 검증 (만료 시간 체크)
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    if (payload.exp * 1000 < Date.now()) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      return false;
+    }
+
+    const response = await authApi.getCurrentUser();
     return response.success;
   } catch {
     localStorage.removeItem("token");

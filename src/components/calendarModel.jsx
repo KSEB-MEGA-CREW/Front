@@ -18,7 +18,7 @@ const ACCURACY_LEVELS = [
   { range: "81-99", label: "81-99점", color: "bg-green-700" },
   { range: "100", label: "100점", color: "bg-green-800" },
 ];
-// 모든 range 값들의 배열
+// 모든 range 값들의 배열 (useMemo로 최적화 가능하지만 상수이므로 생략)
 const allRanges = ACCURACY_LEVELS.map((l) => l.range);
 
 function CalendarModal({ isOpen, onClose, userId }) {

@@ -11,11 +11,9 @@ const AuthCallback = () => {
     const API_BASE_URL =
       import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-
     const handleCallback = async () => {
       const token = searchParams.get("token");
       const error = searchParams.get("error");
-
 
       // 에러 처리 로직
       if (error) {
@@ -52,6 +50,7 @@ const AuthCallback = () => {
             if (userResponse.success) {
               const userData = userResponse.data;
 
+              console.log("authCallback userData:", userData);
               // authContext login 메서드 호출
               login({
                 token,

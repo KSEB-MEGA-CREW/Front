@@ -58,6 +58,8 @@ export const AuthProvider = ({ children }) => {
     setToken(token);
     setUser(user);
     localStorage.setItem("token", token);
+    console.log("context-토큰 저장:", token);
+    console.log("context-로그인 성공:", user);
     localStorage.setItem("user", JSON.stringify(user));
   };
 
@@ -81,4 +83,3 @@ export const AuthProvider = ({ children }) => {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-

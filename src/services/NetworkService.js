@@ -35,14 +35,17 @@ export class NetworkService {
             );
 
             if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error('인증이 만료되었습니다.');
-                } else if (response.status === 403) {
-                    throw new Error('세션 접근 권한이 없습니다.');
-                } else if (response.status === 400) {
-                    throw new Error('프레임 데이터가 유효하지 않습니다.');
-                }
-                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                const errorMessages = {
+                    401: '인증이 만료되었습니다.',
+                    403: '세션 접근 권한이 없습니다.',
+                    400: '프레임 데이터가 유효하지 않습니다.',
+                    429: '요청 한도를 초과했습니다.',
+                    500: '서버 내부 오류가 발생했습니다.',
+                    503: '서비스를 일시적으로 사용할 수 없습니다.'
+                };
+                
+                const errorMessage = errorMessages[response.status] || `HTTP ${response.status}: ${response.statusText}`;
+                throw new Error(errorMessage);
             }
 
             const result = await response.json();
@@ -60,7 +63,7 @@ export class NetworkService {
             ) {
                 this.retryCount++;
                 console.log(`Retrying request (${this.retryCount}/${API_CONFIG.MAX_RETRIES})`);
-                await this.delay(1000 * this.retryCount); // 지수 백오프
+                await this.delay(Math.min(1000 * Math.pow(2, this.retryCount - 1), 10000)); // 지수 백오프 with 언한
                 return this.sendFrame(frameRequest);
             }
 
@@ -70,9 +73,17 @@ export class NetworkService {
 
     // 재시도 가능한 에러인지 확인
     shouldRetry(error) {
-        return error.message.includes('네트워크') ||
-            error.message.includes('timeout') ||
-            error.message.includes('서버 오류');
+        const retryableErrors = [
+            '네트워크',
+            'timeout',
+            '서버 오류',
+            '서버 내부 오류',
+            '서비스를 일시적으로'
+        ];
+        
+        return retryableErrors.some(errorType => 
+            error.message.includes(errorType)
+        ) && !error.message.includes('인증'); // 인증 에러는 재시도하지 않음
     }
 
     // 지연 함수
