@@ -15,12 +15,9 @@ const apiRequest = async (url, options = {}) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        //"Cache-Control": "no-cache",
-        //Pragma: "no-cache",
         ...getAuthHeaders(),
         ...headers,
       },
-      //credentials: "include",
       cache: "no-cache",
       ...restOptions,
     });
@@ -65,7 +62,6 @@ const apiRequest = async (url, options = {}) => {
     if (error.name === "TypeError" && error.message.includes("fetch")) {
       throw new Error("네트워크 연결을 확인해주세요.");
     }
-    // debug용 console.log
     console.error("API 요청 오류:", error);
     throw error;
   }
@@ -73,8 +69,21 @@ const apiRequest = async (url, options = {}) => {
 
 // API 함수들
 export const authApi = {
-  // signup
+  // signup with input validation
   signup: async (signupRequest) => {
+    // 입력 값 검증
+    if (!signupRequest.email || !signupRequest.password) {
+      throw new Error("이메일과 비밀번호는 필수입니다.");
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signupRequest.email)) {
+      throw new Error("유효한 이메일 형식이 아닙니다.");
+    }
+
+    if (signupRequest.password.length < 6) {
+      throw new Error("비밀번호는 6자 이상이어야 합니다.");
+    }
+
     try {
       const response = await apiRequest("/api/auth/signup", {
         method: "POST",
@@ -87,22 +96,41 @@ export const authApi = {
     }
   },
 
-  // login
+  // login with input validation
   login: async (loginRequest) => {
+    // 입력 값 검증
+    if (!loginRequest.email || !loginRequest.password) {
+      throw new Error("이메일과 비밀번호를 입력해주세요.");
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginRequest.email)) {
+      throw new Error("유효한 이메일 형식이 아닙니다.");
+    }
+
     try {
       const response = await apiRequest("/api/auth/login", {
         method: "POST",
         body: JSON.stringify(loginRequest),
       });
 
-      // token -> localStorage에 저장
+      // token -> localStorage에 저장 (XSS 보안 고려)
       if (response.success && response.data.token) {
+        // JWT 토큰 검증
+        try {
+          const payload = JSON.parse(atob(response.data.token.split(".")[1]));
+          if (payload.exp * 1000 < Date.now()) {
+            throw new Error("만료된 토큰입니다.");
+          }
+        } catch {
+          throw new Error("유효하지 않은 토큰입니다.");
+        }
+
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.userInfo));
       }
       return response;
     } catch (error) {
-      console.log("로그인 오류:", error);
+      console.error("로그인 오류:", error);
       throw error;
     }
   },
@@ -127,41 +155,55 @@ export const authApi = {
 
 export const quizApi = {
   getQuiz: async () => {
-    // api 호출 비동기 처리
-    
-    try{
+    try {
       const response = await apiRequest("/api/quiz", {
         method: "POST",
-        headers:{ // localStorage에서 토큰 가져와서 post
-          'Authorization' : `Bearer ${localStorage.getItem('token')}`
-        }
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
-      return response.data; // ApiResponse 구조에 맞춰 수정
-    } catch(error){
-      console.error('퀴즈 조회 오류:',error);
+      // ✅ 응답 객체 전체를 반환하도록 수정
+      return response;
+    } catch (error) {
+      console.error("퀴즈 조회 오류:", error);
       throw error;
     }
   },
   // 퀴즈 결과 저장 API 추가
   saveQuizResult: async (resultData) => {
-    try{
+    try {
       const response = await apiRequest("/api/quiz/result", {
         method: "POST",
-        body: JSON.stringify(resultData)
+        body: JSON.stringify(resultData),
       });
       return response;
-    }catch(error){
-      console.error('퀴즈 결과 저장 오류:', error);
+    } catch (error) {
+      console.error("퀴즈 결과 저장 오류:", error);
       throw error;
     }
   },
-  // 정답률(Accuracy) 데이터 가져오기 => 이거 아직 백엔드에 없습니다!!! 전달 및 확인 부탁!!!
-  getWeeklyAccuracy: async () => {
-    // API 엔드포인트는 실제 서버와 맞춰주세요!
-    const response = await apiRequest("/api/accuracy/weekly", {
-      method: "GET",
-    });
-    return response;
+
+  // quizApi.js의 getUserQuizHistory
+  getUserQuizHistory: async (year, month, userId) => {
+    try {
+      const data = await apiRequest(
+        `/api/quiz/quiz-stats/monthly/${year}/${month}/user/${userId}`,
+        {
+          method: "GET",
+        }
+      );
+
+      const calendarData = Object.entries(data).map(([date, accuracy]) => ({
+        date,
+        accuracy,
+      }));
+
+      return calendarData; // 배열로 변환하여 반환
+      // 또는 객체 그대로 사용/ 여기서 data에 배열이 오길 기대함
+    } catch (error) {
+      console.error("월 퀴즈 정보 조회:", error);
+      throw error; // 에러가 발생하면 Promise.reject로 넘어감
+    }
   },
 };
 
@@ -170,23 +212,32 @@ export const GOOGLE_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
 
 // 카카오 OAuth2 URL - 카카오 로그인 url에 맞게 수정
 // 현재는 구글과 동일하게 설정되어 있지만, 실제 카카오 OAuth2 URL로 변경해야 합니다.
-export const KAKAO_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
+export const KAKAO_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/kakao`;
 
 // 네이버 OAuth2 URL - 네이버 로그인 url에 맞게 수정
 // 현재는 구글과 동일하게 설정되어 있지만, 실제 네이버 OAuth2 URL로 변경해야 합니다.
-export const NAVER_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/google`;
+export const NAVER_AUTH_URL = `${API_BASE_URL}/oauth2/authorization/naver`;
 // token 유효성 검사를 여기서 처리
-// 로직 수정 -> fetch 요청으로 처리
-export const validateToken = async (token) => {
+export const validateToken = async () => {
+  const token = localStorage.getItem("token");
+  if (!token || token.trim() === "") {
+    return false;
+  }
+
   try {
-    const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    return response.ok;
-  } catch (error) {
+    // JWT 단순 검증 (만료 시간 체크)
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (payload.exp * 1000 < Date.now()) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      return false;
+    }
+
+    const response = await authApi.getCurrentUser();
+    return response.success;
+  } catch {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
     return false;
   }
 };
@@ -197,4 +248,6 @@ export default {
   quizApi,
   validateToken,
   GOOGLE_AUTH_URL,
+  KAKAO_AUTH_URL,
+  NAVER_AUTH_URL,
 };
