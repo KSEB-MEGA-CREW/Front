@@ -12,14 +12,18 @@ function LogoutButton() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/auth");
   };
 
   return (
     <button
       onClick={handleLogout}
       className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors duration-200
-        ${isMainPage ? "bg-transparent text-white" : "bg-blue-300 text-white hover:bg-blue-400"}`}
+        ${
+          isMainPage
+            ? "bg-transparent text-white"
+            : "bg-blue-300 text-white hover:bg-blue-400"
+        }`}
     >
       <LogOut className="w-4 h-4" />
       로그아웃
