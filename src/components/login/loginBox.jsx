@@ -160,20 +160,6 @@ const LoginBox = () => {
               회원가입
             </Link>
           </div>
-          {/*
-           이 버튼은 VideoGuid 팝업을 띄우는 역할을 하므로, 
-           해당 팝업의 상태(showVideoGuid)와 핸들러(handleShowVideoGuid)를 
-           LoginPage에서 props로 받아와야 합니다. 
-           만약 이 버튼이 LoginBox와 직접적인 관련이 없다면 LoginPage로 옮기는 것이 좋습니다.
-           여기서는 일단 주석 처리합니다.
-          <button
-            type="button"
-            // onClick={handleShowVideoGuid} 
-            className="underline hover:text-white text-white/80"
-          >
-            설명 가이드
-          </button>
-          */}
         </div>
       </form>
 

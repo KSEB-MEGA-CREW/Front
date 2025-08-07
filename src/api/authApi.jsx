@@ -15,12 +15,9 @@ const apiRequest = async (url, options = {}) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        //"Cache-Control": "no-cache",
-        //Pragma: "no-cache",
         ...getAuthHeaders(),
         ...headers,
       },
-      //credentials: "include",
       cache: "no-cache",
       ...restOptions,
     });
@@ -65,7 +62,6 @@ const apiRequest = async (url, options = {}) => {
     if (error.name === "TypeError" && error.message.includes("fetch")) {
       throw new Error("네트워크 연결을 확인해주세요.");
     }
-    // debug용 console.log
     console.error("API 요청 오류:", error);
     throw error;
   }
@@ -102,7 +98,7 @@ export const authApi = {
       }
       return response;
     } catch (error) {
-      console.log("로그인 오류:", error);
+      console.error("로그인 오류:", error);
       throw error;
     }
   },
@@ -199,7 +195,7 @@ export const validateToken = async () => {
   try {
     const response = await authApi.getCurrentUser(); // 수정: authApi 사용
     return response.success;
-  } catch (error) {
+  } catch {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     return false;
