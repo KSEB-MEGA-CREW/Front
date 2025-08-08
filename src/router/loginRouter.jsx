@@ -1,7 +1,7 @@
 import LoginPage from "../pages/loginPage/loginPage"; // Outlet을 포함한 레이아웃 페이지
 import LoginBox from "../components/login/loginBox"; // 독립적인 로그인 폼 (이전 리팩토링 결과)
 import SignUpBox from "../components/login/signupBox"; // 독립적인 회원가입 폼 (이전 리팩토링 결과)
-import PublicRoute from "./PublicRoute";
+import PublicRoute from "./publicRoute";
 
 function LoginRouter() {
   return {
