@@ -21,7 +21,7 @@ const AuthCallback = () => {
         const errorMessages = {
           no_email: "이메일 정보를 가져올 수 없습니다.",
           server_error: "서버 오류가 발생했습니다.",
-          OAuth2_인증_실패: "Google 인증에 실패했습니다.",
+          OAuth2_인증_실패: "인증에 실패했습니다.",
           auth_failed: "인증에 실패했습니다.",
         };
 
