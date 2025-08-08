@@ -7,7 +7,6 @@ import {
   ArrowRightLeft,
   Volume2,
 } from "lucide-react";
-import TopMenuComponent from "../../components/menu/topMenu";
 
 function MainPage() {
   const [scrollY, setScrollY] = useState(0);
@@ -90,10 +89,6 @@ function MainPage() {
             />
           ))}
         </div>
-      </div>
-      {/* TopMenu */}
-      <div className="absolute top-0 left-0 w-full z-40" role="navigation">
-        <TopMenuComponent />
       </div>
       {/* 패럴랙스 배경 */}
       <div className="fixed inset-0 -z-10" aria-hidden>

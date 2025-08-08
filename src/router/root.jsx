@@ -3,6 +3,7 @@ import ProtectedRoute from "./protectedRoute";
 import StudyRouter from "./studyRouter";
 import TranslateRouter from "./translateRouter";
 import LoginRouter from "./loginRouter";
+import BasicLayout from "../layouts/basicLayout";
 
 // Lazy Loading => 직접 import로 변경
 import Main from "../pages/basicPage/mainPage";
@@ -29,7 +30,9 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <ProtectedRoute>
-        <Main />
+        <BasicLayout>
+          <Main />
+        </BasicLayout>
       </ProtectedRoute>
     ),
   },
@@ -37,7 +40,9 @@ const router = createBrowserRouter([
     path: "/mypage",
     element: (
       <ProtectedRoute>
-        <MyPage />
+        <BasicLayout>
+          <MyPage />
+        </BasicLayout>
       </ProtectedRoute>
     ),
   },
@@ -45,7 +50,9 @@ const router = createBrowserRouter([
     path: "/about",
     element: (
       <ProtectedRoute>
-        <AboutPage />
+        <BasicLayout>
+          <AboutPage />
+        </BasicLayout>
       </ProtectedRoute>
     ),
   },
@@ -53,7 +60,9 @@ const router = createBrowserRouter([
     path: "/privacy",
     element: (
       <ProtectedRoute>
-        <PrivacyPage />
+        <BasicLayout>
+          <PrivacyPage />
+        </BasicLayout>
       </ProtectedRoute>
     ),
   },
@@ -61,7 +70,9 @@ const router = createBrowserRouter([
     path: "/good",
     element: (
       <ProtectedRoute>
-        <GoodPage />
+        <BasicLayout>
+          <GoodPage />
+        </BasicLayout>
       </ProtectedRoute>
     ),
   },
