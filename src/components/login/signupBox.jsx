@@ -168,10 +168,13 @@ const SignUpBox = () => {
         {errors.confirmPassword && (
           <p className="text-sm text-red-400 mt-1">{errors.confirmPassword}</p>
         )}
-        <div>
-          <label className="block text-white/70 mb-1 font-semibold">
+        <div className="border border-white/20 rounded-xl p-4">
+          <label className="text-center block text-white/70 mb-1 font-semibold">
             청각상태
           </label>
+          <p className="text-xs text-white/50 mb-3 text-center">
+            맞춤형 수어 번역 서비스 제공을 위해 수집됩니다
+          </p>
           <div className="flex flex-col space-y-3">
             {" "}
             {/* 위아래 줄거리 3단위 */}
@@ -186,7 +189,7 @@ const SignUpBox = () => {
                 onChange={handleInputChange}
                 required
               />
-              <span>청인: 소리를 듣는 데 어려움이 없는 사람</span>
+              <span>청인: 청력에 이상이 없음</span>
             </label>
             <label className="flex items-center space-x-2 text-white/80 pt-1">
               {" "}
@@ -198,7 +201,7 @@ const SignUpBox = () => {
                 checked={formData.hearing === "deaf"}
                 onChange={handleInputChange}
               />
-              <span>농인: 소리를 듣는 데 어려움을 겪는 사람</span>
+              <span>농인: 청각에 이상이 있음</span>
             </label>
           </div>
         </div>
