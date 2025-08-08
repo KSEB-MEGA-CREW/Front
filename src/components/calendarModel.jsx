@@ -10,13 +10,13 @@ const formatDate = (date) => {
 
 // ✅ 색상 및 범례 정보. range를 고유 식별자로 사용
 const ACCURACY_LEVELS = [
-  { range: "0", label: "0점", color: "bg-gray-700" },
-  { range: "1-20", label: "1-20점", color: "bg-green-300" },
-  { range: "21-40", label: "21-40점", color: "bg-green-400" },
-  { range: "41-60", label: "41-60점", color: "bg-green-500" },
-  { range: "61-80", label: "61-80점", color: "bg-green-600" },
-  { range: "81-99", label: "81-99점", color: "bg-green-700" },
-  { range: "100", label: "100점", color: "bg-green-800" },
+  { range: "0", label: "0%", color: "bg-gray-700" },
+  { range: "1-20", label: "1-20%", color: "bg-green-300" },
+  { range: "21-40", label: "21-40%", color: "bg-green-400" },
+  { range: "41-60", label: "41-60%", color: "bg-green-500" },
+  { range: "61-80", label: "61-80%", color: "bg-green-600" },
+  { range: "81-99", label: "81-99%", color: "bg-green-700" },
+  { range: "100", label: "100%", color: "bg-green-800" },
 ];
 // 모든 range 값들의 배열
 const allRanges = ACCURACY_LEVELS.map((l) => l.range);
@@ -256,6 +256,11 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
       <hr
         className={`my-6 ${isModal ? "border-gray-700" : "border-gray-200"}`}
       />
+
+      {/* 가이드 문구 */}
+      <div className={`text-center text-xs mb-3 ${isModal ? "text-gray-400" : "text-gray-500"}`}>
+        💡 아래 정답률 박스를 클릭하면 해당하는 날짜만 달력에서 확인할 수 있어요!
+      </div>
 
       {/* ✅ 토글 기능이 적용된 범례 */}
       <div className="flex justify-center items-center flex-wrap gap-2 text-xs mb-4">

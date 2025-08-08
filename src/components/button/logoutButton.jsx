@@ -2,7 +2,7 @@ import { useAuth } from "../../Context/authContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LogOut } from "lucide-react";
 
-function LogoutButton() {
+function LogoutButton({ className }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,12 +18,16 @@ function LogoutButton() {
   return (
     <button
       onClick={handleLogout}
-      className={`flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors duration-200
+      className={
+        className 
+          ? `${className} flex items-center gap-2`
+          : `flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors duration-200
         ${
           isMainPage
-            ? "bg-transparent text-white"
+            ? "bg-transparent text-white hover:bg-white/10 hover:text-blue-300"
             : "bg-blue-300 text-white hover:bg-blue-400"
-        }`}
+        }`
+      }
     >
       <LogOut className="w-4 h-4" />
       로그아웃

@@ -56,9 +56,15 @@ const StasticComponent = () => {
         // 월별 데이터에서 최근 7일 데이터만 필터링 및 매핑
         const weeklyQuizData = recentDays.map((date) => {
           const dayData = monthlyData.find((item) => item.date === date);
+          let accuracy = -1; // 기본값을 -1로 설정 (기록 없음)
+          
+          if (dayData) {
+            accuracy = dayData.accuracy; // 실제 데이터값 사용 (-1, 0, 또는 양수)
+          }
+          
           return {
             date: date,
-            accuracy: dayData ? dayData.accuracy : 0, // 해당 날짜에 데이터가 없으면 0%
+            accuracy: accuracy,
           };
         });
 
@@ -74,22 +80,56 @@ const StasticComponent = () => {
     fetchData();
   }, []);
 
-  // 정답률에 따라 원의 색상을 결정 (배경색을 직접 변경)
-  const getCircleColor = (accuracy) => {
-    if (accuracy >= 90) return "bg-emerald-500";
-    if (accuracy >= 80) return "bg-blue-500";
-    if (accuracy >= 70) return "bg-amber-500";
-    if (accuracy >= 60) return "bg-orange-500";
-    if (accuracy === 0) return "bg-gray-300"; // 데이터가 없는 날
-    return "bg-red-500";
+  // 정답률에 따라 원의 색상과 텍스트 색상을 결정
+  const getCircleStyle = (accuracy) => {
+    if (accuracy === -1) return { 
+      bg: "bg-gray-300", 
+      text: "text-gray-600",
+      shadow: "shadow-lg"
+    }; // 기록이 없는 날
+    if (accuracy >= 90) return { 
+      bg: "bg-emerald-500", 
+      text: "text-white",
+      shadow: "shadow-emerald-200"
+    };
+    if (accuracy >= 80) return { 
+      bg: "bg-blue-500", 
+      text: "text-white",
+      shadow: "shadow-blue-200"
+    };
+    if (accuracy >= 70) return { 
+      bg: "bg-amber-500", 
+      text: "text-white",
+      shadow: "shadow-amber-200"
+    };
+    if (accuracy >= 60) return { 
+      bg: "bg-orange-500", 
+      text: "text-white",
+      shadow: "shadow-orange-200"
+    };
+    return { 
+      bg: "bg-red-500", 
+      text: "text-white",
+      shadow: "shadow-red-200"
+    }; // 0%~59% (0% 포함)
   };
 
-  // 정답률에 따라 원의 크기를 결정
+  // 정답률에 따라 원의 크기를 결정 (개선된 크기 시스템)
   const getCircleSize = (accuracy) => {
-    if (accuracy === 0) return 30; // 데이터가 없는 날은 작은 크기
-    const minSize = 50;
-    const maxSize = 90;
-    return minSize + (accuracy / 100) * (maxSize - minSize);
+    if (accuracy === -1) return 35; // 기록이 없는 날은 작은 크기
+    
+    // 더 역동적인 크기 변화를 위한 비선형 계산
+    const minSize = 45;
+    const maxSize = 95;
+    
+    // 정답률에 따른 단계별 크기 조정
+    if (accuracy >= 90) return maxSize;
+    if (accuracy >= 80) return maxSize - 10;
+    if (accuracy >= 70) return maxSize - 20;
+    if (accuracy >= 60) return maxSize - 30;
+    if (accuracy >= 40) return maxSize - 35;
+    if (accuracy >= 20) return maxSize - 40;
+    return minSize; // 0-19%
   };
 
   // 로딩 상태
@@ -132,18 +172,27 @@ const StasticComponent = () => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-bold text-gray-900">주간 학습</h2>
-        <span className="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded-full">
-          이번주 사용자님의 성취입니다!
-        </span>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+            📊 주간 학습 성취도
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">최근 7일간의 학습 기록을 확인해보세요</p>
+        </div>
+        <div className="text-right">
+          <span className="text-xs text-blue-600 bg-blue-50 px-3 py-1.5 rounded-full font-medium border border-blue-100">
+            이번주 성취 리포트
+          </span>
+        </div>
       </div>
 
       {/* 주간 차트 영역 */}
-      <div className="mb-8">
-        <div className="flex justify-between items-end h-40 px-2">
+      <div className="mb-10">
+        <div className="bg-gradient-to-b from-gray-50/50 to-transparent rounded-2xl p-4 mb-6">
+          <div className="flex justify-between items-end h-44 px-4">
           {weeklyData.map((item, index) => {
             const size = getCircleSize(item.accuracy);
+            const circleStyle = getCircleStyle(item.accuracy);
             return (
               <div
                 key={index}
@@ -151,82 +200,113 @@ const StasticComponent = () => {
               >
                 {/* 정답률을 나타내는 원 */}
                 <div
-                  className={`${getCircleColor(
-                    item.accuracy
-                  )} rounded-full flex items-center justify-center text-white font-bold transition-all duration-300 ease-in-out group-hover:scale-110 shadow-lg cursor-pointer relative overflow-hidden`}
+                  className={`${circleStyle.bg} ${circleStyle.shadow} rounded-full flex items-center justify-center font-bold transition-all duration-500 ease-out group-hover:scale-125 group-hover:rotate-6 cursor-pointer relative overflow-hidden transform group-hover:-translate-y-2`}
                   style={{
                     width: `${size}px`,
                     height: `${size}px`,
-                    fontSize: `${Math.max(10, size * 0.2)}px`,
+                    fontSize: `${Math.max(10, size * 0.25)}px`,
                   }}
                 >
-                  <span className="relative z-10">
-                    {item.accuracy === 0 ? "-" : item.accuracy}
+                  <span className={`relative z-10 ${circleStyle.text} drop-shadow-sm font-extrabold`}>
+                    {item.accuracy === -1 ? "―" : `${item.accuracy}%`}
                   </span>
-                  {/* 호버 효과 */}
-                  <div className="absolute inset-0 bg-white bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 rounded-full"></div>
+                  {/* 호버 효과 - 빛나는 효과 */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-full transform rotate-45"></div>
+                  {/* 펄스 효과 */}
+                  <div className="absolute inset-0 rounded-full animate-pulse opacity-0 group-hover:opacity-20 bg-white transition-all duration-300"></div>
                 </div>
 
                 {/* 호버 툴팁 */}
-                <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-3 py-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap z-20 shadow-lg">
+                <div className="absolute -top-20 left-1/2 transform -translate-x-1/2 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white px-4 py-3 rounded-xl text-sm opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-105 whitespace-nowrap z-30 shadow-2xl border border-gray-600/50 backdrop-blur-sm">
                   <div className="text-center">
-                    <div className="font-semibold">
-                      {item.accuracy === 0
-                        ? "학습 기록 없음"
-                        : `정답률 ${item.accuracy}%`}
+                    <div className="font-bold text-base mb-1">
+                      {item.accuracy === -1 ? (
+                        <span className="text-gray-300 flex items-center gap-1">
+                          <span className="w-2 h-2 bg-gray-400 rounded-full"></span>
+                          학습 기록 없음
+                        </span>
+                      ) : (
+                        <span className={`flex items-center gap-2 ${
+                          item.accuracy >= 80 ? 'text-green-300' : 
+                          item.accuracy >= 60 ? 'text-yellow-300' : 'text-red-300'
+                        }`}>
+                          <span className={`text-2xl ${
+                            item.accuracy >= 80 ? '🎉' : 
+                            item.accuracy >= 60 ? '👍' : 
+                            item.accuracy > 0 ? '💪' : '😔'
+                          }`}></span>
+                          정답률 {item.accuracy}%
+                        </span>
+                      )}
                     </div>
-                    <div className="text-gray-300 text-[10px] mt-1">
-                      {new Date(item.date).toLocaleDateString()}
+                    <div className="text-gray-400 text-xs font-medium bg-gray-700/50 px-2 py-1 rounded-full">
+                      {new Date(item.date).toLocaleDateString('ko-KR', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        weekday: 'short'
+                      })}
                     </div>
                   </div>
-                  {/* 툴팁 화살표 */}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                  {/* 툴팁 화살표 - 개선된 디자인 */}
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2">
+                    <div className="w-0 h-0 border-l-6 border-r-6 border-t-6 border-transparent border-t-gray-800"></div>
+                    <div className="w-0 h-0 border-l-5 border-r-5 border-t-5 border-transparent border-t-gray-700 absolute -top-1 left-1/2 transform -translate-x-1/2"></div>
+                  </div>
                 </div>
               </div>
             );
           })}
         </div>
 
-        {/* 요일 레이블 */}
-        <div className="flex justify-between mt-4 px-2">
-          {weeklyData.map((item, index) => (
-            <div key={index} className="flex-1 text-center">
-              <p className="text-sm font-medium text-gray-700">
-                {getDayOfWeek(item.date)}
-              </p>
-              <p className="text-xs text-gray-400 mt-1">
-                {new Date(item.date).getDate()}
-              </p>
-            </div>
-          ))}
+          {/* 요일 레이블 */}
+          <div className="flex justify-between mt-6 px-4">
+            {weeklyData.map((item, index) => {
+              const isToday = new Date(item.date).toDateString() === new Date().toDateString();
+              return (
+                <div key={index} className="flex-1 text-center">
+                  <p className={`text-sm font-semibold ${isToday ? 'text-blue-600' : 'text-gray-700'}`}>
+                    {getDayOfWeek(item.date)}
+                  </p>
+                  <p className={`text-xs mt-1 px-2 py-1 rounded-full ${
+                    isToday ? 'text-blue-600 bg-blue-50 border border-blue-200' : 'text-gray-400'
+                  }`}>
+                    {new Date(item.date).getDate()}일
+                  </p>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
-      {/* 범례 */}
-      <div className="flex justify-center items-center space-x-4 text-xs">
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
-          <span className="text-gray-600">90% 이상</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-          <span className="text-gray-600">80-89%</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-          <span className="text-gray-600">70-79%</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
-          <span className="text-gray-600">60-69%</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-          <span className="text-gray-600">60% 미만</span>
-        </div>
-        <div className="flex items-center space-x-1">
-          <div className="w-3 h-3 bg-gray-300 rounded-full"></div>
-          <span className="text-gray-600">기록 없음</span>
+      {/* 범례 - 개선된 디자인 */}
+      <div className="bg-gray-50 rounded-xl p-4">
+        <h3 className="text-sm font-semibold text-gray-700 text-center mb-3">성취도 가이드</h3>
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm">
+            <div className="w-4 h-4 bg-emerald-500 rounded-full shadow-sm"></div>
+            <span className="text-gray-700 font-medium">90% 이상</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm">
+            <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
+            <span className="text-gray-700 font-medium">80-89%</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm">
+            <div className="w-4 h-4 bg-amber-500 rounded-full shadow-sm"></div>
+            <span className="text-gray-700 font-medium">70-79%</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm">
+            <div className="w-4 h-4 bg-orange-500 rounded-full shadow-sm"></div>
+            <span className="text-gray-700 font-medium">60-69%</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm">
+            <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
+            <span className="text-gray-700 font-medium">60% 미만</span>
+          </div>
+          <div className="flex items-center space-x-2 bg-white p-2 rounded-lg shadow-sm">
+            <div className="w-4 h-4 bg-gray-300 rounded-full shadow-sm"></div>
+            <span className="text-gray-700 font-medium">기록 없음</span>
+          </div>
         </div>
       </div>
     </div>

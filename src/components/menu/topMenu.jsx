@@ -13,6 +13,8 @@ function TopMenuComponent() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isDarkPage, setIsDarkPage] = useState(true);
   const [currentPath, setCurrentPath] = useState("/");
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const { user, isLoading } = useAuth();
 
   useEffect(() => {
@@ -20,6 +22,26 @@ function TopMenuComponent() {
     setCurrentPath(path);
     setIsDarkPage(path === "/" || path === "/main");
   }, []);
+
+  // 스크롤 기반 네비게이션 숨김/표시 효과
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      
+      // 스크롤이 100px 이하이거나 위로 스크롤할 때는 보이게 함
+      if (currentScrollY < 100 || lastScrollY > currentScrollY) {
+        setIsVisible(true);
+      } else {
+        // 아래로 스크롤할 때는 숨김
+        setIsVisible(false);
+      }
+      
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const menuItems = [
     { to: "/translate", label: "양방향 수어 통역", icon: <Mic size={18} /> },
@@ -29,7 +51,9 @@ function TopMenuComponent() {
   const getNavStyles = () =>
     isDarkPage
       ? {
-          nav: "sticky top-0 left-0 w-full z-50 px-4 py-3 bg-black/20 backdrop-blur-md border-b border-white/10 shadow-lg",
+          nav: `sticky top-0 left-0 w-full z-50 px-4 py-3 bg-black/20 backdrop-blur-md border-b border-white/10 shadow-lg transform transition-transform duration-300 ${
+            isVisible ? 'translate-y-0' : '-translate-y-full'
+          }`,
           logo: "flex items-center space-x-2 text-xl font-bold text-white",
           logoIcon: "text-blue-400",
           menuItem:
@@ -44,9 +68,16 @@ function TopMenuComponent() {
           mobileItemInactive:
             "text-white/80 hover:text-blue-300 hover:bg-white/5",
           nickname: "ml-4 cursor-pointer text-blue-300 hover:underline",
+          // [추가] 다크모드 로그아웃 버튼 스타일
+          logoutButton:
+            "text-sm px-4 py-2 rounded-full transition-all duration-200 text-white/80 hover:text-red-400 hover:bg-white/5",
+          mobileLogoutButton:
+            "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium transition-all text-white/80 hover:text-red-400 hover:bg-white/5",
         }
       : {
-          nav: "sticky top-0 left-0 w-full z-50 px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-lg",
+          nav: `sticky top-0 left-0 w-full z-50 px-4 py-3 bg-white/90 backdrop-blur-md border-b border-gray-200 shadow-lg transform transition-transform duration-300 ${
+            isVisible ? 'translate-y-0' : '-translate-y-full'
+          }`,
           logo: "flex items-center space-x-2 text-xl font-bold text-gray-800",
           logoIcon: "text-blue-600",
           menuItem:
@@ -61,11 +92,15 @@ function TopMenuComponent() {
           mobileItemInactive:
             "text-gray-700 hover:text-blue-600 hover:bg-gray-50",
           nickname: "ml-4 cursor-pointer text-blue-600 hover:underline",
+          // [추가] 라이트모드 로그아웃 버튼 스타일
+          logoutButton:
+            "text-sm px-4 py-2 rounded-full transition-all duration-200 text-gray-700 hover:text-red-600 hover:bg-gray-50",
+          mobileLogoutButton:
+            "flex items-center gap-3 w-full px-4 py-3 rounded-lg text-sm font-medium transition-all text-gray-700 hover:text-red-600 hover:bg-gray-50",
         };
 
   const styles = getNavStyles();
 
-  // 닉네임 클릭 시 마이페이지로 이동
   const handleNicknameClick = (e) => {
     e.preventDefault();
     window.location.href = "/myPage";
@@ -111,7 +146,8 @@ function TopMenuComponent() {
 
         {/* 오른쪽: 로그아웃 버튼 / 닉네임 환영 메세지 */}
         <div className="hidden md:flex flex-1 justify-end items-center">
-          <LogoutButton />
+          {/* [수정] 호버 스타일을 적용하기 위해 className 추가 */}
+          <LogoutButton className={styles.logoutButton} />
           {!isLoading && user && (
             <span
               className={styles.nickname}
@@ -160,7 +196,8 @@ function TopMenuComponent() {
               </CustomNavLink>
             );
           })}
-          <LogoutButton />
+          {/* [수정] 모바일용 호버 스타일을 적용하기 위해 className 추가 */}
+          <LogoutButton className={styles.mobileLogoutButton} />
         </div>
       )}
     </nav>
