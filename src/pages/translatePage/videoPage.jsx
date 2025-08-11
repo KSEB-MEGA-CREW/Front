@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
-  Camera, CameraOff, Mic, MicOff, Play, Square, Settings, 
+  Play, Square, Settings, 
   Volume2, VolumeX, RotateCcw, Maximize, Minimize,
-  AlertCircle, CheckCircle, Wifi, WifiOff
+  AlertCircle, Wifi, WifiOff
 } from "lucide-react";
 import { useFrameExtraction } from "../../hooks/useFrameExtraction";
 import { useVideoCapture } from "../../hooks/useVideoCapture";

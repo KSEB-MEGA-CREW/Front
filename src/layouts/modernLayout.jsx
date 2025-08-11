@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../Context/themeContext';
 import SideMenu from '../components/navigation/sideMenu';
 
-const ModernLayout = ({ children, showMyPage, showStats, showSettings }) => {
+const ModernLayout = ({ children, showMyPage }) => {
   const [isSideMenuOpen, setIsSideMenuOpen] = useState(true);
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
@@ -25,7 +25,7 @@ const ModernLayout = ({ children, showMyPage, showStats, showSettings }) => {
   };
 
   const handleShowStats = () => {
-    if (showStats) showStats();
+    navigate('/stats');
     // 모바일에서는 메뉴 닫기
     if (window.innerWidth < 768) {
       setIsSideMenuOpen(false);
@@ -33,7 +33,7 @@ const ModernLayout = ({ children, showMyPage, showStats, showSettings }) => {
   };
 
   const handleShowSettings = () => {
-    if (showSettings) showSettings();
+    navigate('/settings');
     // 모바일에서는 메뉴 닫기
     if (window.innerWidth < 768) {
       setIsSideMenuOpen(false);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { authApi } from "../../api/authApi";
 
 const SignUpBox = () => {
@@ -213,8 +213,8 @@ const SignUpBox = () => {
       {/* 약관 동의 텍스트 */}
       <div className="text-xs text-center text-gray-400">
         가입을 진행하시면 
-        <a href="#" className="text-blue-400 hover:text-blue-300 underline ml-1">서비스 이용약관</a> 및 
-        <a href="#" className="text-blue-400 hover:text-blue-300 underline ml-1">개인정보처리방침</a>에 
+        <Link to="/about" className="text-blue-400 hover:text-blue-300 underline ml-1">서비스 이용약관</Link> 및 
+        <Link to="/privacy" className="text-blue-400 hover:text-blue-300 underline ml-1">개인정보처리방침</Link>에 
         동의하는 것으로 간주됩니다.
       </div>
     </div>

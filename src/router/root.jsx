@@ -5,14 +5,15 @@ import TranslateRouter from "./translateRouter";
 import LoginRouter from "./loginRouter";
 import BasicLayout from "../layouts/basicLayout";
 
-// Lazy Loading => 직접 import로 변경
+// 직접 import
 import Main from "../pages/basicPage/mainPage";
-import MyPage from "../pages/basicPage/myPage";
 import OAuth2RedirectHandler from "../pages/loginPage/OAuth2RedirectHandler";
 import AuthCallback from "../components/authCallback";
 import AboutPage from "../pages/basicPage/aboutPage";
 import PrivacyPage from "../pages/basicPage/privacyPage";
 import GoodPage from "../pages/basicPage/goodPage";
+import StatsPage from "../pages/statsPage/statsPage";
+import SettingsPage from "../pages/settingsPage/settingsPage";
 
 const router = createBrowserRouter([
   LoginRouter(),
@@ -37,33 +38,19 @@ const router = createBrowserRouter([
     ),
   },
   {
-    path: "/mypage",
-    element: (
-      <ProtectedRoute>
-        <BasicLayout>
-          <MyPage />
-        </BasicLayout>
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: "/about",
     element: (
-      <ProtectedRoute>
-        <BasicLayout>
-          <AboutPage />
-        </BasicLayout>
-      </ProtectedRoute>
+      <BasicLayout>
+        <AboutPage />
+      </BasicLayout>
     ),
   },
   {
     path: "/privacy",
     element: (
-      <ProtectedRoute>
-        <BasicLayout>
-          <PrivacyPage />
-        </BasicLayout>
-      </ProtectedRoute>
+      <BasicLayout>
+        <PrivacyPage />
+      </BasicLayout>
     ),
   },
   {
@@ -72,6 +59,26 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <BasicLayout>
           <GoodPage />
+        </BasicLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/stats",
+    element: (
+      <ProtectedRoute>
+        <BasicLayout>
+          <StatsPage />
+        </BasicLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/settings",
+    element: (
+      <ProtectedRoute>
+        <BasicLayout>
+          <SettingsPage />
         </BasicLayout>
       </ProtectedRoute>
     ),

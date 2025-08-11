@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { 
-  Play, Square, RotateCcw, Settings, Volume2, VolumeX, 
-  Loader, AlertCircle, CheckCircle, Send, Sparkles,
+  Square, RotateCcw, Settings, Volume2, VolumeX, 
+  Loader, AlertCircle, CheckCircle, Sparkles,
   User, MessageSquare, Clock
 } from "lucide-react";
 import { useUnityAvatar } from "../../hooks/useUnityAvatar";
@@ -21,7 +21,7 @@ const AvatarPage = () => {
     isLoading: isUnityLoading,
     error: unityError,
     isPlaying,
-    currentAnimation,
+    // currentAnimation,
     containerRef,
     initializeUnity,
     sendAnimationData,
@@ -34,7 +34,7 @@ const AvatarPage = () => {
     isLoading: isConversionLoading,
     error: conversionError,
     convertTextToSignLanguage,
-    getPredefinedSignLanguages,
+    // getPredefinedSignLanguages,
     clearError
   } = useTextToSignAPI();
 

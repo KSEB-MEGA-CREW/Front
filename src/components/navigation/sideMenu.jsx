@@ -7,7 +7,8 @@ import {
   Settings, 
   LogOut,
   MessageSquare,
-  UserCircle
+  UserCircle,
+  Bot
 } from 'lucide-react';
 import { useAuth } from '../../Context/authContext';
 import { useTheme } from '../../Context/themeContext';
@@ -21,12 +22,18 @@ const SideMenu = ({ isOpen, setIsOpen, onNavigate, onShowMyPage, onShowStats, on
   const menuItems = [
     {
       icon: <Home size={20} />,
+      label: "홈",
+      path: "/",
+      onClick: () => onNavigate("/")
+    },
+    {
+      icon: <MessageSquare size={20} />,
       label: "수어 → 텍스트",
       path: "/translate/video",
       onClick: () => onNavigate("/translate/video")
     },
     {
-      icon: <MessageSquare size={20} />,
+      icon: <Bot size={20} />,
       label: "텍스트 → 아바타", 
       path: "/translate/avatar",
       onClick: () => onNavigate("/translate/avatar")

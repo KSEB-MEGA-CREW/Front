@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { FaCheckCircle, FaTimesCircle, FaCalendarAlt } from "react-icons/fa";
 import { CheckCircle, XCircle, Calendar, Play, RotateCcw, Trophy, Target, Award, Star } from "lucide-react";
 import { quizApi } from "../../api/authApi";
 import { useAuth } from "../../Context/authContext";
