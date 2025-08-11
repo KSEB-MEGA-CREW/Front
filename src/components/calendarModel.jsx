@@ -38,7 +38,9 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
       const month = activeDate.getMonth() + 1;
       try {
         const result = await quizApi.getUserQuizHistory(year, month, userId);
+        console.log("calendar: ", result?.date, result);
         const actualData = result?.data || result || [];
+        console.log("월간 퀴즈 기록 로딩:", actualData);
         if (!Array.isArray(actualData)) {
           setQuizHistory({});
           return;
@@ -258,8 +260,13 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
       />
 
       {/* 가이드 문구 */}
-      <div className={`text-center text-xs mb-3 ${isModal ? "text-gray-400" : "text-gray-500"}`}>
-        💡 아래 정답률 박스를 클릭하면 해당하는 날짜만 달력에서 확인할 수 있어요!
+      <div
+        className={`text-center text-xs mb-3 ${
+          isModal ? "text-gray-400" : "text-gray-500"
+        }`}
+      >
+        💡 아래 정답률 박스를 클릭하면 해당하는 날짜만 달력에서 확인할 수
+        있어요!
       </div>
 
       {/* ✅ 토글 기능이 적용된 범례 */}

@@ -14,6 +14,7 @@ import PrivacyPage from "../pages/basicPage/privacyPage";
 import GoodPage from "../pages/basicPage/goodPage";
 import StatsPage from "../pages/statsPage/statsPage";
 import SettingsPage from "../pages/settingsPage/settingsPage";
+import ErrorPage from "../pages/errorPage/errorPage";
 
 const router = createBrowserRouter([
   LoginRouter(),
@@ -85,6 +86,11 @@ const router = createBrowserRouter([
   },
   TranslateRouter(),
   StudyRouter(),
+  // 404 에러 페이지 - 모든 라우트의 마지막에 배치
+  {
+    path: "*",
+    element: <ErrorPage />,
+  },
 ]);
 
 export default router;
