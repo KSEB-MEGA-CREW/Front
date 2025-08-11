@@ -1,5 +1,4 @@
 import { API_CONFIG } from "../constants/videoConfig";
-import { performanceLogger } from "../utils/performanceUtils";
 
 /**
  * 백엔드 통신을 위한 중앙화된 네트워크 서비스 클래스

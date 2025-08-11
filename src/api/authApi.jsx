@@ -199,7 +199,7 @@ export const validateToken = async () => {
   try {
     const response = await authApi.getCurrentUser(); // 수정: authApi 사용
     return response.success;
-  } catch (error) {
+  } catch (_error) {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     return false;

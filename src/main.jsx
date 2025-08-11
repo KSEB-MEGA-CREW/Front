@@ -3,9 +3,12 @@ import "./index.css";
 import router from "./router/root";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./Context/authContext";
+import { ThemeProvider } from "./Context/themeContext";
 
 createRoot(document.getElementById("root")).render(
-  <AuthProvider>
-    <RouterProvider router={router} />
-  </AuthProvider>
+  <ThemeProvider>
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  </ThemeProvider>
 );
