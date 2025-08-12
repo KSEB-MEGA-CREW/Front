@@ -1,13 +1,94 @@
-import React from 'react';
-import { X, User, Mail, Calendar, Award } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, User, Mail, Calendar, Award, Edit2, Save, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../Context/authContext';
 import { useTheme } from '../../Context/themeContext';
 
 const MyPageModal = ({ isOpen, onClose }) => {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   const { isDarkMode } = useTheme();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [editData, setEditData] = useState({
+    username: user?.username || '',
+    email: user?.email || ''
+  });
 
   if (!isOpen) return null;
+
+  const handleEditToggle = () => {
+    if (isEditMode) {
+      // 편집 모드 취소
+      setEditData({
+        username: user?.username || '',
+        email: user?.email || ''
+      });
+      setError('');
+    }
+    setIsEditMode(!isEditMode);
+  };
+
+  const handleInputChange = (field, value) => {
+    setEditData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    setError('');
+  };
+
+  const handleSave = async () => {
+    if (!editData.username.trim()) {
+      setError('사용자명을 입력해주세요.');
+      return;
+    }
+    
+    if (!editData.email.trim()) {
+      setError('이메일을 입력해주세요.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editData.email)) {
+      setError('올바른 이메일 형식을 입력해주세요.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError('');
+      
+      // 실제 API 호출은 여기서 구현
+      // await updateUserProfile(editData);
+      
+      // 임시로 로컬 상태 업데이트
+      if (updateUser) {
+        updateUser({
+          ...user,
+          username: editData.username,
+          email: editData.email
+        });
+      }
+      
+      // 로컬스토리지 업데이트
+      const updatedUser = {
+        ...user,
+        username: editData.username,
+        email: editData.email
+      };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      setIsEditMode(false);
+      
+      // 성공 알림 (선택사항)
+      alert('프로필이 성공적으로 수정되었습니다.');
+      
+    } catch (error) {
+      console.error('프로필 수정 실패:', error);
+      setError('프로필 수정 중 오류가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -24,22 +105,41 @@ const MyPageModal = ({ isOpen, onClose }) => {
       `}>
         
         {/* 헤더 */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className={`flex items-center justify-between p-6 border-b ${
+          isDarkMode ? 'border-gray-700' : 'border-gray-200'
+        }`}>
           <h2 className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-            내 계정
+            {isEditMode ? '프로필 수정' : '내 계정'}
           </h2>
-          <button
-            onClick={onClose}
-            className={`
-              p-2 rounded-lg transition-colors
-              ${isDarkMode 
-                ? 'hover:bg-gray-700 text-gray-400 hover:text-white' 
-                : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
-              }
-            `}
-          >
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            {!isEditMode && (
+              <button
+                onClick={handleEditToggle}
+                className={`
+                  p-2 rounded-lg transition-colors
+                  ${isDarkMode 
+                    ? 'hover:bg-gray-700 text-gray-400 hover:text-white' 
+                    : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
+                  }
+                `}
+                title="프로필 수정"
+              >
+                <Edit2 size={18} />
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className={`
+                p-2 rounded-lg transition-colors
+                ${isDarkMode 
+                  ? 'hover:bg-gray-700 text-gray-400 hover:text-white' 
+                  : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
+                }
+              `}
+            >
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* 사용자 정보 */}
@@ -81,9 +181,26 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   사용자명
                 </p>
-                <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {user?.username || '사용자'}
-                </p>
+                {isEditMode ? (
+                  <input
+                    type="text"
+                    value={editData.username}
+                    onChange={(e) => handleInputChange('username', e.target.value)}
+                    className={`
+                      w-full mt-1 px-3 py-2 rounded-lg border transition-colors
+                      ${isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                      }
+                      focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                    `}
+                    placeholder="사용자명을 입력하세요"
+                  />
+                ) : (
+                  <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {user?.username || '사용자'}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -98,9 +215,26 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                   이메일
                 </p>
-                <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {user?.email || 'user@example.com'}
-                </p>
+                {isEditMode ? (
+                  <input
+                    type="email"
+                    value={editData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className={`
+                      w-full mt-1 px-3 py-2 rounded-lg border transition-colors
+                      ${isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                      }
+                      focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                    `}
+                    placeholder="이메일을 입력하세요"
+                  />
+                ) : (
+                  <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {user?.email || 'user@example.com'}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -139,27 +273,64 @@ const MyPageModal = ({ isOpen, onClose }) => {
             </div>
           </div>
 
+          {/* 에러 메시지 */}
+          {error && (
+            <div className={`
+              p-3 rounded-lg border flex items-center gap-2
+              ${isDarkMode 
+                ? 'bg-red-900/20 border-red-700 text-red-400' 
+                : 'bg-red-50 border-red-200 text-red-600'
+              }
+            `}>
+              <AlertCircle size={16} />
+              <span className="text-sm">{error}</span>
+            </div>
+          )}
+
           {/* 액션 버튼들 */}
-          <div className="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <button className={`
-              w-full p-3 rounded-lg font-medium transition-colors
-              ${isDarkMode 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                : 'bg-blue-600 hover:bg-blue-700 text-white'
-              }
-            `}>
-              프로필 수정
-            </button>
-            <button className={`
-              w-full p-3 rounded-lg font-medium transition-colors border
-              ${isDarkMode 
-                ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
-                : 'border-gray-300 hover:bg-gray-100 text-gray-700'
-              }
-            `}>
-              학습 기록 보기
-            </button>
-          </div>
+          {isEditMode ? (
+            <div className={`space-y-3 pt-4 border-t ${
+              isDarkMode ? 'border-gray-700' : 'border-gray-200'
+            }`}>
+              <button
+                onClick={handleSave}
+                disabled={isLoading}
+                className={`
+                  w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2
+                  ${isLoading 
+                    ? 'bg-gray-400 cursor-not-allowed' 
+                    : 'bg-blue-600 hover:bg-blue-700'
+                  } text-white
+                `}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    저장 중...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} />
+                    저장하기
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handleEditToggle}
+                disabled={isLoading}
+                className={`
+                  w-full p-3 rounded-lg font-medium transition-colors border
+                  ${isDarkMode 
+                    ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
+                    : 'border-gray-300 hover:bg-gray-100 text-gray-700'
+                  }
+                  ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}
+                `}
+              >
+                취소
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

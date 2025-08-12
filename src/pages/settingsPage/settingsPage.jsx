@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../Context/themeContext';
-import { Settings, Moon, Sun, Info, Shield, Bell } from 'lucide-react';
+import { Settings, Moon, Sun, Info, Shield, Bell, ChevronRight } from 'lucide-react';
 
 const SettingsPage = () => {
   const { isDarkMode, toggleTheme } = useTheme();
+  const navigate = useNavigate();
 
   return (
     <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -176,14 +178,20 @@ const SettingsPage = () => {
               `}>
                 비밀번호 변경
               </button>
-              <button className={`
-                w-full text-left p-3 rounded-lg transition-colors
-                ${isDarkMode 
-                  ? 'hover:bg-gray-700 text-gray-300' 
-                  : 'hover:bg-gray-100 text-gray-700'
-                }
-              `}>
-                개인정보 처리방침
+              <button 
+                onClick={() => navigate('/privacy-policy')}
+                className={`
+                  w-full text-left p-3 rounded-lg transition-colors flex items-center justify-between group
+                  ${isDarkMode 
+                    ? 'hover:bg-gray-700 text-gray-300' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                  }
+                `}
+              >
+                <span>개인정보 처리방침</span>
+                <ChevronRight size={16} className={`transition-transform group-hover:translate-x-1 ${
+                  isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                }`} />
               </button>
               <button className={`
                 w-full text-left p-3 rounded-lg transition-colors
@@ -234,23 +242,35 @@ const SettingsPage = () => {
                   v1.0.0
                 </span>
               </div>
-              <button className={`
-                w-full text-left p-3 rounded-lg transition-colors
-                ${isDarkMode 
-                  ? 'hover:bg-gray-700 text-gray-300' 
-                  : 'hover:bg-gray-100 text-gray-700'
-                }
-              `}>
-                이용약관
+              <button 
+                onClick={() => navigate('/terms-of-service')}
+                className={`
+                  w-full text-left p-3 rounded-lg transition-colors flex items-center justify-between group
+                  ${isDarkMode 
+                    ? 'hover:bg-gray-700 text-gray-300' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                  }
+                `}
+              >
+                <span>이용약관</span>
+                <ChevronRight size={16} className={`transition-transform group-hover:translate-x-1 ${
+                  isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                }`} />
               </button>
-              <button className={`
-                w-full text-left p-3 rounded-lg transition-colors
-                ${isDarkMode 
-                  ? 'hover:bg-gray-700 text-gray-300' 
-                  : 'hover:bg-gray-100 text-gray-700'
-                }
-              `}>
-                고객 지원
+              <button 
+                onClick={() => navigate('/customer-support')}
+                className={`
+                  w-full text-left p-3 rounded-lg transition-colors flex items-center justify-between group
+                  ${isDarkMode 
+                    ? 'hover:bg-gray-700 text-gray-300' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                  }
+                `}
+              >
+                <span>고객 지원</span>
+                <ChevronRight size={16} className={`transition-transform group-hover:translate-x-1 ${
+                  isDarkMode ? 'text-gray-500' : 'text-gray-400'
+                }`} />
               </button>
             </div>
           </div>

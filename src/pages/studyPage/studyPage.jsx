@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { CheckCircle, XCircle, Calendar, Play, RotateCcw, Trophy, Target, Award, Star } from "lucide-react";
+import { CheckCircle, XCircle, Calendar, Play, RotateCcw, Trophy, Target, Award, Star, BarChart3 } from "lucide-react";
 import { quizApi } from "../../api/authApi";
 import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
@@ -340,8 +340,15 @@ function StudyWord() {
               ))}
             </div>
 
-            {/* 다시 풀기 버튼 */}
-            <div className="flex justify-center">
+            {/* 버튼들 */}
+            <div className="flex justify-center gap-4">
+              <button
+                className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 rounded-2xl font-bold text-white text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl"
+                onClick={() => window.location.href = '/study/stats'}
+              >
+                <BarChart3 size={20} />
+                기록 확인하기
+              </button>
               <button
                 className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 rounded-2xl font-bold text-white text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl"
                 onClick={handleRetry}

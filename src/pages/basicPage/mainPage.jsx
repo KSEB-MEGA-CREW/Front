@@ -6,15 +6,21 @@ import {
   Hand,
   ArrowRightLeft,
   Volume2,
+  Play,
+  CheckCircle,
+  Star,
+  Zap,
+  Heart,
+  Globe,
+  Award,
+  TrendingUp
 } from "lucide-react";
 import { useTheme } from "../../Context/themeContext";
 
 function MainPage() {
   const { isDarkMode } = useTheme();
-  const [scrollY, setScrollY] = useState(0);
-  const [scrollProgress, setScrollProgress] = useState(0);
   const [translationDemo, setTranslationDemo] = useState(false);
-  const [todayUsers] = useState(230 + Math.floor(Math.random() * 70)); // 추후 API로 대체 예정
+  const [todayUsers] = useState(2847 + Math.floor(Math.random() * 153));
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -23,302 +29,325 @@ function MainPage() {
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-
-      setScrollY(currentScrollY);
-      setScrollProgress(
-        (currentScrollY / (documentHeight - windowHeight)) * 100
-      );
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   const features = [
     {
-      icon: <Mic className="w-8 h-8" aria-label="실시간 수어 번역 아이콘" />,
-      title: "실시간 수어 번역",
-      description: "AI 기술로 수어와 음성을 실시간으로 번역합니다",
-      color: "from-blue-400 to-purple-500",
+      icon: <Zap className="w-8 h-8" />,
+      title: "실시간 번역",
+      description: "AI 기반 실시간 수어 번역으로 즉석에서 소통하세요",
+      gradient: "from-blue-500 to-cyan-500",
     },
     {
-      icon: <Users className="w-8 h-8" aria-label="양방향 소통 아이콘" />,
+      icon: <Users className="w-8 h-8" />,
       title: "양방향 소통",
-      description: "청각장애인과 청인 모두가 자연스럽게 대화할 수 있습니다",
-      color: "from-purple-400 to-pink-500",
+      description: "수어와 음성을 자유롭게 번역하여 모두가 소통할 수 있어요",
+      gradient: "from-purple-500 to-pink-500",
     },
     {
-      icon: <BookOpen className="w-8 h-8" aria-label="체계적인 학습 아이콘" />,
+      icon: <BookOpen className="w-8 h-8" />,
       title: "체계적인 학습",
-      description: "단계별 수어 학습 프로그램을 제공합니다",
-      color: "from-pink-400 to-red-500",
+      description: "단계별 수어 학습으로 실력을 체계적으로 향상시키세요",
+      gradient: "from-green-500 to-emerald-500",
+    },
+  ];
+
+  const stats = [
+    { icon: <Users className="w-6 h-6" />, label: "활성 사용자", value: "15,000+" },
+    { icon: <Globe className="w-6 h-6" />, label: "번역 완료", value: "2.5M+" },
+    { icon: <Award className="w-6 h-6" />, label: "정확도", value: "98.5%" },
+    { icon: <TrendingUp className="w-6 h-6" />, label: "성장률", value: "+157%" },
+  ];
+
+  const projects = [
+    {
+      title: "실생활 속 수어 통역",
+      description: "병원, 은행, 관공서 등 일상에서 필요한 순간마다 실시간 수어 통역을 제공합니다.",
+      image: "/assets/imagecard01.png",
+    },
+    {
+      title: "AI 기술의 혁신",
+      description: "최신 딥러닝 기술로 수어의 미세한 움직임까지 정확하게 인식하고 번역합니다.",
+      image: "/assets/imagecard04.png",
+    },
+    {
+      title: "학습과 성장",
+      description: "개인 맞춤형 학습 시스템으로 수어 실력을 체계적으로 향상시킬 수 있습니다.",
+      image: "/assets/imagecard02.png",
+    },
+    {
+      title: "함께 만드는 미래",
+      description: "청각장애인과 청인이 함께 만들어가는 포용적인 소통 플랫폼입니다.",
+      image: "/assets/imagecard03.png",
     },
   ];
 
   return (
-    <div className={`min-h-screen overflow-hidden relative ${
-      isDarkMode ? "bg-gray-900" : "bg-gray-50"
+    <div className={`min-h-screen ${
+      isDarkMode ? "bg-gray-900" : "bg-white"
     }`}>
-      {/* 스크롤 진행도 바 */}
-      <div
-        className={`fixed top-0 left-0 w-full h-1 z-50 ${
-          isDarkMode ? "bg-black/20" : "bg-gray-300"
-        }`}
-        aria-hidden
-      >
-        <div
-          className="h-full bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 transition-all duration-300 ease-out"
-          style={{ width: `${scrollProgress}%` }}
-        />
-      </div>
-      {/* 플로팅 스크롤 인디케이터 */}
-      <div
-        className="fixed right-8 top-1/2 transform -translate-y-1/2 z-40"
-        aria-hidden
-      >
-        <div className="flex flex-col space-y-2">
-          {[0, 25, 50, 75, 100].map((threshold, index) => (
-            <div
-              key={index}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                scrollProgress > threshold
-                  ? "bg-cyan-400/80 scale-125 shadow-lg shadow-cyan-400/50"
-                  : isDarkMode
-                    ? "bg-white/20 scale-100"
-                    : "bg-gray-400/60 scale-100"
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-      {/* 패럴랙스 배경 - 다크 모드에만 적용 */}
-      {isDarkMode && (
-        <div className="fixed inset-0 -z-10" aria-hidden>
-          <div
-            className="w-full h-full bg-cover bg-center transition-transform duration-200"
-            style={{
-              backgroundImage: "url('/assets/back7.jpg')",
-            }}
-          />
-          {/* 마우스 오로라 효과 (애니메이션 OFF면 표시 안 됨) */}
-        </div>
-      )}
-      {/* 메인 콘텐츠 */}
-      <main
-        className="relative z-20 flex flex-col items-center justify-center min-h-screen text-center px-6"
-        style={{
-          transform: `translateY(${scrollY * -0.3}px)`,
-          opacity: Math.max(1 - scrollProgress / 25, 0.1),
-        }}
-      >
-        <h1
-          className={`text-5xl md:text-6xl font-bold mb-15 transition-all duration-700 animate-pulse-glow ${
-            isDarkMode ? "text-white drop-shadow-2xl" : "text-gray-900"
-          }`}
-          style={{
-            transform: `scale(${1 - scrollProgress * 0.002})`,
-          }}
-        >
-          수어 통역이 <span className={isDarkMode ? "text-white" : "text-gray-900"}>더 가까워집니다</span>
-        </h1>
-        {/* 양방향 번역 강조 섹션 */}
-        <a
-          href="/translate"
-          className={`relative mb-12 p-6 rounded-2xl border-2 border-cyan-400/50 max-w-2xl w-full block group transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-cyan-400/20 cursor-pointer hover:border-cyan-400/70 ${
-            isDarkMode 
-              ? "bg-black/20 backdrop-blur-xl hover:bg-black/30" 
-              : "bg-white/80 backdrop-blur-xl hover:bg-white/90"
-          }`}
-          tabIndex={0}
-          aria-label="양방향 수어 통역 체험 바로가기"
-        >
-          {/* 글로우 효과, 애니메이션 OFF면 표시 안됨 */}
-          <div className={`absolute inset-0 rounded-2xl animate-pulse transition-all duration-300 ${
-            isDarkMode 
-              ? "bg-gradient-to-r from-cyan-400/10 via-blue-500/10 to-purple-500/10 group-hover:from-cyan-400/20 group-hover:via-blue-500/20 group-hover:to-purple-500/20" 
-              : "bg-gradient-to-r from-cyan-400/5 via-blue-500/5 to-purple-500/5 group-hover:from-cyan-400/10 group-hover:via-blue-500/10 group-hover:to-purple-500/10"
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className={`h-full w-full ${
+            isDarkMode ? "bg-gradient-to-br from-blue-600 via-purple-600 to-cyan-600" : "bg-gradient-to-br from-blue-100 via-purple-100 to-cyan-100"
           }`}></div>
-          <div className="relative z-10">
-            <div className="flex items-center justify-center mb-4">
-              <div className={`text-xl md:text-2xl font-bold flex items-center gap-3 ${
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
+          <div className="text-center">
+            {/* Badge */}
+            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+              <Star className="w-4 h-4 mr-2" />
+              AI 기반 수어 번역 서비스
+            </div>
+
+            {/* Main Heading */}
+            <h1 className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}>
+              <span className="block">수어와 음성을</span>
+              <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+                실시간으로 연결
+              </span>
+            </h1>
+
+            {/* Subtitle */}
+            <p className={`text-xl md:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}>
+              첨단 AI 기술로 수어와 음성을 즉시 번역하여<br />
+              모든 사람이 자유롭게 소통할 수 있는 세상을 만듭니다
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <a
+                href="/translate"
+                className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                지금 체험하기
+              </a>
+              <a
+                href="/study"
+                className={`inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
+                  isDarkMode 
+                    ? "border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-800" 
+                    : "border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50"
+                }`}
+              >
+                <BookOpen className="w-5 h-5 mr-2" />
+                학습 시작하기
+              </a>
+            </div>
+
+            {/* Demo Section */}
+            <div className={`max-w-4xl mx-auto p-8 rounded-2xl border ${
+              isDarkMode 
+                ? "bg-gray-800 border-gray-700" 
+                : "bg-gray-50 border-gray-200"
+            }`}>
+              <h3 className={`text-lg font-semibold mb-6 ${
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}>
-                <span>실시간</span>
-                <span>양방향</span>
-                <span>수어 번역</span>
-              </div>
-            </div>
-            {/* 번역 시각화 */}
-            <div className="flex items-center justify-center space-x-6 mb-6">
-              {/* 수어 아이콘 */}
-              <div
-                className={`relative transition-all duration-1000 ${
-                  translationDemo
-                    ? "scale-110 text-cyan-400"
-                    : "scale-100 text-white/70"
-                }`}
-              >
-                <Hand className="w-12 h-12 md:w-14 md:h-14" />
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs font-medium" />
-                {translationDemo && (
-                  <div className="absolute inset-0 bg-cyan-400/20 rounded-full animate-ping"></div>
-                )}
-              </div>
-              {/* 양방향 화살표 */}
-              <div className="relative">
-                <ArrowRightLeft
-                  className={`w-8 h-8 md:w-10 md:h-10 text-white transition-all duration-500 ${
+                실시간 번역 데모
+              </h3>
+              
+              <div className="flex items-center justify-center space-x-8 mb-6">
+                {/* 수어 아이콘 */}
+                <div className={`relative transition-all duration-1000 ${
+                  translationDemo ? "scale-110" : "scale-100"
+                }`}>
+                  <div className={`p-6 rounded-2xl ${
+                    translationDemo 
+                      ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30" 
+                      : isDarkMode 
+                        ? "bg-gray-700 text-gray-400" 
+                        : "bg-white text-gray-500 shadow-md"
+                  } transition-all duration-1000`}>
+                    <Hand className="w-12 h-12" />
+                  </div>
+                  <div className={`text-sm mt-2 font-medium text-center ${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}>
+                    수어
+                  </div>
+                </div>
+
+                {/* 화살표 */}
+                <div className="relative">
+                  <ArrowRightLeft className={`w-8 h-8 transition-all duration-500 ${
                     translationDemo ? "rotate-180" : "rotate-0"
-                  }`}
-                />
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full opacity-20 animate-pulse"></div>
+                  } ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
+                </div>
+
+                {/* 음성 아이콘 */}
+                <div className={`relative transition-all duration-1000 ${
+                  !translationDemo ? "scale-110" : "scale-100"
+                }`}>
+                  <div className={`p-6 rounded-2xl ${
+                    !translationDemo 
+                      ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30" 
+                      : isDarkMode 
+                        ? "bg-gray-700 text-gray-400" 
+                        : "bg-white text-gray-500 shadow-md"
+                  } transition-all duration-1000`}>
+                    <Volume2 className="w-12 h-12" />
+                  </div>
+                  <div className={`text-sm mt-2 font-medium text-center ${
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                  }`}>
+                    음성
+                  </div>
+                </div>
               </div>
-              {/* 음성 아이콘 */}
-              <div
-                className={`relative transition-all duration-1000 ${
-                  !translationDemo
-                    ? "scale-110 text-purple-400"
-                    : "scale-100 text-white/70"
-                }`}
-              >
-                <Volume2 className="w-12 h-12 md:w-14 md:h-14" />
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs font-medium" />
-                {!translationDemo && (
-                  <div className="absolute inset-0 bg-purple-400/20 rounded-full animate-ping"></div>
-                )}
-              </div>
-            </div>
-            {/* 데모 텍스트 */}
-            <div className="text-center mb-4">
-              <p className={`text-base md:text-lg mb-2 ${
-                isDarkMode ? "text-white/90" : "text-gray-700"
-              }`}>
-                {translationDemo
-                  ? "🤟 '안녕하세요'   →   🎵 '안녕하세요'"
-                  : "🎵 '반갑습니다'   →   🤟 '반갑습니다'"}
-              </p>
-              <div className={`text-xs ${
-                isDarkMode ? "text-white/70" : "text-gray-600"
-              }`}>
-                {translationDemo
-                  ? "수어를 음성으로 실시간 변환"
-                  : "음성을 수어로 실시간 변환"}
-              </div>
-            </div>
-            {/* CTA 버튼 */}
-            <div className="text-center pt-4 border-t border-white/10">
-              <div className="inline-flex items-center justify-center bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-bold px-8 py-3 rounded-full shadow-lg shadow-cyan-400/20 group-hover:shadow-cyan-400/40 group-hover:scale-105 transition-all duration-300 group-hover:from-cyan-400 group-hover:to-purple-400">
-                <span className="text-lg">지금 바로 체험하기</span>
-                <span className="ml-2 text-xl">✨</span>
-              </div>
-              <div className={`text-xs mt-2 ${
-                isDarkMode ? "text-white/50" : "text-gray-600"
-              }`}>
-                클릭하여 양방향 수어 번역을 시작하세요
+
+              <div className="text-center">
+                <p className={`text-lg font-medium ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}>
+                  {translationDemo 
+                    ? "🤟 '안녕하세요' → 🎵 '안녕하세요'" 
+                    : "🎵 '반갑습니다' → 🤟 '반갑습니다'"}
+                </p>
+                <p className={`text-sm mt-2 ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}>
+                  {translationDemo 
+                    ? "수어를 음성으로 실시간 변환" 
+                    : "음성을 수어로 실시간 변환"}
+                </p>
               </div>
             </div>
           </div>
-        </a>
-        {/* 이용자 통계 */}
-        <div className="flex flex-col items-center mb-24">
-          <span className={`text-base font-medium mb-1 ${
-            isDarkMode ? "text-white/70" : "text-gray-700"
-          }`}>
-            오늘{" "}
-            <strong className="text-cyan-500 text-xl">
-              {todayUsers.toLocaleString()}
-            </strong>
-            명이 통역 서비스를 체험했어요!
-          </span>
-          <span className={`text-sm ${
-            isDarkMode ? "text-white/50" : "text-gray-600"
-          }`}>
-            이용자분들의 소중한 경험이 쌓이고 있습니다
-          </span>
         </div>
-        {/* 스크롤 다운 인디케이터 */}
-        <div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce"
-          style={{
-            opacity: Math.max(1 - scrollProgress / 10, 0),
-          }}
-          aria-hidden
-        >
-          <div className="flex flex-col items-center space-y-2">
-            <span className={`text-sm ${
-              isDarkMode ? "text-white/70" : "text-gray-600"
+      </section>
+
+      {/* Stats Section */}
+      <section className={`py-16 ${
+        isDarkMode ? "bg-gray-800" : "bg-gray-50"
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className={`text-3xl font-bold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-900"
             }`}>
-              아래로 스크롤
-            </span>
-            <div className={`w-6 h-10 border-2 rounded-full flex justify-center backdrop-blur-sm ${
-              isDarkMode 
-                ? "border-white/50 bg-white/5" 
-                : "border-gray-400 bg-gray-100/50"
-            }`}>
-              <div className="w-1 h-3 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full mt-2 animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </main>
-      {/* 기능 소개 섹션 */}
-      <section
-        className={`relative z-20 py-24 ${
-          isDarkMode 
-            ? "bg-gradient-to-b from-transparent to-black/20" 
-            : "bg-gradient-to-b from-transparent to-gray-100/20"
-        }`}
-        style={{
-          transform: `translateY(${scrollY * -0.1}px)`,
-        }}
-      >
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className={`text-4xl font-bold mb-4 ${
-              isDarkMode ? "text-white drop-shadow-2xl" : "text-gray-900"
-            }`}>
-              수담의 주요 기능
+              실시간 서비스 현황
             </h2>
-            <p className={`max-w-2xl mx-auto ${
-              isDarkMode ? "text-white/90 drop-shadow-lg" : "text-gray-700"
+            <p className={`text-lg ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
             }`}>
-              혁신적인 AI 기술로 더 나은 소통의 세상을 만들어갑니다
+              오늘 <span className="font-bold text-blue-500">{todayUsers.toLocaleString()}</span>명이 
+              수담을 통해 소통했습니다
             </p>
           </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className={`text-center p-6 rounded-xl ${
+                isDarkMode ? "bg-gray-900" : "bg-white"
+              } shadow-lg`}>
+                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 ${
+                  isDarkMode ? "bg-blue-500/20 text-blue-400" : "bg-blue-100 text-blue-600"
+                }`}>
+                  {stat.icon}
+                </div>
+                <div className={`text-2xl font-bold mb-1 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}>
+                  {stat.value}
+                </div>
+                <div className={`text-sm ${
+                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                }`}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl font-bold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}>
+              수담의 핵심 기능
+            </h2>
+            <p className={`text-xl max-w-3xl mx-auto ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}>
+              최신 AI 기술로 구현된 혁신적인 수어 번역 서비스의 주요 기능들을 만나보세요
+            </p>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-8">
             {features.map((feature, index) => (
-              <div
-                key={index}
-                className={`relative p-8 rounded-2xl border transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group ${
-                  isDarkMode 
-                    ? "bg-black/30 backdrop-blur-xl border-white/20 hover:bg-black/40" 
-                    : "bg-white/80 backdrop-blur-xl border-gray-200 hover:bg-white/90"
-                }`}
-              >
-                <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
-                  isDarkMode 
-                    ? "bg-gradient-to-br from-blue-500/10 to-purple-500/10" 
-                    : "bg-gradient-to-br from-blue-500/5 to-purple-500/5"
-                }`}></div>
-                <div className="relative z-10">
-                  <div className="text-blue-400 mb-4 transform group-hover:scale-110 transition-transform duration-300">
-                    {feature.icon}
-                  </div>
-                  <h3 className={`text-xl font-semibold mb-3 ${
+              <div key={index} className={`relative p-8 rounded-2xl transition-all duration-300 hover:scale-105 ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              } shadow-lg hover:shadow-xl`}>
+                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-xl mb-6 bg-gradient-to-r ${feature.gradient} text-white`}>
+                  {feature.icon}
+                </div>
+                <h3 className={`text-xl font-bold mb-4 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}>
+                  {feature.title}
+                </h3>
+                <p className={`leading-relaxed ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}>
+                  {feature.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Projects Section */}
+      <section className={`py-20 ${
+        isDarkMode ? "bg-gray-800" : "bg-gray-50"
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className={`text-4xl font-bold mb-4 ${
+              isDarkMode ? "text-white" : "text-gray-900"
+            }`}>
+              수담이 만드는 변화
+            </h2>
+            <p className={`text-xl max-w-3xl mx-auto ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
+            }`}>
+              AI 기술로 연결되는 새로운 소통의 세상, 모든 사람이 함께하는 포용적인 미래
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {projects.map((project, index) => (
+              <div key={index} className={`rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 ${
+                isDarkMode ? "bg-gray-900" : "bg-white"
+              } shadow-lg hover:shadow-xl`}>
+                <div className="aspect-video">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-8">
+                  <h3 className={`text-xl font-bold mb-4 ${
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}>
-                    {feature.title}
+                    {project.title}
                   </h3>
                   <p className={`leading-relaxed ${
-                    isDarkMode ? "text-white/80" : "text-gray-700"
+                    isDarkMode ? "text-gray-300" : "text-gray-600"
                   }`}>
-                    {feature.description}
+                    {project.description}
                   </p>
                 </div>
               </div>
@@ -326,147 +355,82 @@ function MainPage() {
           </div>
         </div>
       </section>
-      {/* 변화/후기 섹션 */}
-      <section className="relative z-20 py-32">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${
-              isDarkMode ? "text-white drop-shadow-2xl" : "text-gray-900"
+
+      {/* CTA Section */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className={`p-12 rounded-3xl ${
+            isDarkMode ? "bg-gradient-to-r from-gray-800 to-gray-900" : "bg-gradient-to-r from-blue-50 to-purple-50"
+          }`}>
+            <Heart className="w-16 h-16 mx-auto mb-6 text-red-500" />
+            <h2 className={`text-3xl md:text-4xl font-bold mb-6 ${
+              isDarkMode ? "text-white" : "text-gray-900"
             }`}>
-              수담이 만드는 변화
+              함께 만들어가는 소통의 세상
             </h2>
-            <p className={`text-xl max-w-3xl mx-auto ${
-              isDarkMode ? "text-white/90 drop-shadow-lg" : "text-gray-700"
+            <p className={`text-xl mb-8 ${
+              isDarkMode ? "text-gray-300" : "text-gray-600"
             }`}>
-              실제 사용자들의 이야기와 함께하는 소통의 순간들
+              수담과 함께 모든 사람이 자유롭게 소통할 수 있는<br />
+              포용적인 미래를 만들어보세요
             </p>
-          </div>
-          <div className="relative max-w-4xl mx-auto">
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-blue-400 via-purple-500 to-cyan-400 opacity-60 shadow-lg shadow-blue-500/20"></div>
-            <div className="space-y-16">
-              {[
-                {
-                  title: "실생활 솔루션",
-                  description: `병원, 관공서, 교육기관 등 다양한 현장에서\n실시간 수어 통역은 소통의 해결책이 됩니다.\n`,
-                  image: "/assets/imagecard01.png",
-                  side: "left",
-                },
-                {
-                  title: "AI 기술과 수어의 만남",
-                  description: `인공지능 기반 실시간 번역 기술을 활용하여,\n수어와 음성/텍스트 간의 자연스러운 양방향 소통을 가능케 합니다.\n기술은 수어를 이해하고, 우리는 사람을 이해합니다.`,
-                  image: "/assets/imagecard04.png",
-                  side: "right",
-                },
-                {
-                  title: "배움과 확장성",
-                  description: `수어 학습기능을 지원하여 더 넓은 세상과 \n연결합니다.\n수어는 언어이자, 배움의 시작입니다.`,
-                  image: "/assets/imagecard02.png",
-                  side: "left",
-                },
-                {
-                  title: "함께 만들어가는 수어 플랫폼",
-                  description: `누구나 참여할 수 있는 열린 기술.\n이건 단순한 서비스가 아니라 '공존의 기술'입니다.`,
-                  image: "/assets/imagecard03.png",
-                  side: "right",
-                },
-              ].map((item, index) => (
-                <div
-                  key={index}
-                  className={`flex items-center ${
-                    item.side === "right" ? "flex-row-reverse" : ""
-                  }`}
-                  style={{
-                    opacity: scrollProgress > 60 + index * 10 ? 1 : 0.3,
-                    transform: `translateY(${
-                      Math.max(0, scrollY - (1000 + index * 200)) * -0.05
-                    }px)`,
-                    transition: "all 0.8s ease-out",
-                  }}
-                >
-                  {/* 카드 본체 */}
-                  <div
-                    className={`w-1/2 ${
-                      item.side === "right" ? "pl-8" : "pr-8"
-                    }`}
-                  >
-                    <div className={`relative group rounded-3xl p-8 border transition-all duration-500 transform hover:scale-105 ${
-                      isDarkMode 
-                        ? "bg-black/30 backdrop-blur-xl border-white/20 hover:bg-black/40" 
-                        : "bg-white/80 backdrop-blur-xl border-gray-200 hover:bg-white/90"
-                    }`}>
-                      {/* Hover 시 등장할 이미지 */}
-                      <div
-                        className={`absolute z-20 hidden md:block ${
-                          item.side === "right"
-                            ? "right-[calc(100%+75px)]"
-                            : "left-[calc(100%+75px)]"
-                        } top-[0px] w-64 h-40 opacity-0 group-hover:opacity-100 transition-all duration-500 transform scale-90 group-hover:scale-100 rounded-xl overflow-hidden shadow-xl`}
-                      >
-                        <img
-                          src={item.image}
-                          alt={`${item.title} 일러스트`}
-                          className="w-full h-full object-cover rounded-xl"
-                        />
-                      </div>
-                      {/* 카드 내부 텍스트 */}
-                      <div className="relative z-10">
-                        <h3 className={`text-2xl font-bold mb-4 ${
-                          isDarkMode ? "text-white" : "text-gray-900"
-                        }`}>
-                          {item.title}
-                        </h3>
-                        <p className={`leading-relaxed whitespace-pre-line ${
-                          isDarkMode ? "text-white/90" : "text-gray-700"
-                        }`}>
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* 연결점 */}
-                  <div className="relative">
-                    <div className="w-6 h-6 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full border-4 border-white/20 shadow-lg shadow-blue-500/30 animate-pulse"></div>
-                    <div
-                      className={`absolute top-1/2 ${
-                        item.side === "right" ? "right-6" : "left-6"
-                      } w-8 h-0.5 bg-gradient-to-r from-blue-400 to-purple-500`}
-                    ></div>
-                  </div>
-                  {/* 빈 공간 */}
-                  <div className="w-1/2"></div>
-                </div>
-              ))}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="/translate"
+                className="inline-flex items-center px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+              >
+                <CheckCircle className="w-5 h-5 mr-2" />
+                지금 시작하기
+              </a>
             </div>
           </div>
         </div>
       </section>
+
       {/* Footer */}
-      <footer className={`relative z-30 flex flex-col items-center justify-center w-full py-10 text-sm ${
-        isDarkMode 
-          ? "bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white/70" 
-          : "bg-gradient-to-t from-gray-200/80 via-gray-100/60 to-transparent text-gray-700"
+      <footer className={`py-12 ${
+        isDarkMode ? "bg-gray-900 border-t border-gray-800" : "bg-gray-100 border-t border-gray-200"
       }`}>
-        <div className="flex flex-row flex-wrap gap-5 mb-3">
-          <a
-            href="/about"
-            className="hover:text-cyan-300 underline underline-offset-4 transition"
-          >
-            서비스 소개
-          </a>
-          <a
-            href="mailto:dissolve1882@naver.com"
-            className="hover:text-cyan-300 underline underline-offset-4 transition"
-          >
-            문의처
-          </a>
-          <a
-            href="/privacy"
-            className="hover:text-cyan-300 underline underline-offset-4 transition"
-          >
-            개인정보처리방침
-          </a>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="mb-4 md:mb-0">
+              <h3 className={`text-2xl font-bold ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}>
+                수담
+              </h3>
+              <p className={`text-sm ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}>
+                AI로 연결되는 수어 번역 서비스
+              </p>
+            </div>
+            
+            <div className="flex flex-wrap gap-6">
+              <a href="/about" className={`hover:text-blue-500 transition-colors ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}>
+                서비스 소개
+              </a>
+              <a href="mailto:dissolve1882@naver.com" className={`hover:text-blue-500 transition-colors ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}>
+                문의하기
+              </a>
+              <a href="/privacy" className={`hover:text-blue-500 transition-colors ${
+                isDarkMode ? "text-gray-400" : "text-gray-600"
+              }`}>
+                개인정보처리방침
+              </a>
+            </div>
+          </div>
+          
+          <div className={`mt-8 pt-8 border-t text-center text-sm ${
+            isDarkMode ? "border-gray-800 text-gray-400" : "border-gray-200 text-gray-600"
+          }`}>
+            © {new Date().getFullYear()} 수담. All rights reserved.
+          </div>
         </div>
-        <div>© {new Date().getFullYear()} 수담. All rights reserved.</div>
       </footer>
     </div>
   );

@@ -1,0 +1,427 @@
+import React, { useState } from 'react';
+import { useTheme } from '../../Context/themeContext';
+import { ArrowLeft, Headphones, Mail, Phone, MessageCircle, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+const CustomerSupport = () => {
+  const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    category: '',
+    subject: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const categories = [
+    { id: 'technical', label: '기술적 문제', icon: '⚙️' },
+    { id: 'account', label: '계정 관련', icon: '👤' },
+    { id: 'learning', label: '학습 문의', icon: '📚' },
+    { id: 'billing', label: '결제 문의', icon: '💳' },
+    { id: 'feature', label: '기능 제안', icon: '💡' },
+    { id: 'other', label: '기타', icon: '❓' }
+  ];
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // 실제 API 호출 시뮬레이션
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      // 폼 초기화
+      setFormData({
+        name: '',
+        email: '',
+        category: '',
+        subject: '',
+        message: ''
+      });
+      setSelectedCategory('');
+    }, 2000);
+  };
+
+  return (
+    <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* 헤더 */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/settings')}
+            className={`
+              p-2 rounded-lg transition-colors
+              ${isDarkMode 
+                ? 'hover:bg-gray-800 text-gray-400 hover:text-white' 
+                : 'hover:bg-white text-gray-600 hover:text-gray-900'
+              }
+            `}
+          >
+            <ArrowLeft size={24} />
+          </button>
+          <div className="flex items-center gap-3">
+            <div className={`
+              p-3 rounded-lg
+              ${isDarkMode 
+                ? 'bg-purple-500/20 text-purple-400' 
+                : 'bg-purple-100 text-purple-600'
+              }
+            `}>
+              <Headphones size={32} />
+            </div>
+            <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              고객 지원
+            </h1>
+          </div>
+        </div>
+
+        {/* 연락처 정보 */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className={`
+            p-6 rounded-2xl shadow-lg border text-center
+            ${isDarkMode 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-200'
+            }
+          `}>
+            <div className={`
+              w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
+              ${isDarkMode ? 'bg-blue-500/20' : 'bg-blue-100'}
+            `}>
+              <Mail size={24} className={`${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            </div>
+            <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              이메일
+            </h3>
+            <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              24시간 이내 답변
+            </p>
+            <p className={`font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+              support@sudam.com
+            </p>
+          </div>
+
+          <div className={`
+            p-6 rounded-2xl shadow-lg border text-center
+            ${isDarkMode 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-200'
+            }
+          `}>
+            <div className={`
+              w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
+              ${isDarkMode ? 'bg-green-500/20' : 'bg-green-100'}
+            `}>
+              <Phone size={24} className={`${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
+            </div>
+            <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              전화 상담
+            </h3>
+            <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              평일 09:00~18:00
+            </p>
+            <p className={`font-medium ${isDarkMode ? 'text-green-400' : 'text-green-600'}`}>
+              02-1234-5678
+            </p>
+          </div>
+
+          <div className={`
+            p-6 rounded-2xl shadow-lg border text-center
+            ${isDarkMode 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-200'
+            }
+          `}>
+            <div className={`
+              w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center
+              ${isDarkMode ? 'bg-purple-500/20' : 'bg-purple-100'}
+            `}>
+              <MessageCircle size={24} className={`${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+            </div>
+            <h3 className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              라이브 채팅
+            </h3>
+            <p className={`text-sm mb-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              즉시 응답
+            </p>
+            <p className={`font-medium ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`}>
+              평일 09:00~18:00
+            </p>
+          </div>
+        </div>
+
+        {/* 문의 양식 */}
+        <div className={`
+          p-8 rounded-2xl shadow-lg border
+          ${isDarkMode 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
+          }
+        `}>
+          <h2 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            문의하기
+          </h2>
+
+          {isSubmitted ? (
+            <div className="text-center py-12">
+              <div className={`
+                w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center
+                ${isDarkMode ? 'bg-green-500/20' : 'bg-green-100'}
+              `}>
+                <CheckCircle size={32} className="text-green-500" />
+              </div>
+              <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                문의가 성공적으로 전송되었습니다!
+              </h3>
+              <p className={`mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                24시간 이내에 답변드리겠습니다.
+              </p>
+              <button
+                onClick={() => setIsSubmitted(false)}
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              >
+                새로운 문의하기
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* 카테고리 선택 */}
+              <div>
+                <label className={`block text-sm font-medium mb-3 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  문의 카테고리
+                </label>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedCategory(category.id);
+                        handleInputChange('category', category.id);
+                      }}
+                      className={`
+                        p-3 rounded-lg border text-left transition-colors
+                        ${selectedCategory === category.id
+                          ? isDarkMode
+                            ? 'bg-blue-600 border-blue-500 text-white'
+                            : 'bg-blue-600 border-blue-500 text-white'
+                          : isDarkMode
+                            ? 'border-gray-600 hover:bg-gray-700 text-gray-300'
+                            : 'border-gray-300 hover:bg-gray-100 text-gray-700'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{category.icon}</span>
+                        <span className="text-sm font-medium">{category.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* 개인 정보 */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    이름 *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    className={`
+                      w-full px-4 py-3 rounded-lg border transition-colors
+                      ${isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                      }
+                      focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                    `}
+                    placeholder="성함을 입력하세요"
+                  />
+                </div>
+                <div>
+                  <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    이메일 *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className={`
+                      w-full px-4 py-3 rounded-lg border transition-colors
+                      ${isDarkMode 
+                        ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                        : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                      }
+                      focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                    `}
+                    placeholder="이메일을 입력하세요"
+                  />
+                </div>
+              </div>
+
+              {/* 제목 */}
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  제목 *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.subject}
+                  onChange={(e) => handleInputChange('subject', e.target.value)}
+                  className={`
+                    w-full px-4 py-3 rounded-lg border transition-colors
+                    ${isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                      : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                    }
+                    focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                  `}
+                  placeholder="문의 제목을 입력하세요"
+                />
+              </div>
+
+              {/* 메시지 */}
+              <div>
+                <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  문의 내용 *
+                </label>
+                <textarea
+                  required
+                  rows={6}
+                  value={formData.message}
+                  onChange={(e) => handleInputChange('message', e.target.value)}
+                  className={`
+                    w-full px-4 py-3 rounded-lg border transition-colors resize-none
+                    ${isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                      : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                    }
+                    focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                  `}
+                  placeholder="문의 내용을 상세히 입력해주세요..."
+                />
+              </div>
+
+              {/* 제출 버튼 */}
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={isSubmitting || !formData.name || !formData.email || !formData.subject || !formData.message || !formData.category}
+                  className={`
+                    w-full py-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
+                    ${isSubmitting || !formData.name || !formData.email || !formData.subject || !formData.message || !formData.category
+                      ? 'bg-gray-400 cursor-not-allowed text-white'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }
+                  `}
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      전송 중...
+                    </>
+                  ) : (
+                    <>
+                      <Send size={18} />
+                      문의 전송
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* 안내 메시지 */}
+              <div className={`
+                p-4 rounded-lg border-l-4 border-blue-500
+                ${isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50'}
+              `}>
+                <div className="flex items-start gap-2">
+                  <AlertCircle size={18} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                  <div className={`text-sm ${isDarkMode ? 'text-blue-200' : 'text-blue-600'}`}>
+                    <p className="font-medium mb-1">문의 전 확인사항</p>
+                    <ul className="space-y-1 text-xs">
+                      <li>• 기술적 문제의 경우 구체적인 오류 메시지나 상황을 포함해주세요.</li>
+                      <li>• 계정 관련 문의 시 보안을 위해 비밀번호는 포함하지 마세요.</li>
+                      <li>• 평일 업무시간(09:00~18:00) 내 문의는 당일 답변드립니다.</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </form>
+          )}
+        </div>
+
+        {/* FAQ 섹션 */}
+        <div className={`
+          p-8 rounded-2xl shadow-lg border
+          ${isDarkMode 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
+          }
+        `}>
+          <h2 className={`text-2xl font-bold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            자주 묻는 질문
+          </h2>
+          <div className="space-y-4">
+            <details className={`
+              p-4 rounded-lg border
+              ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}
+            `}>
+              <summary className={`font-semibold cursor-pointer ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                비밀번호를 잊어버렸어요
+              </summary>
+              <p className={`mt-3 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                로그인 페이지에서 "비밀번호 찾기"를 클릭하시고, 가입한 이메일 주소를 입력하시면 
+                비밀번호 재설정 링크를 보내드립니다.
+              </p>
+            </details>
+            
+            <details className={`
+              p-4 rounded-lg border
+              ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}
+            `}>
+              <summary className={`font-semibold cursor-pointer ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                카메라가 작동하지 않아요
+              </summary>
+              <p className={`mt-3 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                브라우저에서 카메라 접근 권한을 허용했는지 확인해주세요. 
+                설정 > 개인정보 보호 > 카메라에서 해당 브라우저의 권한을 확인할 수 있습니다.
+              </p>
+            </details>
+            
+            <details className={`
+              p-4 rounded-lg border
+              ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}
+            `}>
+              <summary className={`font-semibold cursor-pointer ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                학습 진도가 저장되지 않아요
+              </summary>
+              <p className={`mt-3 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                로그인 상태를 확인해주세요. 로그아웃 상태에서는 학습 진도가 저장되지 않습니다. 
+                또한 브라우저의 쿠키 설정을 확인해주세요.
+              </p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CustomerSupport;

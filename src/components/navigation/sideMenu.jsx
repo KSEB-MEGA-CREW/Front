@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Menu, 
-  X, 
+  ChevronLeft,
   Home, 
   BarChart3, 
   Settings, 
@@ -94,7 +94,7 @@ const SideMenu = ({ isOpen, setIsOpen, onNavigate, onShowMyPage, onShowStats, on
                 : 'hover:bg-gray-100 text-gray-600'
             }`}
           >
-            {isOpen ? <X size={20} /> : <Menu size={20} />}
+            {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
           </button>
         </div>
 

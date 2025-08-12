@@ -15,6 +15,9 @@ import GoodPage from "../pages/basicPage/goodPage";
 import StatsPage from "../pages/statsPage/statsPage";
 import SettingsPage from "../pages/settingsPage/settingsPage";
 import ErrorPage from "../pages/errorPage/errorPage";
+import PrivacyPolicy from "../pages/legalPage/privacyPolicy";
+import TermsOfService from "../pages/legalPage/termsOfService";
+import CustomerSupport from "../pages/legalPage/customerSupport";
 
 const router = createBrowserRouter([
   LoginRouter(),
@@ -80,6 +83,36 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <BasicLayout>
           <SettingsPage />
+        </BasicLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/privacy-policy",
+    element: (
+      <ProtectedRoute>
+        <BasicLayout>
+          <PrivacyPolicy />
+        </BasicLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/terms-of-service",
+    element: (
+      <ProtectedRoute>
+        <BasicLayout>
+          <TermsOfService />
+        </BasicLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/customer-support",
+    element: (
+      <ProtectedRoute>
+        <BasicLayout>
+          <CustomerSupport />
         </BasicLayout>
       </ProtectedRoute>
     ),
