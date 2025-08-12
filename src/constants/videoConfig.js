@@ -13,7 +13,12 @@ export const VIDEO_CONFIG = {
 export const API_CONFIG = {
     BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
     ENDPOINTS: {
+        // 웹캠 -> 텍스트
         ANALYZE_FRAME: '/api/signlanguage/analyze',
-        HEALTH_CHECK: '/api/signlanguage/health'
+        HEALTH_CHECK: '/api/signlanguage/health',
+
+        // 텍스트 -> 수어 애니메이션
+        TEXT_TO_SIGN: '/api/translation/text-to-sign',
+        TRANSLATION_HEALTH: '/api/translation/health'
     }
 };
