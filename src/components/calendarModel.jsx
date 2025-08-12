@@ -104,7 +104,6 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
           if (record.date) acc[record.date] = { accuracy: record.accuracy };
           return acc;
         }, {});
-        console.log("퀴즈 기록 로딩 완료:", historyMap);
         setQuizHistory(historyMap);
       } catch (error) {
         console.error("퀴즈 기록 로딩 실패:", error);

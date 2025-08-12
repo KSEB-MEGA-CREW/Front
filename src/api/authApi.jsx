@@ -15,12 +15,9 @@ const apiRequest = async (url, options = {}) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        //"Cache-Control": "no-cache",
-        //Pragma: "no-cache",
         ...getAuthHeaders(),
         ...headers,
       },
-      //credentials: "include",
       cache: "no-cache",
       ...restOptions,
     });
@@ -66,7 +63,6 @@ const apiRequest = async (url, options = {}) => {
     if (error.name === "TypeError" && error.message.includes("fetch")) {
       throw new Error("네트워크 연결을 확인해주세요.");
     }
-    // debug용 console.log
     console.error("API 요청 오류:", error);
     throw error;
   }
@@ -103,7 +99,7 @@ export const authApi = {
       }
       return response;
     } catch (error) {
-      console.log("로그인 오류:", error);
+      console.error("로그인 오류:", error);
       throw error;
     }
   },
@@ -131,9 +127,6 @@ export const quizApi = {
     try {
       const response = await apiRequest("/api/quiz", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
       });
       // ✅ 응답 객체 전체를 반환하도록 수정
       return response;
@@ -171,8 +164,7 @@ export const quizApi = {
         accuracy,
       }));
 
-      return calendarData; // 배열로 변환하여 반환
-      // 또는 객체 그대로 사용/ 여기서 data에 배열이 오길 기대함
+      return calendarData;
     } catch (error) {
       console.error("월 퀴즈 정보 조회:", error);
       throw error; // 에러가 발생하면 Promise.reject로 넘어감

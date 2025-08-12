@@ -5,8 +5,6 @@ const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  // console.log("useAuth context:", context); // 디버깅용 로그
-  //console.trace("useAuth가 호출되었습니다.");
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider.");
   }
@@ -25,7 +23,6 @@ export const AuthProvider = ({ children }) => {
         const storedToken = localStorage.getItem("token");
         const storedUser = localStorage.getItem("user");
 
-        console.log(storedToken, storedUser); // 디버깅용 로그
         if (storedToken && storedUser) {
           // 토큰 유효성 검증
 
@@ -40,7 +37,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (error) {
-        console.log("Auth 초기화 오류:", error);
+        console.error("Auth 초기화 오류:", error);
         // 에러 발생 시 로컬 스토리지 정리
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -76,7 +73,6 @@ export const AuthProvider = ({ children }) => {
   const value = {
     user,
     token,
-    isLoading: loading,
     loading,
     login,
     logout,

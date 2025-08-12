@@ -60,9 +60,8 @@ function StudyWord() {
         correctCount: correctAnswers,
         categoryCorrectCounts: categoryCorrectCounts,
       });
-      console.log("퀴즈 결과 백엔드 저장 성공");
     } catch (error) {
-      console.log("퀴즈 결과 저장 실패:", error);
+      console.error("퀴즈 결과 저장 실패:", error);
     }
   };
 
@@ -74,7 +73,6 @@ function StudyWord() {
     setIsFinished(false);
     try {
       const response = await quizApi.getQuiz();
-      console.log("API로부터 받은 전체 응답:", response);
 
       if (response && response.success && Array.isArray(response.data)) {
         const processedQuizzes = response.data.map((q) => ({
@@ -84,10 +82,7 @@ function StudyWord() {
         }));
         setQuizList(processedQuizzes.slice(0, 5));
       } else {
-        console.error(
-          "퀴즈 데이터 형식이 올바르지 않거나 조회에 실패했습니다:",
-          response
-        );
+        console.error("퀴즈 데이터 조회 실패:", response?.message || "Unknown error");
         setQuizList([]);
       }
     } catch (error) {

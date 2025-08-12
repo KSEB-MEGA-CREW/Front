@@ -1,4 +1,3 @@
-// useNavigate 이용 (react-router-dom v6+)
 import { useNavigate } from "react-router-dom";
 import { User } from 'lucide-react';
 
@@ -6,12 +5,7 @@ function AvatarButton() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    console.log('AvatarButton 클릭됨'); // 디버깅용
-    try {
-      navigate("/translate/avatar"); // 라우터 설정에 맞는 올바른 경로
-    } catch (error) {
-      console.error('Navigation 오류:', error);
-    }
+    navigate("/translate/avatar");
   };
 
   return (
