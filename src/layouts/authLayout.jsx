@@ -108,8 +108,12 @@ const AuthLayout = () => {
 
         <div className="hidden md:block w-px bg-white opacity-30 my-16"></div>
 
-        <div className="flex-1 flex items-center justify-center p-8 md:p-0 md:pr-24">
-          <Outlet />
+        {/* 수정된 영역 */}
+        <div className="flex-1 flex items-center justify-center p-8 md:p-0">
+          {/* Outlet을 감싸는 컨테이너 박스 추가 */}
+          <div className="w-full max-w-md">
+            <Outlet />
+          </div>
         </div>
       </div>
     </div>
