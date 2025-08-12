@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../Context/themeContext';
+import { useAuth } from '../../Context/authContext';
 import { ArrowLeft, Headphones, Mail, Phone, MessageCircle, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 

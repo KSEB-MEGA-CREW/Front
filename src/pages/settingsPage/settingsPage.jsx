@@ -1,11 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../../Context/themeContext';
-import { Settings, Moon, Sun, Info, Shield, Bell, ChevronRight } from 'lucide-react';
+import { Settings, Moon, Sun, Info, Shield, ChevronRight } from 'lucide-react';
+import DeleteAccountModal from '../../components/modals/DeleteAccountModal';
 
 const SettingsPage = () => {
   const { isDarkMode, toggleTheme } = useTheme();
   const navigate = useNavigate();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   return (
     <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
@@ -81,64 +83,6 @@ const SettingsPage = () => {
             </div>
           </div>
 
-          {/* 알림 설정 */}
-          <div className={`
-            p-6 rounded-2xl shadow-lg border
-            ${isDarkMode 
-              ? 'bg-gray-800 border-gray-700' 
-              : 'bg-white border-gray-200'
-            }
-          `}>
-            <div className="flex items-center gap-4 mb-4">
-              <div className={`
-                p-3 rounded-lg
-                ${isDarkMode 
-                  ? 'bg-yellow-500/20 text-yellow-400' 
-                  : 'bg-yellow-100 text-yellow-600'
-                }
-              `}>
-                <Bell size={24} />
-              </div>
-              <div>
-                <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  알림 설정
-                </h3>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  학습 알림 및 앱 알림을 관리하세요
-                </p>
-              </div>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  학습 리마인더
-                </span>
-                <button className={`
-                  relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                  ${isDarkMode ? 'bg-blue-600' : 'bg-gray-300'}
-                `}>
-                  <span className={`
-                    inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6
-                  `} />
-                </button>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <span className={`${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  진행 상황 알림
-                </span>
-                <button className={`
-                  relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                  ${isDarkMode ? 'bg-gray-600' : 'bg-gray-300'}
-                `}>
-                  <span className={`
-                    inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1
-                  `} />
-                </button>
-              </div>
-            </div>
-          </div>
 
           {/* 개인정보 및 보안 */}
           <div className={`
@@ -169,15 +113,6 @@ const SettingsPage = () => {
             </div>
 
             <div className="space-y-3">
-              <button className={`
-                w-full text-left p-3 rounded-lg transition-colors
-                ${isDarkMode 
-                  ? 'hover:bg-gray-700 text-gray-300' 
-                  : 'hover:bg-gray-100 text-gray-700'
-                }
-              `}>
-                비밀번호 변경
-              </button>
               <button 
                 onClick={() => navigate('/privacy-policy')}
                 className={`
@@ -193,13 +128,16 @@ const SettingsPage = () => {
                   isDarkMode ? 'text-gray-500' : 'text-gray-400'
                 }`} />
               </button>
-              <button className={`
-                w-full text-left p-3 rounded-lg transition-colors
-                ${isDarkMode 
-                  ? 'hover:bg-gray-700 text-gray-300' 
-                  : 'hover:bg-gray-100 text-gray-700'
-                }
-              `}>
+              <button 
+                onClick={() => setIsDeleteModalOpen(true)}
+                className={`
+                  w-full text-left p-3 rounded-lg transition-colors
+                  ${isDarkMode 
+                    ? 'hover:bg-gray-700 text-gray-300' 
+                    : 'hover:bg-gray-100 text-gray-700'
+                  }
+                `}
+              >
                 계정 삭제
               </button>
             </div>
@@ -276,6 +214,12 @@ const SettingsPage = () => {
           </div>
         </div>
       </div>
+
+      {/* 계정 삭제 확인 모달 */}
+      <DeleteAccountModal 
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+      />
     </div>
   );
 };

@@ -137,6 +137,19 @@ export const authApi = {
     }
   },
 
+  // deleteAccount 계정 삭제
+  deleteAccount: async () => {
+    try {
+      const response = await apiRequest("/api/auth/delete-account", {
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error("계정 삭제 오류:", error);
+      throw error;
+    }
+  },
+
   //logout
   logout: () => {
     localStorage.removeItem("token");
