@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { X, User, Mail, Calendar, Award, Edit2, Save, AlertCircle } from 'lucide-react';
+import { X, User, Calendar, Edit2, Save, AlertCircle, Ear, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../Context/authContext';
 import { useTheme } from '../../Context/themeContext';
+import { authApi } from '../../api/authApi';
 
 const MyPageModal = ({ isOpen, onClose }) => {
   const { user, updateUser } = useAuth();
@@ -9,9 +10,10 @@ const MyPageModal = ({ isOpen, onClose }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [editData, setEditData] = useState({
     username: user?.username || '',
-    email: user?.email || ''
+    hearingStatus: user?.hearingStatus || ''
   });
 
   if (!isOpen) return null;
@@ -21,9 +23,10 @@ const MyPageModal = ({ isOpen, onClose }) => {
       // 편집 모드 취소
       setEditData({
         username: user?.username || '',
-        email: user?.email || ''
+        hearingStatus: user?.hearingStatus || ''
       });
       setError('');
+      setSuccessMessage('');
     }
     setIsEditMode(!isEditMode);
   };
@@ -34,6 +37,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
       [field]: value
     }));
     setError('');
+    setSuccessMessage('');
   };
 
   const handleSave = async () => {
@@ -41,50 +45,47 @@ const MyPageModal = ({ isOpen, onClose }) => {
       setError('사용자명을 입력해주세요.');
       return;
     }
-    
-    if (!editData.email.trim()) {
-      setError('이메일을 입력해주세요.');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(editData.email)) {
-      setError('올바른 이메일 형식을 입력해주세요.');
-      return;
-    }
 
     try {
       setIsLoading(true);
       setError('');
       
-      // 실제 API 호출은 여기서 구현
-      // await updateUserProfile(editData);
-      
-      // 임시로 로컬 상태 업데이트
-      if (updateUser) {
-        updateUser({
-          ...user,
-          username: editData.username,
-          email: editData.email
-        });
-      }
-      
-      // 로컬스토리지 업데이트
-      const updatedUser = {
-        ...user,
+      // 서버로 수정 요청
+      const response = await authApi.updateUserProfile({
         username: editData.username,
-        email: editData.email
-      };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      
-      setIsEditMode(false);
-      
-      // 성공 알림 (선택사항)
-      alert('프로필이 성공적으로 수정되었습니다.');
+        hearingStatus: editData.hearingStatus
+      });
+
+      if (response.success) {
+        // AuthContext의 user 상태 업데이트
+        if (updateUser) {
+          updateUser({
+            ...user,
+            ...response.data // 서버에서 반환된 최신 데이터로 업데이트
+          });
+        }
+        
+        setIsEditMode(false);
+        setSuccessMessage('프로필이 성공적으로 수정되었습니다.');
+        
+        // 성공 메시지를 3초 후 자동으로 숨기기
+        setTimeout(() => {
+          setSuccessMessage('');
+        }, 3000);
+        
+      } else {
+        setError(response.message || '프로필 수정에 실패했습니다.');
+      }
       
     } catch (error) {
       console.error('프로필 수정 실패:', error);
-      setError('프로필 수정 중 오류가 발생했습니다.');
+      
+      // 서버에서 반환된 에러 메시지가 있다면 사용
+      if (error.message && error.message !== '프로필 수정 오류:') {
+        setError(error.message);
+      } else {
+        setError('프로필 수정 중 오류가 발생했습니다. 다시 시도해 주세요.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -209,17 +210,16 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 p-2 rounded-lg
                 ${isDarkMode ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600'}
               `}>
-                <Mail size={18} />
+                <Ear size={18} />
               </div>
               <div className="flex-1">
                 <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  이메일
+                  청각상태
                 </p>
                 {isEditMode ? (
-                  <input
-                    type="email"
-                    value={editData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
+                  <select
+                    value={editData.hearingStatus}
+                    onChange={(e) => handleInputChange('hearingStatus', e.target.value)}
                     className={`
                       w-full mt-1 px-3 py-2 rounded-lg border transition-colors
                       ${isDarkMode 
@@ -228,11 +228,18 @@ const MyPageModal = ({ isOpen, onClose }) => {
                       }
                       focus:outline-none focus:ring-2 focus:ring-blue-500/20
                     `}
-                    placeholder="이메일을 입력하세요"
-                  />
+                  >
+                    <option value="">청각상태를 선택하세요</option>
+                    <option value="hearing">정상청력</option>
+                    <option value="hard_of_hearing">난청</option>
+                    <option value="deaf">농아</option>
+                  </select>
                 ) : (
                   <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                    {user?.email || 'user@example.com'}
+                    {user?.hearingStatus === 'hearing' ? '정상청력' :
+                     user?.hearingStatus === 'hard_of_hearing' ? '난청' :
+                     user?.hearingStatus === 'deaf' ? '농아' :
+                     '아직 정하지 않음'}
                   </p>
                 )}
               </div>
@@ -255,22 +262,6 @@ const MyPageModal = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className={`
-                p-2 rounded-lg
-                ${isDarkMode ? 'bg-yellow-500/20 text-yellow-400' : 'bg-yellow-100 text-yellow-600'}
-              `}>
-                <Award size={18} />
-              </div>
-              <div className="flex-1">
-                <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  학습 레벨
-                </p>
-                <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                  초급자
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* 에러 메시지 */}
@@ -284,6 +275,20 @@ const MyPageModal = ({ isOpen, onClose }) => {
             `}>
               <AlertCircle size={16} />
               <span className="text-sm">{error}</span>
+            </div>
+          )}
+
+          {/* 성공 메시지 */}
+          {successMessage && (
+            <div className={`
+              p-3 rounded-lg border flex items-center gap-2
+              ${isDarkMode 
+                ? 'bg-green-900/20 border-green-700 text-green-400' 
+                : 'bg-green-50 border-green-200 text-green-600'
+              }
+            `}>
+              <CheckCircle size={16} />
+              <span className="text-sm">{successMessage}</span>
             </div>
           )}
 

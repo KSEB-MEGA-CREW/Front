@@ -115,6 +115,28 @@ export const authApi = {
     }
   },
 
+  // updateUserProfile 사용자 정보 수정
+  updateUserProfile: async (updateData) => {
+    try {
+      const response = await apiRequest("/api/auth/update-profile", {
+        method: "PUT",
+        body: JSON.stringify(updateData),
+      });
+      
+      // 수정 성공 시 localStorage의 사용자 정보도 업데이트
+      if (response.success && response.data) {
+        const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
+        const updatedUser = { ...currentUser, ...response.data };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+      
+      return response;
+    } catch (error) {
+      console.error("프로필 수정 오류:", error);
+      throw error;
+    }
+  },
+
   //logout
   logout: () => {
     localStorage.removeItem("token");
