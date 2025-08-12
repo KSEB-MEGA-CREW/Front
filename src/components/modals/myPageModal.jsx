@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
-import { authApi } from "../../api/authApi";
 
 const MyPageModal = ({ isOpen, onClose }) => {
   const { user, updateUser } = useAuth();
@@ -81,36 +80,26 @@ const MyPageModal = ({ isOpen, onClose }) => {
       setIsLoading(true);
       setError("");
 
-      // 서버로 수정 요청
-      const response = await authApi.updateUserProfile({
+      // AuthContext의 updateUser 함수를 통해 서버 업데이트 및 상태 관리
+      // 이 함수가 API 호출, localStorage, React 상태를 모두 관리함
+      await updateUser({
         username: editData.username,
         hearingStatus: editData.hearingStatus,
       });
 
-      if (response.success) {
-        // AuthContext의 user 상태 업데이트
-        if (updateUser) {
-          updateUser({
-            ...user,
-            ...response.data, // 서버에서 반환된 최신 데이터로 업데이트
-          });
-        }
+      setIsEditMode(false);
+      setSuccessMessage("프로필이 성공적으로 수정되었습니다.");
 
-        setIsEditMode(false);
-        setSuccessMessage("프로필이 성공적으로 수정되었습니다.");
+      // 성공 메시지를 3초 후 자동으로 숨기기
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
 
-        // 성공 메시지를 3초 후 자동으로 숨기기
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 3000);
-      } else {
-        setError(response.message || "프로필 수정에 실패했습니다.");
-      }
     } catch (error) {
       console.error("프로필 수정 실패:", error);
-
-      // 서버에서 반환된 에러 메시지가 있다면 사용
-      if (error.message && error.message !== "프로필 수정 오류:") {
+      
+      // 서버 에러 메시지 표시
+      if (error.message) {
         setError(error.message);
       } else {
         setError("프로필 수정 중 오류가 발생했습니다. 다시 시도해 주세요.");
