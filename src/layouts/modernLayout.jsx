@@ -40,6 +40,14 @@ const ModernLayout = ({ children, showMyPage }) => {
     }
   };
 
+  const handleShowQuiz = () => {
+    navigate('/study');
+    // 모바일에서는 메뉴 닫기
+    if (window.innerWidth < 768) {
+      setIsSideMenuOpen(false);
+    }
+  };
+
   return (
     <div className={`flex h-screen ${isDarkMode ? 'dark' : ''}`}>
       {/* 사이드 메뉴 */}
@@ -50,6 +58,7 @@ const ModernLayout = ({ children, showMyPage }) => {
         onShowMyPage={handleShowMyPage}
         onShowStats={handleShowStats}
         onShowSettings={handleShowSettings}
+        onShowQuiz={handleShowQuiz}
       />
 
       {/* 메인 콘텐츠 영역 */}

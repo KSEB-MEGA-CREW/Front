@@ -8,13 +8,14 @@ import {
   LogOut,
   MessageSquare,
   UserCircle,
-  Bot
+  Bot,
+  Brain
 } from 'lucide-react';
 import { useAuth } from '../../Context/authContext';
 import { useTheme } from '../../Context/themeContext';
 import LogoutButton from '../button/logoutButton';
 
-const SideMenu = ({ isOpen, setIsOpen, onNavigate, onShowMyPage, onShowStats, onShowSettings }) => {
+const SideMenu = ({ isOpen, setIsOpen, onNavigate, onShowMyPage, onShowStats, onShowSettings, onShowQuiz }) => {
   const { user } = useAuth();
   const { isDarkMode } = useTheme();
 
@@ -37,6 +38,11 @@ const SideMenu = ({ isOpen, setIsOpen, onNavigate, onShowMyPage, onShowStats, on
       label: "텍스트 → 아바타", 
       path: "/translate/avatar",
       onClick: () => onNavigate("/translate/avatar")
+    },
+    {
+      icon: <Brain size={20} />,
+      label: "퀴즈",
+      onClick: onShowQuiz
     },
     {
       icon: <BarChart3 size={20} />,

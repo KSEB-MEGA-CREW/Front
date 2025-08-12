@@ -6,8 +6,10 @@ import {
 } from "lucide-react";
 import { useFrameExtraction } from "../../hooks/useFrameExtraction";
 import { useVideoCapture } from "../../hooks/useVideoCapture";
+import { useTheme } from "../../Context/themeContext";
 
 const VideoPage = () => {
+    const { isDarkMode } = useTheme();
     const [translationText, setTranslationText] = useState("");
     const [translationHistory, setTranslationHistory] = useState([]);
     const [statusMessage, setStatusMessage] = useState("");
@@ -141,19 +143,33 @@ const VideoPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+        <div className={`min-h-screen relative overflow-hidden ${
+          isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        }`}>
             
             {/* 메인 컨테이너 */}
             <div className="relative w-full h-screen flex flex-col lg:flex-row">
                 
                 {/* 비디오 영역 */}
                 <div className="flex-1 relative p-4">
-                    <div className="w-full h-full bg-white/20 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden relative">
+                    <div className={`
+                      w-full h-full rounded-3xl shadow-2xl overflow-hidden relative border
+                      ${isDarkMode 
+                        ? "bg-gray-800 border-gray-700" 
+                        : "bg-white border-gray-200"
+                      }
+                    `}>
                         
                         {/* 상단 상태 바 */}
                         <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
                             <div className="flex items-center gap-3">
-                                <div className={`flex items-center gap-2 px-3 py-1.5 bg-white/30 backdrop-blur-md rounded-full text-sm font-medium ${getConnectionStatusColor()}`}>
+                                <div className={`
+                                  flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                                  ${isDarkMode 
+                                    ? "bg-gray-700 text-gray-200" 
+                                    : "bg-gray-100 text-gray-700"
+                                  } ${getConnectionStatusColor()}
+                                `}>
                                     {getConnectionStatusIcon()}
                                     <span>
                                         {connectionStatus === 'connected' ? '연결됨' : 
@@ -162,7 +178,13 @@ const VideoPage = () => {
                                 </div>
                                 
                                 {isProcessing && (
-                                    <div className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 backdrop-blur-md rounded-full text-red-700 text-sm font-medium">
+                                    <div className={`
+                                      flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                                      ${isDarkMode 
+                                        ? "bg-red-500/20 text-red-300" 
+                                        : "bg-red-100 text-red-700"
+                                      }
+                                    `}>
                                         <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
                                         수어 분석 중
                                     </div>
@@ -171,21 +193,39 @@ const VideoPage = () => {
                             
                             <div className="flex items-center gap-2">
                                 {isCameraReady && (
-                                    <div className="px-3 py-1.5 bg-white/30 backdrop-blur-md rounded-full text-sm font-medium text-gray-700">
+                                    <div className={`
+                                      px-3 py-1.5 rounded-full text-sm font-medium
+                                      ${isDarkMode 
+                                        ? "bg-gray-700 text-gray-300" 
+                                        : "bg-gray-100 text-gray-700"
+                                      }
+                                    `}>
                                         {cameraInfo?.width}×{cameraInfo?.height}
                                     </div>
                                 )}
                                 
                                 <button
                                     onClick={toggleFullscreen}
-                                    className="p-2 bg-white/30 hover:bg-white/40 backdrop-blur-md rounded-xl text-gray-700 hover:text-gray-900 transition-all duration-200"
+                                    className={`
+                                      p-2 rounded-xl transition-all duration-200
+                                      ${isDarkMode 
+                                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100" 
+                                        : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                                      }
+                                    `}
                                 >
                                     {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
                                 </button>
                                 
                                 <button
                                     onClick={() => setShowSettings(!showSettings)}
-                                    className="p-2 bg-white/30 hover:bg-white/40 backdrop-blur-md rounded-xl text-gray-700 hover:text-gray-900 transition-all duration-200"
+                                    className={`
+                                      p-2 rounded-xl transition-all duration-200
+                                      ${isDarkMode 
+                                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100" 
+                                        : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                                      }
+                                    `}
                                 >
                                     <Settings size={18} />
                                 </button>
@@ -199,8 +239,16 @@ const VideoPage = () => {
                                     <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
                                         <AlertCircle size={32} className="text-red-600" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-800 mb-3">카메라 오류</h3>
-                                    <p className="text-gray-600 mb-6">{cameraError}</p>
+                                    <h3 className={`text-xl font-bold mb-3 ${
+                                      isDarkMode ? "text-white" : "text-gray-800"
+                                    }`}>
+                                      카메라 오류
+                                    </h3>
+                                    <p className={`mb-6 ${
+                                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                                    }`}>
+                                      {cameraError}
+                                    </p>
                                     <button
                                         onClick={() => restartCamera()}
                                         className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
@@ -222,15 +270,36 @@ const VideoPage = () => {
 
                         {/* 설정 패널 */}
                         {showSettings && (
-                            <div className="absolute top-16 right-4 bg-white/20 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px]">
-                                <h4 className="text-lg font-semibold text-gray-800 mb-4">카메라 설정</h4>
+                            <div className={`
+                              absolute top-16 right-4 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px] border
+                              ${isDarkMode 
+                                ? "bg-gray-800 border-gray-700" 
+                                : "bg-white border-gray-200"
+                              }
+                            `}>
+                                <h4 className={`text-lg font-semibold mb-4 ${
+                                  isDarkMode ? "text-white" : "text-gray-800"
+                                }`}>
+                                  카메라 설정
+                                </h4>
                                 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">카메라 선택</label>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                          isDarkMode ? "text-gray-300" : "text-gray-700"
+                                        }`}>
+                                          카메라 선택
+                                        </label>
                                         <select
                                             onChange={(e) => switchDevice(e.target.value)}
-                                            className="w-full bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                            className={`
+                                              w-full rounded-lg px-3 py-2 text-sm border
+                                              focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                                              ${isDarkMode 
+                                                ? "bg-gray-700 border-gray-600 text-gray-200" 
+                                                : "bg-gray-50 border-gray-300 text-gray-800"
+                                              }
+                                            `}
                                         >
                                             {availableDevices.map(device => (
                                                 <option key={device.deviceId} value={device.deviceId}>
@@ -241,10 +310,21 @@ const VideoPage = () => {
                                     </div>
                                     
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-2">해상도</label>
+                                        <label className={`block text-sm font-medium mb-2 ${
+                                          isDarkMode ? "text-gray-300" : "text-gray-700"
+                                        }`}>
+                                          해상도
+                                        </label>
                                         <select
                                             onChange={(e) => changeResolution(e.target.value)}
-                                            className="w-full bg-white/50 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-2 text-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+                                            className={`
+                                              w-full rounded-lg px-3 py-2 text-sm border
+                                              focus:outline-none focus:ring-2 focus:ring-blue-500/50
+                                              ${isDarkMode 
+                                                ? "bg-gray-700 border-gray-600 text-gray-200" 
+                                                : "bg-gray-50 border-gray-300 text-gray-800"
+                                              }
+                                            `}
                                         >
                                             <option value="vga">640×480 (표준)</option>
                                             <option value="hd">1280×720 (HD)</option>
@@ -252,9 +332,15 @@ const VideoPage = () => {
                                         </select>
                                     </div>
                                     
-                                    <div className="pt-2 border-t border-white/20">
+                                    <div className={`pt-2 border-t ${
+                                      isDarkMode ? "border-gray-700" : "border-gray-200"
+                                    }`}>
                                         <div className="flex items-center justify-between">
-                                            <span className="text-sm font-medium text-gray-700">음성 출력</span>
+                                            <span className={`text-sm font-medium ${
+                                              isDarkMode ? "text-gray-300" : "text-gray-700"
+                                            }`}>
+                                              음성 출력
+                                            </span>
                                             <button
                                                 onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
                                                 className={`p-2 rounded-lg transition-all duration-200 ${
@@ -274,7 +360,13 @@ const VideoPage = () => {
                         {/* 상태 메시지 */}
                         {statusMessage && (
                             <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-30">
-                                <div className="bg-white/90 backdrop-blur-xl text-gray-800 text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border border-white/30">
+                                <div className={`
+                                  text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border
+                                  ${isDarkMode 
+                                    ? "bg-gray-800 border-gray-700 text-gray-200" 
+                                    : "bg-white border-gray-200 text-gray-800"
+                                  }
+                                `}>
                                     {statusMessage}
                                 </div>
                             </div>
@@ -286,11 +378,23 @@ const VideoPage = () => {
                 <div className="w-full lg:w-96 p-4 flex flex-col max-h-[50vh] lg:max-h-none">
                     
                     {/* 현재 번역 결과 */}
-                    <div className="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-6 mb-4">
+                    <div className={`
+                      rounded-2xl shadow-lg p-6 mb-4 border
+                      ${isDarkMode 
+                        ? "bg-gray-800 border-gray-700" 
+                        : "bg-white border-gray-200"
+                      }
+                    `}>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-semibold text-gray-800">실시간 번역</h3>
+                            <h3 className={`text-lg font-semibold ${
+                              isDarkMode ? "text-white" : "text-gray-800"
+                            }`}>
+                              실시간 번역
+                            </h3>
                             {confidence > 0 && (
-                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <div className={`flex items-center gap-2 text-sm ${
+                                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                                }`}>
                                     <div className="flex items-center gap-1">
                                         <div className={`w-2 h-2 rounded-full ${confidence > 0.8 ? 'bg-green-500' : confidence > 0.6 ? 'bg-yellow-500' : 'bg-red-500'}`} />
                                         {Math.round(confidence * 100)}%
@@ -301,11 +405,21 @@ const VideoPage = () => {
                         
                         <div 
                             ref={translationRef}
-                            className="min-h-[120px] bg-white/30 backdrop-blur-sm rounded-xl p-4 border border-white/20"
+                            className={`
+                              min-h-[120px] rounded-xl p-4 border
+                              ${isDarkMode 
+                                ? "bg-gray-700 border-gray-600" 
+                                : "bg-gray-50 border-gray-200"
+                              }
+                            `}
                         >
-                            <p className="text-lg text-gray-800 leading-relaxed">
+                            <p className={`text-lg leading-relaxed ${
+                              isDarkMode ? "text-gray-200" : "text-gray-800"
+                            }`}>
                                 {translationText || (
-                                    <span className="text-gray-500 italic">
+                                    <span className={`italic ${
+                                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                                    }`}>
                                         {isProcessing ? "AI가 수어를 분석하고 있어요..." : "수어를 입력해주세요"}
                                     </span>
                                 )}
@@ -314,12 +428,28 @@ const VideoPage = () => {
                     </div>
 
                     {/* 번역 기록 */}
-                    <div className="bg-white/20 backdrop-blur-xl rounded-2xl border border-white/20 shadow-lg p-4 lg:p-6 flex-1">
+                    <div className={`
+                      rounded-2xl shadow-lg p-4 lg:p-6 flex-1 border
+                      ${isDarkMode 
+                        ? "bg-gray-800 border-gray-700" 
+                        : "bg-white border-gray-200"
+                      }
+                    `}>
                         <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-base lg:text-lg font-semibold text-gray-800">번역 기록</h3>
+                            <h3 className={`text-base lg:text-lg font-semibold ${
+                              isDarkMode ? "text-white" : "text-gray-800"
+                            }`}>
+                              번역 기록
+                            </h3>
                             <button
                                 onClick={clearTranslation}
-                                className="p-2 hover:bg-white/20 rounded-lg text-gray-500 hover:text-gray-700 transition-all duration-200"
+                                className={`
+                                  p-2 rounded-lg transition-all duration-200
+                                  ${isDarkMode 
+                                    ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200" 
+                                    : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                                  }
+                                `}
                                 title="기록 지우기"
                             >
                                 <RotateCcw size={16} />
@@ -328,12 +458,28 @@ const VideoPage = () => {
                         
                         <div className="space-y-2 lg:space-y-3 max-h-[200px] lg:max-h-[400px] overflow-y-auto">
                             {translationHistory.length === 0 ? (
-                                <p className="text-gray-500 text-center py-4 lg:py-8 italic text-sm lg:text-base">번역 기록이 없습니다</p>
+                                <p className={`text-center py-4 lg:py-8 italic text-sm lg:text-base ${
+                                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                                }`}>
+                                  번역 기록이 없습니다
+                                </p>
                             ) : (
                                 translationHistory.map((item) => (
-                                    <div key={item.id} className="bg-white/20 backdrop-blur-sm rounded-lg p-2.5 lg:p-3 border border-white/20">
-                                        <p className="text-gray-800 text-xs lg:text-sm leading-relaxed">{item.text}</p>
-                                        <div className="flex items-center justify-between mt-1.5 lg:mt-2 text-xs text-gray-500">
+                                    <div key={item.id} className={`
+                                      rounded-lg p-2.5 lg:p-3 border
+                                      ${isDarkMode 
+                                        ? "bg-gray-700 border-gray-600" 
+                                        : "bg-gray-50 border-gray-200"
+                                      }
+                                    `}>
+                                        <p className={`text-xs lg:text-sm leading-relaxed ${
+                                          isDarkMode ? "text-gray-200" : "text-gray-800"
+                                        }`}>
+                                          {item.text}
+                                        </p>
+                                        <div className={`flex items-center justify-between mt-1.5 lg:mt-2 text-xs ${
+                                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                                        }`}>
                                             <span>{item.timestamp.toLocaleTimeString()}</span>
                                             <div className="flex items-center gap-1">
                                                 <div className={`w-1.5 h-1.5 rounded-full ${item.confidence > 0.8 ? 'bg-green-500' : item.confidence > 0.6 ? 'bg-yellow-500' : 'bg-red-500'}`} />
@@ -377,7 +523,9 @@ const VideoPage = () => {
                             className={`p-3 lg:p-4 rounded-xl lg:rounded-2xl transition-all duration-200 ${
                                 isSpeechEnabled 
                                     ? 'bg-gradient-to-r from-green-400 to-emerald-500 text-white' 
-                                    : 'bg-white/30 text-gray-600 hover:bg-white/40'
+                                    : isDarkMode
+                                      ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                             }`}
                             title="음성 출력 토글"
                         >

@@ -7,8 +7,10 @@ import {
   ArrowRightLeft,
   Volume2,
 } from "lucide-react";
+import { useTheme } from "../../Context/themeContext";
 
 function MainPage() {
+  const { isDarkMode } = useTheme();
   const [scrollY, setScrollY] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [translationDemo, setTranslationDemo] = useState(false);
@@ -61,10 +63,14 @@ function MainPage() {
   ];
 
   return (
-    <div className="min-h-screen overflow-hidden relative">
+    <div className={`min-h-screen overflow-hidden relative ${
+      isDarkMode ? "bg-gray-900" : "bg-gray-50"
+    }`}>
       {/* 스크롤 진행도 바 */}
       <div
-        className="fixed top-0 left-0 w-full h-1 bg-black/20 z-50"
+        className={`fixed top-0 left-0 w-full h-1 z-50 ${
+          isDarkMode ? "bg-black/20" : "bg-gray-300"
+        }`}
         aria-hidden
       >
         <div
@@ -84,22 +90,26 @@ function MainPage() {
               className={`w-3 h-3 rounded-full transition-all duration-300 ${
                 scrollProgress > threshold
                   ? "bg-cyan-400/80 scale-125 shadow-lg shadow-cyan-400/50"
-                  : "bg-white/20 scale-100"
+                  : isDarkMode
+                    ? "bg-white/20 scale-100"
+                    : "bg-gray-400/60 scale-100"
               }`}
             />
           ))}
         </div>
       </div>
-      {/* 패럴랙스 배경 */}
-      <div className="fixed inset-0 -z-10" aria-hidden>
-        <div
-          className="w-full h-full bg-cover bg-center transition-transform duration-200"
-          style={{
-            backgroundImage: "url('/assets/back7.jpg')",
-          }}
-        />
-        {/* 마우스 오로라 효과 (애니메이션 OFF면 표시 안 됨) */}
-      </div>
+      {/* 패럴랙스 배경 - 다크 모드에만 적용 */}
+      {isDarkMode && (
+        <div className="fixed inset-0 -z-10" aria-hidden>
+          <div
+            className="w-full h-full bg-cover bg-center transition-transform duration-200"
+            style={{
+              backgroundImage: "url('/assets/back7.jpg')",
+            }}
+          />
+          {/* 마우스 오로라 효과 (애니메이션 OFF면 표시 안 됨) */}
+        </div>
+      )}
       {/* 메인 콘텐츠 */}
       <main
         className="relative z-20 flex flex-col items-center justify-center min-h-screen text-center px-6"
@@ -109,28 +119,40 @@ function MainPage() {
         }}
       >
         <h1
-          className="text-5xl md:text-6xl font-bold text-white drop-shadow-2xl mb-15 transition-all duration-700 animate-pulse-glow"
+          className={`text-5xl md:text-6xl font-bold mb-15 transition-all duration-700 animate-pulse-glow ${
+            isDarkMode ? "text-white drop-shadow-2xl" : "text-gray-900"
+          }`}
           style={{
             transform: `scale(${1 - scrollProgress * 0.002})`,
           }}
         >
-          수어 통역이 <span className="text-white">더 가까워집니다</span>
+          수어 통역이 <span className={isDarkMode ? "text-white" : "text-gray-900"}>더 가까워집니다</span>
         </h1>
         {/* 양방향 번역 강조 섹션 */}
         <a
           href="/translate"
-          className="relative mb-12 p-6 bg-black/20 backdrop-blur-xl rounded-2xl border-2 border-cyan-400/50 max-w-2xl w-full block group transition-all duration-300 hover:scale-[1.02] hover:bg-black/30 hover:shadow-2xl hover:shadow-cyan-400/20 cursor-pointer hover:border-cyan-400/70"
+          className={`relative mb-12 p-6 rounded-2xl border-2 border-cyan-400/50 max-w-2xl w-full block group transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-cyan-400/20 cursor-pointer hover:border-cyan-400/70 ${
+            isDarkMode 
+              ? "bg-black/20 backdrop-blur-xl hover:bg-black/30" 
+              : "bg-white/80 backdrop-blur-xl hover:bg-white/90"
+          }`}
           tabIndex={0}
           aria-label="양방향 수어 통역 체험 바로가기"
         >
           {/* 글로우 효과, 애니메이션 OFF면 표시 안됨 */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-400/10 via-blue-500/10 to-purple-500/10 rounded-2xl animate-pulse group-hover:from-cyan-400/20 group-hover:via-blue-500/20 group-hover:to-purple-500/20 transition-all duration-300"></div>
+          <div className={`absolute inset-0 rounded-2xl animate-pulse transition-all duration-300 ${
+            isDarkMode 
+              ? "bg-gradient-to-r from-cyan-400/10 via-blue-500/10 to-purple-500/10 group-hover:from-cyan-400/20 group-hover:via-blue-500/20 group-hover:to-purple-500/20" 
+              : "bg-gradient-to-r from-cyan-400/5 via-blue-500/5 to-purple-500/5 group-hover:from-cyan-400/10 group-hover:via-blue-500/10 group-hover:to-purple-500/10"
+          }`}></div>
           <div className="relative z-10">
             <div className="flex items-center justify-center mb-4">
-              <div className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
-                <span className="text-white">실시간</span>
-                <span className="text-white">양방향</span>
-                <span className="text-white">수어 번역</span>
+              <div className={`text-xl md:text-2xl font-bold flex items-center gap-3 ${
+                isDarkMode ? "text-white" : "text-gray-900"
+              }`}>
+                <span>실시간</span>
+                <span>양방향</span>
+                <span>수어 번역</span>
               </div>
             </div>
             {/* 번역 시각화 */}
@@ -175,12 +197,16 @@ function MainPage() {
             </div>
             {/* 데모 텍스트 */}
             <div className="text-center mb-4">
-              <p className="text-base md:text-lg text-white/90 mb-2">
+              <p className={`text-base md:text-lg mb-2 ${
+                isDarkMode ? "text-white/90" : "text-gray-700"
+              }`}>
                 {translationDemo
                   ? "🤟 '안녕하세요'   →   🎵 '안녕하세요'"
                   : "🎵 '반갑습니다'   →   🤟 '반갑습니다'"}
               </p>
-              <div className="text-xs text-white/70">
+              <div className={`text-xs ${
+                isDarkMode ? "text-white/70" : "text-gray-600"
+              }`}>
                 {translationDemo
                   ? "수어를 음성으로 실시간 변환"
                   : "음성을 수어로 실시간 변환"}
@@ -192,7 +218,9 @@ function MainPage() {
                 <span className="text-lg">지금 바로 체험하기</span>
                 <span className="ml-2 text-xl">✨</span>
               </div>
-              <div className="text-white/50 text-xs mt-2">
+              <div className={`text-xs mt-2 ${
+                isDarkMode ? "text-white/50" : "text-gray-600"
+              }`}>
                 클릭하여 양방향 수어 번역을 시작하세요
               </div>
             </div>
@@ -200,14 +228,18 @@ function MainPage() {
         </a>
         {/* 이용자 통계 */}
         <div className="flex flex-col items-center mb-24">
-          <span className="text-white/70 text-base font-medium mb-1">
+          <span className={`text-base font-medium mb-1 ${
+            isDarkMode ? "text-white/70" : "text-gray-700"
+          }`}>
             오늘{" "}
-            <strong className="text-cyan-300 text-xl">
+            <strong className="text-cyan-500 text-xl">
               {todayUsers.toLocaleString()}
             </strong>
             명이 통역 서비스를 체험했어요!
           </span>
-          <span className="text-sm text-white/50">
+          <span className={`text-sm ${
+            isDarkMode ? "text-white/50" : "text-gray-600"
+          }`}>
             이용자분들의 소중한 경험이 쌓이고 있습니다
           </span>
         </div>
@@ -220,8 +252,16 @@ function MainPage() {
           aria-hidden
         >
           <div className="flex flex-col items-center space-y-2">
-            <span className="text-white/70 text-sm">아래로 스크롤</span>
-            <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center bg-white/5 backdrop-blur-sm">
+            <span className={`text-sm ${
+              isDarkMode ? "text-white/70" : "text-gray-600"
+            }`}>
+              아래로 스크롤
+            </span>
+            <div className={`w-6 h-10 border-2 rounded-full flex justify-center backdrop-blur-sm ${
+              isDarkMode 
+                ? "border-white/50 bg-white/5" 
+                : "border-gray-400 bg-gray-100/50"
+            }`}>
               <div className="w-1 h-3 bg-gradient-to-b from-blue-400 to-purple-500 rounded-full mt-2 animate-pulse" />
             </div>
           </div>
@@ -229,17 +269,25 @@ function MainPage() {
       </main>
       {/* 기능 소개 섹션 */}
       <section
-        className="relative z-20 py-24 bg-gradient-to-b from-transparent to-black/20"
+        className={`relative z-20 py-24 ${
+          isDarkMode 
+            ? "bg-gradient-to-b from-transparent to-black/20" 
+            : "bg-gradient-to-b from-transparent to-gray-100/20"
+        }`}
         style={{
           transform: `translateY(${scrollY * -0.1}px)`,
         }}
       >
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4 drop-shadow-2xl">
+            <h2 className={`text-4xl font-bold mb-4 ${
+              isDarkMode ? "text-white drop-shadow-2xl" : "text-gray-900"
+            }`}>
               수담의 주요 기능
             </h2>
-            <p className="text-white/90 max-w-2xl mx-auto drop-shadow-lg">
+            <p className={`max-w-2xl mx-auto ${
+              isDarkMode ? "text-white/90 drop-shadow-lg" : "text-gray-700"
+            }`}>
               혁신적인 AI 기술로 더 나은 소통의 세상을 만들어갑니다
             </p>
           </div>
@@ -247,17 +295,29 @@ function MainPage() {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="relative bg-black/30 backdrop-blur-xl p-8 rounded-2xl border border-white/20 hover:bg-black/40 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group"
+                className={`relative p-8 rounded-2xl border transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 group ${
+                  isDarkMode 
+                    ? "bg-black/30 backdrop-blur-xl border-white/20 hover:bg-black/40" 
+                    : "bg-white/80 backdrop-blur-xl border-gray-200 hover:bg-white/90"
+                }`}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${
+                  isDarkMode 
+                    ? "bg-gradient-to-br from-blue-500/10 to-purple-500/10" 
+                    : "bg-gradient-to-br from-blue-500/5 to-purple-500/5"
+                }`}></div>
                 <div className="relative z-10">
                   <div className="text-blue-400 mb-4 transform group-hover:scale-110 transition-transform duration-300">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold text-white mb-3">
+                  <h3 className={`text-xl font-semibold mb-3 ${
+                    isDarkMode ? "text-white" : "text-gray-900"
+                  }`}>
                     {feature.title}
                   </h3>
-                  <p className="text-white/80 leading-relaxed">
+                  <p className={`leading-relaxed ${
+                    isDarkMode ? "text-white/80" : "text-gray-700"
+                  }`}>
                     {feature.description}
                   </p>
                 </div>
@@ -270,10 +330,14 @@ function MainPage() {
       <section className="relative z-20 py-32">
         <div className="container mx-auto px-6">
           <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 drop-shadow-2xl">
+            <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${
+              isDarkMode ? "text-white drop-shadow-2xl" : "text-gray-900"
+            }`}>
               수담이 만드는 변화
             </h2>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto drop-shadow-lg">
+            <p className={`text-xl max-w-3xl mx-auto ${
+              isDarkMode ? "text-white/90 drop-shadow-lg" : "text-gray-700"
+            }`}>
               실제 사용자들의 이야기와 함께하는 소통의 순간들
             </p>
           </div>
@@ -325,7 +389,11 @@ function MainPage() {
                       item.side === "right" ? "pl-8" : "pr-8"
                     }`}
                   >
-                    <div className="relative group bg-black/30 backdrop-blur-xl rounded-3xl p-8 border border-white/20 hover:bg-black/40 transition-all duration-500 transform hover:scale-105">
+                    <div className={`relative group rounded-3xl p-8 border transition-all duration-500 transform hover:scale-105 ${
+                      isDarkMode 
+                        ? "bg-black/30 backdrop-blur-xl border-white/20 hover:bg-black/40" 
+                        : "bg-white/80 backdrop-blur-xl border-gray-200 hover:bg-white/90"
+                    }`}>
                       {/* Hover 시 등장할 이미지 */}
                       <div
                         className={`absolute z-20 hidden md:block ${
@@ -342,10 +410,14 @@ function MainPage() {
                       </div>
                       {/* 카드 내부 텍스트 */}
                       <div className="relative z-10">
-                        <h3 className="text-2xl font-bold text-white mb-4">
+                        <h3 className={`text-2xl font-bold mb-4 ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}>
                           {item.title}
                         </h3>
-                        <p className="text-white/90 leading-relaxed whitespace-pre-line">
+                        <p className={`leading-relaxed whitespace-pre-line ${
+                          isDarkMode ? "text-white/90" : "text-gray-700"
+                        }`}>
                           {item.description}
                         </p>
                       </div>
@@ -369,7 +441,11 @@ function MainPage() {
         </div>
       </section>
       {/* Footer */}
-      <footer className="relative z-30 flex flex-col items-center justify-center w-full py-10 bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white/70 text-sm">
+      <footer className={`relative z-30 flex flex-col items-center justify-center w-full py-10 text-sm ${
+        isDarkMode 
+          ? "bg-gradient-to-t from-black/80 via-black/60 to-transparent text-white/70" 
+          : "bg-gradient-to-t from-gray-200/80 via-gray-100/60 to-transparent text-gray-700"
+      }`}>
         <div className="flex flex-row flex-wrap gap-5 mb-3">
           <a
             href="/about"
