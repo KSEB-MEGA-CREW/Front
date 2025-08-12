@@ -32,7 +32,8 @@ const apiRequest = async (url, options = {}) => {
       // 현재 페이지가 로그인 페이지면 리다이렉트하지 않음 => 굳이 리다이렉트할 필요가 없으므로
       // 현재 페이지가 로그인 페이지가 아닐 때만 리다이렉트
       if (!window.location.pathname.includes("/auth")) {
-        window.location.href = "/auth";
+        // React Router를 사용하는 곳에서 처리하도록 이벤트 발생
+        window.dispatchEvent(new CustomEvent('auth-expired'));
       }
       throw new Error("인증이 만료되었습니다.");
     }

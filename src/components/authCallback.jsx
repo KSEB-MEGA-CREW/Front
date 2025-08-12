@@ -95,9 +95,6 @@ const AuthCallback = () => {
           로그인 처리 중...
         </h2>
         <p className="text-gray-600 mb-4">잠시만 기다려주세요.</p>
-        <div className="text-xs text-gray-400 break-all">
-          {window.location.href}
-        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/authContext";
 import { useTheme } from "../Context/themeContext";
 import ModernLayout from "./modernLayout";
@@ -7,12 +7,30 @@ import MyPageModal from "../components/modals/myPageModal";
 
 function BasicLayout({ children }) {
   const location = useLocation();
-  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+  const { user, loading, logout } = useAuth();
   const { isDarkMode } = useTheme();
   const [showMyPageModal, setShowMyPageModal] = useState(false);
   
   const isHomePage = location.pathname === "/" || location.pathname === "/main";
   const isPublicPage = ["/about", "/privacy"].includes(location.pathname);
+
+  // auth-expired 이벤트 리스너 추가
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      logout();
+      // 현재 페이지가 로그인 페이지가 아닌 경우에만 리다이렉트
+      if (!location.pathname.includes("/auth")) {
+        navigate("/auth", { replace: true });
+      }
+    };
+
+    window.addEventListener('auth-expired', handleAuthExpired);
+    
+    return () => {
+      window.removeEventListener('auth-expired', handleAuthExpired);
+    };
+  }, [logout, navigate, location.pathname]);
 
   const handleShowMyPage = () => {
     setShowMyPageModal(true);

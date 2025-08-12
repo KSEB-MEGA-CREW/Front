@@ -52,6 +52,7 @@ export const AuthProvider = ({ children }) => {
     initializeAuth();
   }, []);
 
+
   const login = ({ token, user }) => {
     if (!token || !user) {
       console.error("Login failed: Invalid auth data");

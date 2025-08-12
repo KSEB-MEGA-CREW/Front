@@ -1,14 +1,12 @@
-import { useAuth } from "../../Context/authContext";
-import { useNavigate, useLocation } from "react-router-dom";
-import { LogOut } from "lucide-react";
+// src/components/button/logoutButton.js
 
-function LogoutButton({ className }) {
+import { useAuth } from "../../Context/authContext";
+import { useNavigate } from "react-router-dom";
+
+// children prop을 받도록 수정합니다.
+function LogoutButton({ children, className }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // 경로가 "/" 또는 "/main" 같은 메인 페이지인지 확인
-  const isMainPage = location.pathname === "/" || location.pathname === "/main";
 
   const handleLogout = () => {
     logout();
@@ -18,19 +16,10 @@ function LogoutButton({ className }) {
   return (
     <button
       onClick={handleLogout}
-      className={
-        className 
-          ? `${className} flex items-center gap-2`
-          : `flex items-center gap-2 px-4 py-2 rounded-lg shadow-md transition-colors duration-200
-        ${
-          isMainPage
-            ? "bg-transparent text-white hover:bg-white/10 hover:text-blue-300"
-            : "bg-blue-300 text-white hover:bg-blue-400"
-        }`
-      }
+      className={className} // className은 SideMenu에서 전달한 것을 그대로 사용
     >
-      <LogOut className="w-4 h-4" />
-      로그아웃
+      {/* SideMenu에서 전달한 자식 요소(아이콘, 텍스트 등)를 여기에 렌더링 */}
+      {children}
     </button>
   );
 }

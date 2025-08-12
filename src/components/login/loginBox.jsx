@@ -1,7 +1,7 @@
 // src/components/LoginBox.jsx
 
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../Context/authContext";
 import {
   authApi,
@@ -13,6 +13,8 @@ import {
 const LoginBox = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
@@ -37,8 +39,7 @@ const LoginBox = () => {
           token: response.data.token,
           user: response.data.userInfo,
         });
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectTo = urlParams.get("redirect") || "/";
+        const redirectTo = searchParams.get("redirect") || "/";
         navigate(redirectTo, { replace: true });
       } else {
         setError(response.message || "로그인에 실패했습니다.");
@@ -70,13 +71,13 @@ const LoginBox = () => {
       setError(`${provider} 로그인 URL이 설정되지 않았습니다.`);
       return;
     }
-    const currentUrl = window.location.pathname + window.location.search;
+    const currentUrl = location.pathname + location.search;
     sessionStorage.setItem("loginRedirect", currentUrl);
+    // OAuth 리다이렉트는 외부 도메인으로 이동하므로 window.location.href 사용이 적절함
     window.location.href = authUrl;
   };
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
     const errorParam = searchParams.get("error");
     if (errorParam) {
       const errorMessages = {
@@ -88,7 +89,7 @@ const LoginBox = () => {
       };
       setError(errorMessages[errorParam] || "알 수 없는 오류가 발생했습니다.");
     }
-  }, []);
+  }, [searchParams]);
 
   return (
     <div className="space-y-6">
