@@ -1,51 +1,114 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 
 const AuthLayout = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 100,
+        y: (e.clientY / window.innerHeight) * 100,
+      });
+    };
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
+
+  const backgroundStyle = {
+    backgroundImage: "url('/assets/image.png')",
+    backgroundSize: "cover",
+    backgroundPosition: `${mousePosition.x / 8}% ${mousePosition.y / 8}%`,
+    backgroundRepeat: "no-repeat",
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    zIndex: 0,
+    transition: "background-position 0.4s ease-out",
+  };
+  const overlayStyle = {
+    background: `rgba(0, 0, 0, 0.3)`,
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    zIndex: 1,
+    pointerEvents: "none",
+  };
+  const starsStyle = {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    background: `radial-gradient(2px 2px at 20px 30px, #eee, transparent), radial-gradient(2px 2px at 40px 70px, rgba(255,255,255,0.8), transparent), radial-gradient(1px 1px at 90px 40px, #fff, transparent), radial-gradient(1px 1px at 130px 80px, rgba(255,255,255,0.6), transparent), radial-gradient(2px 2px at 160px 30px, #ddd, transparent)`,
+    backgroundRepeat: "repeat",
+    backgroundSize: "200px 100px",
+    animation: "twinkle 4s ease-in-out infinite alternate",
+    opacity: 0.5,
+    zIndex: 2,
+    pointerEvents: "none",
+  };
+
   return (
-    <div className="min-h-screen flex">
-      {/* 왼쪽 섹션 - 진한 네이비색 배경 */}
-      <div className="flex-1 bg-slate-900 flex items-center justify-center p-12 text-white relative">
-        {/* 배경 그라데이션 효과 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-900"></div>
-        
-        {/* 장식용 패턴 */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-        </div>
+    <div style={backgroundStyle} className="overflow-y-auto">
+      <style jsx="true">{`
+        @keyframes twinkle {
+          0% {
+            opacity: 0.6;
+          }
+          50% {
+            opacity: 0.2;
+          }
+          100% {
+            opacity: 0.6;
+          }
+        }
+        @keyframes float {
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
+        }
+      `}</style>
+      <div style={starsStyle}></div>
+      <div style={overlayStyle}></div>
 
-        {/* 콘텐츠 */}
-        <div className="relative z-10 max-w-lg text-center">
-          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
-            수담
-          </h1>
-          <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-            수어로 세상과 소통하는 새로운 방법
-          </p>
-          <div className="text-lg text-slate-400 space-y-2">
-            <p>AI 기반 수어 인식과 번역으로</p>
-            <p>모든 사람이 자유롭게 소통할 수 있는</p>
-            <p>포용적인 디지털 세상을 만듭니다</p>
+      <div className="flex flex-col md:flex-row w-full min-h-full relative z-10">
+        <div className="flex-1 flex items-center justify-center p-8 md:p-0 md:pl-24 text-center md:text-left">
+          <div className="text-white">
+            <h1
+              className="text-6xl md:text-8xl font-thin mb-6 md:mb-8 tracking-widest"
+              style={{ fontFamily: "Georgia, serif" }}
+            >
+              수담, 手談
+            </h1>
+            <p
+              className="text-2xl md:text-3xl font-light mb-4 md:mb-6 tracking-wide"
+              style={{ fontFamily: "Georgia, serif" }}
+            >
+              "소통의 장벽을 허물다."
+            </p>
+            <div
+              className="text-lg md:text-xl leading-relaxed opacity-90 font-light max-w-2xl"
+              style={{ fontFamily: "Georgia, serif" }}
+            >
+              <p>누구나 자유롭게 이야기하고 이해받을 수 있도록,</p>
+              <p>우리는 기술로 세상의 모든 말과 귀가 되어</p>
+              <p>경계 없는 소통을 완성합니다.</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* 오른쪽 섹션 - 검은색 배경 */}
-      <div className="flex-1 bg-black flex items-center justify-center p-12">
-        <div className="w-full max-w-md">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-semibold text-white mb-2">시작하기</h2>
-            <p className="text-gray-400">계정으로 로그인하거나 새로운 계정을 만드세요</p>
-          </div>
-          
-          {/* Outlet에서 로그인/회원가입 버튼들이 렌더링됩니다 */}
+        <div className="hidden md:block w-px bg-white opacity-30 my-16"></div>
+
+        <div className="flex-1 flex items-center justify-center p-8 md:p-0 md:pr-24">
           <Outlet />
         </div>
       </div>
