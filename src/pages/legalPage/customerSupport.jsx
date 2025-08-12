@@ -23,6 +23,7 @@ const CustomerSupport = () => {
     category: "",
     subject: "",
     message: "",
+    isPublic: false,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -64,6 +65,7 @@ const CustomerSupport = () => {
         category: formData.category,
         subject: formData.subject.trim(),
         content: formData.message.trim(),
+        isPublic: formData.isPublic,
       };
 
       const response = await authApi.submitSupportTicket(supportData);
@@ -75,6 +77,7 @@ const CustomerSupport = () => {
           category: "",
           subject: "",
           message: "",
+          isPublic: false,
         });
         setSelectedCategory("");
       } else {
@@ -439,6 +442,61 @@ const CustomerSupport = () => {
                   `}
                   placeholder="문의 내용을 상세히 입력해주세요..."
                 />
+              </div>
+
+              {/* 공개/비공개 선택 */}
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-3 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  공개 설정
+                </label>
+                <div className="space-y-3">
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isPublic"
+                      checked={!formData.isPublic}
+                      onChange={() => handleInputChange("isPublic", false)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <div className="ml-3">
+                      <div className={`text-sm font-medium ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}>
+                        🔒 비공개 문의
+                      </div>
+                      <div className={`text-xs ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}>
+                        본인과 관리자만 볼 수 있습니다
+                      </div>
+                    </div>
+                  </label>
+                  <label className="flex items-center cursor-pointer">
+                    <input
+                      type="radio"
+                      name="isPublic"
+                      checked={formData.isPublic}
+                      onChange={() => handleInputChange("isPublic", true)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    />
+                    <div className="ml-3">
+                      <div className={`text-sm font-medium ${
+                        isDarkMode ? "text-white" : "text-gray-900"
+                      }`}>
+                        🌐 공개 문의
+                      </div>
+                      <div className={`text-xs ${
+                        isDarkMode ? "text-gray-400" : "text-gray-600"
+                      }`}>
+                        모든 사용자가 볼 수 있습니다 (FAQ 효과)
+                      </div>
+                    </div>
+                  </label>
+                </div>
               </div>
 
               {/* 제출 버튼 */}

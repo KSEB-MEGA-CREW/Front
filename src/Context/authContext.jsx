@@ -100,6 +100,12 @@ export const AuthProvider = ({ children }) => {
       throw error;
     }
   };
+  
+  // 관리자 권한 확인 함수
+  const isAdmin = () => {
+    return user?.role === 'admin' || user?.username === 'admin';
+  };
+
   // ***** 추가된 부분 끝 *****
   const value = {
     user,
@@ -108,6 +114,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateUser,
+    isAdmin,
     isAuthenticated: !!token && !!user,
   };
 

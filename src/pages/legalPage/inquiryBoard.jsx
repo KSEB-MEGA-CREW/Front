@@ -7,13 +7,14 @@ import { useNavigate } from 'react-router-dom';
 
 const InquiryBoard = () => {
   const { isDarkMode } = useTheme();
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [viewMode, setViewMode] = useState('public'); // 'public', 'my', 'admin'
 
   const categories = [
     { id: 'all', label: '전체', icon: '📋' },
@@ -36,14 +37,33 @@ const InquiryBoard = () => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      if (!user?.id) {
+      if (!user?.id && viewMode !== 'public') {
         setError('사용자 정보를 찾을 수 없습니다.');
         setIsLoading(false);
         return;
       }
 
       try {
-        const response = await authApi.getSupportTickets(user.id);
+        let response;
+        
+        switch (viewMode) {
+          case 'public':
+            response = await authApi.getPublicSupportTickets();
+            break;
+          case 'my':
+            response = await authApi.getSupportTickets(user.id);
+            break;
+          case 'admin':
+            if (isAdmin()) {
+              response = await authApi.getAllSupportTickets();
+            } else {
+              throw new Error('관리자 권한이 필요합니다.');
+            }
+            break;
+          default:
+            response = await authApi.getPublicSupportTickets();
+        }
+
         if (response.success && response.data) {
           setTickets(response.data);
         } else {
@@ -58,8 +78,9 @@ const InquiryBoard = () => {
       }
     };
 
+    setIsLoading(true);
     fetchTickets();
-  }, [user?.id]);
+  }, [user?.id, viewMode, isAdmin]);
 
   // 검색 및 필터링
   const filteredTickets = tickets.filter(ticket => {
@@ -118,6 +139,48 @@ const InquiryBoard = () => {
               문의 게시판
             </h1>
           </div>
+        </div>
+
+        {/* 뷰 모드 탭 */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          <button
+            onClick={() => setViewMode('public')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              viewMode === 'public'
+                ? 'bg-blue-600 text-white'
+                : isDarkMode
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            🌐 공개 문의
+          </button>
+          <button
+            onClick={() => setViewMode('my')}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              viewMode === 'my'
+                ? 'bg-blue-600 text-white'
+                : isDarkMode
+                ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            👤 내 문의
+          </button>
+          {isAdmin() && (
+            <button
+              onClick={() => setViewMode('admin')}
+              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                viewMode === 'admin'
+                  ? 'bg-red-600 text-white'
+                  : isDarkMode
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              ⚡ 관리자 뷰
+            </button>
+          )}
         </div>
 
         {/* 검색 및 필터 */}
@@ -228,8 +291,9 @@ const InquiryBoard = () => {
             {filteredTickets.map((ticket) => (
               <div
                 key={ticket.id}
+                onClick={() => navigate(`/ticket/${ticket.id}`)}
                 className={`
-                  p-6 rounded-2xl shadow-lg border transition-colors hover:shadow-xl
+                  p-6 rounded-2xl shadow-lg border transition-colors hover:shadow-xl cursor-pointer
                   ${isDarkMode 
                     ? 'bg-gray-800 border-gray-700 hover:bg-gray-750' 
                     : 'bg-white border-gray-200 hover:bg-gray-50'
@@ -237,7 +301,7 @@ const InquiryBoard = () => {
                 `}
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <span className="text-lg">{getCategoryIcon(ticket.category)}</span>
                     <span className={`
                       px-3 py-1 rounded-full text-xs font-medium
@@ -248,6 +312,34 @@ const InquiryBoard = () => {
                     `}>
                       {getCategoryLabel(ticket.category)}
                     </span>
+                    
+                    {/* 공개/비공개 상태 표시 */}
+                    <span className={`
+                      px-2 py-1 rounded-full text-xs font-medium
+                      ${ticket.isPublic 
+                        ? isDarkMode
+                          ? 'bg-green-500/20 text-green-400'
+                          : 'bg-green-100 text-green-600'
+                        : isDarkMode
+                          ? 'bg-orange-500/20 text-orange-400'
+                          : 'bg-orange-100 text-orange-600'
+                      }
+                    `}>
+                      {ticket.isPublic ? '🌐 공개' : '🔒 비공개'}
+                    </span>
+
+                    {/* 관리자 뷰에서만 사용자명 표시 */}
+                    {viewMode === 'admin' && (
+                      <span className={`
+                        px-2 py-1 rounded-full text-xs font-medium
+                        ${isDarkMode 
+                          ? 'bg-purple-500/20 text-purple-400' 
+                          : 'bg-purple-100 text-purple-600'
+                        }
+                      `}>
+                        👤 {ticket.userName || '익명'}
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar size={14} />

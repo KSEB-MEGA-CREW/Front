@@ -164,7 +164,7 @@ export const authApi = {
     }
   },
 
-  // getSupportTickets 문의 목록 조회
+  // getSupportTickets 문의 목록 조회 (개인)
   getSupportTickets: async (userId) => {
     try {
       const response = await apiRequest(`/api/support/tickets/user/${userId}`, {
@@ -173,6 +173,59 @@ export const authApi = {
       return response;
     } catch (error) {
       console.error("문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getPublicSupportTickets 공개 문의 목록 조회
+  getPublicSupportTickets: async () => {
+    try {
+      const response = await apiRequest("/api/support/tickets/public", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("공개 문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getAllSupportTickets 전체 문의 목록 조회 (관리자용)
+  getAllSupportTickets: async () => {
+    try {
+      const response = await apiRequest("/api/support/tickets/admin", {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("전체 문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTicketById 특정 문의 상세 조회
+  getSupportTicketById: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("문의 상세 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // submitSupportReply 관리자 답변 작성
+  submitSupportReply: async (ticketId, replyData) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}/reply`, {
+        method: "POST",
+        body: JSON.stringify(replyData),
+      });
+      return response;
+    } catch (error) {
+      console.error("답변 작성 오류:", error);
       throw error;
     }
   },
