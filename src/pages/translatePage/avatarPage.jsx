@@ -64,33 +64,36 @@ const AvatarPage = () => {
     if (!text.trim()) return;
 
     try {
-      clearError();
-      const result = await convertTextToSignLanguage(text);
-      
-      if (result.success) {
-        // 변환 성공 시 아바타에 애니메이션 데이터 전송
-        const success = sendAnimationData(result.animationData);
+        clearError();
+        const result = await convertTextToSignLanguage(text);
         
-        if (success) {
-          const newTranslation = {
-            id: Date.now(),
-            text: text,
-            timestamp: new Date(),
-            confidence: result.confidence,
-            duration: result.animationData.duration || 2.5
-          };
-          
-          setCurrentTranslation(newTranslation);
-          setTranslationHistory(prev => [newTranslation, ...prev.slice(0, 9)]);
-          
-          // 음성 출력
-          if (isSpeechEnabled) {
-            speakText(text);
-          }
+        if (result.success) {
+            console.log('✅ 번역 요청 전송 완료:', result.data);
+            
+            // 즉시 응답 처리 (실제 애니메이션은 WebSocket으로 받을 예정)
+            const newTranslation = {
+                id: Date.now(),
+                text: text,
+                timestamp: new Date(),
+                requestId: result.data.requestId,
+                status: result.data.status, // "SUBMITTED"
+                confidence: 0.0, // WebSocket으로 업데이트 예정
+                duration: 0 // WebSocket으로 업데이트 예정
+            };
+            
+            setCurrentTranslation(newTranslation);
+            setTranslationHistory(prev => [newTranslation, ...prev.slice(0, 9)]);
+            
+            // 음성 출력
+            if (isSpeechEnabled) {
+                speakText(text);
+            }
+            
+            // TODO: WebSocket으로 실제 애니메이션 데이터 대기
         }
-      }
     } catch (error) {
-      console.error("수어 변환 오류:", error);
+        console.error("수어 변환 오류:", error);
+        setError(error.message);
     }
   };
 

@@ -7,36 +7,23 @@ export class NetworkService {
     constructor() {
 
         this.baseURL = API_CONFIG.BASE_URL;
-
         this.controller = new AbortController();
-
         this.retryCount = 0;
 
     }
 
-
-
     // JWT 토큰 가져오기
-
     getAuthToken() {
-
         return localStorage.getItem('token');
-
     }
 
-
-
     // 프레임 전송 요청 <- 백엔드 FrameController와 연동
-
     async sendFrame(frameRequest) {
-
         const MAX_RETRIES = API_CONFIG.MAX_RETRIES || 3; // 설정 파일에서 가져오거나 기본값 설정
-
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
                 const token = this.getAuthToken();
                 if (!token) throw new Error('인증 토큰이 없습니다.');
-
                 const response = await fetch(`${this.baseURL}${API_CONFIG.ENDPOINTS.ANALYZE_FRAME}`, {
                     method: 'POST',
                     headers: {
@@ -78,10 +65,7 @@ export class NetworkService {
 
     }
 
-
-
     // 재시도 가능한 에러인지 확인
-
     shouldRetry(error) {
 
         // 5xx 서버 에러, 429(요청 한도 초과), 네트워크 에러 등 재시도
@@ -95,7 +79,7 @@ export class NetworkService {
 
     // 최종적으로 던질 에러 객체를 생성하는 헬퍼 함수
     createFinalError(error) {
-        const errorMessages = {
+        const frameErrorMessages = {
             401: '인증이 만료되었습니다.',
             403: '세션 접근 권한이 없습니다.',
             400: '프레임 데이터가 유효하지 않습니다.',
@@ -103,51 +87,99 @@ export class NetworkService {
             500: '서버 내부 오류가 발생했습니다.',
             503: '서비스를 일시적으로 사용할 수 없습니다.'
         };
-        const message = errorMessages[error.status] || `An unexpected error occurred.`;
+
+        const translationErrorMessages = {
+            401: '인증이 만료되었습니다.',
+            403: '번역 세션 접근 권한이 없습니다.',
+            400: '번역할 텍스트가 유효하지 않습니다.',
+            429: '번역 요청 한도를 초과했습니다.',
+            500: 'AI 번역 서버 오류가 발생했습니다.',
+            503: '번역 서비스를 일시적으로 사용할 수 없습니다.'
+        };
+
+        const errorMessages = type === 'translation' ? translationErrorMessages : frameErrorMessages;
+        const message = errorMessages[error.status] || `예상치 못한 오류가 발생했습니다.`;
         return new Error(message);
     }
 
-
-
     // 지연 함수
-
     delay(ms) {
-
         return new Promise(resolve => setTimeout(resolve, ms));
-
     }
 
 
 
     // 헬스체크
-
-    async healthCheck() {
-
+    async healthCheck(service = 'frame') {
         try {
+            const endpoint = service === 'translation'
+                ? API_CONFIG.ENDPOINTS.TRANSLATION_HEALTH
+                : API_CONFIG.ENDPOINTS.HEALTH_CHECK;
 
-            const response = await fetch(`${this.baseURL}${API_CONFIG.ENDPOINTS.HEALTH_CHECK}`);
-
+            const response = await fetch(`${this.baseURL}${endpoint}`);
             return response.ok;
-
         } catch {
-
             return false;
-
         }
-
     }
 
-
-
     // 요청 취소
-
     abort() {
-
         this.controller.abort();
-
         this.controller = new AbortController();
-
         this.retryCount = 0;
+    }
 
+    // 텍스트를 수어로 변환 요청
+    async convertTextToSign(translationRequest) {
+        const MAX_RETRIES = API_CONFIG.MAX_RETRIES || 3;
+
+        console.log(`텍스트-수어 변환 요청: "${translationRequest.text}"`);
+
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                const token = this.getAuthToken();
+                if (!token) throw new Error('인증 토큰이 없습니다.');
+
+                const response = await fetch(`${this.baseURL}${API_CONFIG.ENDPOINTS.TEXT_TO_SIGN}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(translationRequest),
+                    signal: this.controller.signal
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('텍스트-수어 변환 응답:', result);
+                    return result;
+                }
+
+                // 실패 시 에러 처리
+                const errorText = await response.text();
+                const error = new Error(`HTTP ${response.status}: ${errorText}`);
+                error.status = response.status;
+                throw error;
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    console.log('텍스트-수어 변환 요청 취소됨');
+                    return null;
+                }
+
+                console.error(`텍스트-수어 변환 시도 ${attempt} 실패:`, error.message);
+
+                // 마지막 시도이거나 재시도 불가능한 에러
+                if (attempt === MAX_RETRIES || !this.shouldRetry(error)) {
+                    const finalError = this.createFinalError(error, 'translation');
+                    throw finalError;
+                }
+
+                console.log(`텍스트-수어 변환 재시도 (${attempt}/${MAX_RETRIES})`);
+                const delayTime = Math.min(1000 * Math.pow(2, attempt - 1), 10000);
+                await this.delay(delayTime);
+            }
+        }
     }
 }
