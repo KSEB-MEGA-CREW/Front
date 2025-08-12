@@ -150,6 +150,33 @@ export const authApi = {
     }
   },
 
+  // submitSupportTicket 고객 지원 문의 제출
+  submitSupportTicket: async (supportData) => {
+    try {
+      const response = await apiRequest("/api/support/ticket", {
+        method: "POST",
+        body: JSON.stringify(supportData),
+      });
+      return response;
+    } catch (error) {
+      console.error("지원 문의 제출 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTickets 문의 목록 조회
+  getSupportTickets: async (userId) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/user/${userId}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
   //logout
   logout: () => {
     localStorage.removeItem("token");
