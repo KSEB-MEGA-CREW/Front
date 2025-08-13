@@ -164,10 +164,10 @@ export const authApi = {
     }
   },
 
-  // getSupportTickets 문의 목록 조회 (개인)
-  getSupportTickets: async (userId) => {
+  // getSupportTickets 문의 목록 조회 (개인) - 페이징 지원
+  getSupportTickets: async (userId, page = 1, size = 5) => {
     try {
-      const response = await apiRequest(`/api/support/tickets/user/${userId}`, {
+      const response = await apiRequest(`/api/support/tickets/user/${userId}?page=${page}&size=${size}`, {
         method: "GET",
       });
       return response;
@@ -177,10 +177,10 @@ export const authApi = {
     }
   },
 
-  // getPublicSupportTickets 공개 문의 목록 조회
-  getPublicSupportTickets: async () => {
+  // getPublicSupportTickets 공개 문의 목록 조회 - 페이징 지원
+  getPublicSupportTickets: async (page = 1, size = 5) => {
     try {
-      const response = await apiRequest("/api/support/tickets/public", {
+      const response = await apiRequest(`/api/support/tickets/public?page=${page}&size=${size}`, {
         method: "GET",
       });
       return response;
@@ -190,10 +190,10 @@ export const authApi = {
     }
   },
 
-  // getAllSupportTickets 전체 문의 목록 조회 (관리자용)
-  getAllSupportTickets: async () => {
+  // getAllSupportTickets 전체 문의 목록 조회 (관리자용) - 페이징 지원
+  getAllSupportTickets: async (page = 1, size = 5) => {
     try {
-      const response = await apiRequest("/api/support/tickets/admin", {
+      const response = await apiRequest(`/api/support/tickets/admin?page=${page}&size=${size}`, {
         method: "GET",
       });
       return response;
