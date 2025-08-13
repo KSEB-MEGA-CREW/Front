@@ -1,0 +1,374 @@
+import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../Context/themeContext';
+import { useAuth } from '../../Context/authContext';
+import { authApi } from '../../api/authApi';
+import { ArrowLeft, MessageSquare, Calendar, User, Send, Eye, EyeOff } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+
+const TicketDetail = () => {
+  const { isDarkMode } = useTheme();
+  const { user, isAdmin } = useAuth();
+  const navigate = useNavigate();
+  const { ticketId } = useParams();
+  const [ticket, setTicket] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [replyContent, setReplyContent] = useState('');
+  const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+
+  const categories = [
+    { id: 'technical', label: '기술적 문제', icon: '⚙️' },
+    { id: 'account', label: '계정 관련', icon: '👤' },
+    { id: 'learning', label: '학습 문의', icon: '📚' },
+    { id: 'feature', label: '기능 제안', icon: '💡' },
+    { id: 'other', label: '기타', icon: '❓' }
+  ];
+
+  const getCategoryLabel = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.label : categoryId;
+  };
+
+  const getCategoryIcon = (categoryId) => {
+    const category = categories.find(cat => cat.id === categoryId);
+    return category ? category.icon : '❓';
+  };
+
+  useEffect(() => {
+    const fetchTicket = async () => {
+      if (!ticketId) {
+        setError('문의 ID가 없습니다.');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await authApi.getSupportTicketById(ticketId);
+        if (response.success && response.data) {
+          // 권한 확인: 관리자가 아니고 본인의 문의가 아닌 경우 접근 불허
+          if (!isAdmin() && response.data.userId !== user?.id) {
+            setError('이 문의에 접근할 권한이 없습니다.');
+            setIsLoading(false);
+            return;
+          }
+          setTicket(response.data);
+        } else {
+          setError('문의를 찾을 수 없습니다.');
+        }
+      } catch (error) {
+        console.error('문의 상세 로딩 실패:', error);
+        setError('문의를 불러오는데 실패했습니다.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTicket();
+  }, [ticketId, user?.id, isAdmin]);
+
+  const handleReplySubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!replyContent.trim()) {
+      alert('답변 내용을 입력해주세요.');
+      return;
+    }
+
+    setIsSubmittingReply(true);
+
+    try {
+      const replyData = {
+        content: replyContent.trim(),
+        adminName: user?.username || 'admin'
+      };
+
+      const response = await authApi.submitSupportReply(ticketId, replyData);
+      
+      if (response.success) {
+        // 문의 정보 다시 로드
+        const updatedResponse = await authApi.getSupportTicketById(ticketId);
+        if (updatedResponse.success && updatedResponse.data) {
+          setTicket(updatedResponse.data);
+        }
+        setReplyContent('');
+        alert('답변이 성공적으로 등록되었습니다.');
+      } else {
+        throw new Error(response.message || '답변 등록에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('답변 등록 오류:', error);
+      alert(error.message || '답변 등록 중 오류가 발생했습니다.');
+    } finally {
+      setIsSubmittingReply(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className={`${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                문의 내용을 불러오는 중...
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate('/inquiry-board')}
+              className={`
+                p-2 rounded-lg transition-colors
+                ${isDarkMode 
+                  ? 'hover:bg-gray-800 text-gray-400 hover:text-white' 
+                  : 'hover:bg-white text-gray-600 hover:text-gray-900'
+                }
+              `}
+            >
+              <ArrowLeft size={24} />
+            </button>
+          </div>
+          <div className={`
+            p-8 rounded-2xl shadow-lg border text-center
+            ${isDarkMode 
+              ? 'bg-gray-800 border-gray-700' 
+              : 'bg-white border-gray-200'
+            }
+          `}>
+            <h3 className={`text-lg font-semibold mb-2 ${
+              isDarkMode ? 'text-white' : 'text-gray-900'
+            }`}>
+              오류가 발생했습니다
+            </h3>
+            <p className={`${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              {error}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!ticket) {
+    return null;
+  }
+
+  return (
+    <div className={`min-h-screen p-6 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+      <div className="max-w-4xl mx-auto space-y-8">
+        {/* 헤더 */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/inquiry-board')}
+            className={`
+              p-2 rounded-lg transition-colors
+              ${isDarkMode 
+                ? 'hover:bg-gray-800 text-gray-400 hover:text-white' 
+                : 'hover:bg-white text-gray-600 hover:text-gray-900'
+              }
+            `}
+          >
+            <ArrowLeft size={24} />
+          </button>
+          <div className="flex items-center gap-3">
+            <div className={`
+              p-3 rounded-lg
+              ${isDarkMode 
+                ? 'bg-blue-500/20 text-blue-400' 
+                : 'bg-blue-100 text-blue-600'
+              }
+            `}>
+              <MessageSquare size={32} />
+            </div>
+            <h1 className={`text-4xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              문의 상세
+            </h1>
+          </div>
+        </div>
+
+        {/* 문의 내용 */}
+        <div className={`
+          p-8 rounded-2xl shadow-lg border
+          ${isDarkMode 
+            ? 'bg-gray-800 border-gray-700' 
+            : 'bg-white border-gray-200'
+          }
+        `}>
+          {/* 메타 정보 */}
+          <div className="flex flex-wrap items-center gap-3 mb-6">
+            <span className="text-lg">{getCategoryIcon(ticket.category)}</span>
+            <span className={`
+              px-3 py-1 rounded-full text-xs font-medium
+              ${isDarkMode 
+                ? 'bg-blue-500/20 text-blue-400' 
+                : 'bg-blue-100 text-blue-600'
+              }
+            `}>
+              {getCategoryLabel(ticket.category)}
+            </span>
+            
+            <span className={`
+              px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1
+              ${ticket.isPublic 
+                ? isDarkMode
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-green-100 text-green-600'
+                : isDarkMode
+                  ? 'bg-orange-500/20 text-orange-400'
+                  : 'bg-orange-100 text-orange-600'
+              }
+            `}>
+              {ticket.isPublic ? <Eye size={12} /> : <EyeOff size={12} />}
+              {ticket.isPublic ? '공개' : '비공개'}
+            </span>
+
+            <span className={`
+              px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1
+              ${isDarkMode 
+                ? 'bg-purple-500/20 text-purple-400' 
+                : 'bg-purple-100 text-purple-600'
+              }
+            `}>
+              <User size={12} />
+              {ticket.userName || '익명'}
+            </span>
+
+            <span className={`
+              px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1
+              ${isDarkMode 
+                ? 'bg-gray-600 text-gray-300' 
+                : 'bg-gray-200 text-gray-600'
+              }
+            `}>
+              <Calendar size={12} />
+              {ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('ko-KR') : '날짜 없음'}
+            </span>
+          </div>
+
+          {/* 제목 */}
+          <h2 className={`text-2xl font-bold mb-4 ${
+            isDarkMode ? 'text-white' : 'text-gray-900'
+          }`}>
+            {ticket.subject}
+          </h2>
+
+          {/* 내용 */}
+          <div className={`
+            p-4 rounded-lg border mb-6
+            ${isDarkMode 
+              ? 'bg-gray-700 border-gray-600' 
+              : 'bg-gray-50 border-gray-200'
+            }
+          `}>
+            <p className={`text-sm whitespace-pre-wrap ${
+              isDarkMode ? 'text-gray-300' : 'text-gray-700'
+            }`}>
+              {ticket.content}
+            </p>
+          </div>
+
+          {/* 답변 */}
+          {ticket.reply && (
+            <div className="space-y-4">
+              <h3 className={`text-lg font-semibold ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>
+                관리자 답변
+              </h3>
+              <div className={`
+                p-4 rounded-lg border border-l-4 border-l-blue-500
+                ${isDarkMode 
+                  ? 'bg-blue-900/20 border-blue-700/30' 
+                  : 'bg-blue-50 border-blue-200'
+                }
+              `}>
+                <div className="flex items-center gap-2 mb-2">
+                  <User size={14} className="text-blue-500" />
+                  <span className={`text-sm font-medium ${
+                    isDarkMode ? 'text-blue-400' : 'text-blue-600'
+                  }`}>
+                    {ticket.reply.adminName || 'Admin'}
+                  </span>
+                  <span className={`text-xs ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                  }`}>
+                    {ticket.reply.createdAt ? new Date(ticket.reply.createdAt).toLocaleDateString('ko-KR') : ''}
+                  </span>
+                </div>
+                <p className={`text-sm whitespace-pre-wrap ${
+                  isDarkMode ? 'text-blue-200' : 'text-blue-700'
+                }`}>
+                  {ticket.reply.content}
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* 관리자 답변 작성 폼 */}
+          {isAdmin() && !ticket.reply && (
+            <div className="mt-8 pt-8 border-t border-gray-300 dark:border-gray-600">
+              <h3 className={`text-lg font-semibold mb-4 ${
+                isDarkMode ? 'text-white' : 'text-gray-900'
+              }`}>
+                답변 작성
+              </h3>
+              <form onSubmit={handleReplySubmit} className="space-y-4">
+                <textarea
+                  value={replyContent}
+                  onChange={(e) => setReplyContent(e.target.value)}
+                  rows={6}
+                  placeholder="답변 내용을 입력해주세요..."
+                  className={`
+                    w-full px-4 py-3 rounded-lg border transition-colors resize-none
+                    ${isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white focus:border-blue-500' 
+                      : 'bg-white border-gray-300 text-gray-900 focus:border-blue-500'
+                    }
+                    focus:outline-none focus:ring-2 focus:ring-blue-500/20
+                  `}
+                />
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isSubmittingReply || !replyContent.trim()}
+                    className={`
+                      px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2
+                      ${isSubmittingReply || !replyContent.trim()
+                        ? 'bg-gray-400 cursor-not-allowed text-white'
+                        : 'bg-blue-600 hover:bg-blue-700 text-white'
+                      }
+                    `}
+                  >
+                    {isSubmittingReply ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        답변 등록 중...
+                      </>
+                    ) : (
+                      <>
+                        <Send size={16} />
+                        답변 등록
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TicketDetail;

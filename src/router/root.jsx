@@ -18,6 +18,8 @@ import ErrorPage from "../pages/errorPage/errorPage";
 import PrivacyPolicy from "../pages/legalPage/privacyPolicy";
 import TermsOfService from "../pages/legalPage/termsOfService";
 import CustomerSupport from "../pages/legalPage/customerSupport";
+import InquiryBoard from "../pages/legalPage/inquiryBoard";
+import TicketDetail from "../pages/legalPage/ticketDetail";
 
 const router = createBrowserRouter([
   LoginRouter(),
@@ -113,6 +115,26 @@ const router = createBrowserRouter([
       <ProtectedRoute>
         <BasicLayout>
           <CustomerSupport />
+        </BasicLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/inquiry-board",
+    element: (
+      <ProtectedRoute>
+        <BasicLayout>
+          <InquiryBoard />
+        </BasicLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/ticket/:ticketId",
+    element: (
+      <ProtectedRoute>
+        <BasicLayout>
+          <TicketDetail />
         </BasicLayout>
       </ProtectedRoute>
     ),

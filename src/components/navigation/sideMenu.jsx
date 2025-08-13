@@ -10,6 +10,8 @@ import {
   UserCircle,
   Bot,
   Brain,
+  Shield,
+  Users,
 } from "lucide-react";
 import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
@@ -25,10 +27,10 @@ const SideMenu = ({
   onShowSettings,
   onShowQuiz,
 }) => {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const { isDarkMode } = useTheme();
 
-  // 메뉴 항목 정의
+  // 기본 메뉴 항목 정의
   const menuItems = [
     {
       icon: <Home size={20} />,
@@ -57,6 +59,22 @@ const SideMenu = ({
       icon: <BarChart3 size={20} />,
       label: "통계",
       onClick: onShowStats,
+    },
+  ];
+
+  // 관리자 전용 메뉴 항목
+  const adminMenuItems = [
+    {
+      icon: <Shield size={20} />,
+      label: "문의 관리",
+      path: "/inquiry",
+      onClick: () => onNavigate("/inquiry-board"),
+    },
+    {
+      icon: <Users size={20} />,
+      label: "사용자 관리(추후 추가?)",
+      path: "/admin/users",
+      onClick: () => onNavigate("/admin/users"),
     },
   ];
 
@@ -124,6 +142,7 @@ const SideMenu = ({
         {/* 메뉴 항목들 */}
         <div className="flex-1 py-4">
           <nav className="space-y-2 px-3">
+            {/* 기본 메뉴 항목들 */}
             {menuItems.map((item, index) => (
               <button
                 key={index}
@@ -141,6 +160,50 @@ const SideMenu = ({
                 {isOpen && <span className="font-medium">{item.label}</span>}
               </button>
             ))}
+
+            {/* 관리자 전용 메뉴 */}
+            {isAdmin() && (
+              <>
+                {/* 구분선 */}
+                <div
+                  className={`border-t my-4 ${
+                    isDarkMode ? "border-gray-700" : "border-gray-200"
+                  }`}
+                />
+
+                {/* 관리자 섹션 제목 */}
+                {isOpen && (
+                  <div
+                    className={`px-3 py-2 text-xs font-semibold uppercase tracking-wider ${
+                      isDarkMode ? "text-yellow-400" : "text-yellow-600"
+                    }`}
+                  >
+                    👑 관리자 메뉴
+                  </div>
+                )}
+
+                {/* 관리자 메뉴 항목들 */}
+                {adminMenuItems.map((item, index) => (
+                  <button
+                    key={`admin-${index}`}
+                    onClick={item.onClick}
+                    className={`
+                      w-full flex items-center gap-3 p-3 rounded-lg transition-colors border-l-2 border-yellow-500
+                      ${
+                        isDarkMode
+                          ? "hover:bg-yellow-900/20 text-yellow-300 hover:text-yellow-200 bg-yellow-900/10"
+                          : "hover:bg-yellow-50 text-yellow-700 hover:text-yellow-800 bg-yellow-50/50"
+                      }
+                    `}
+                  >
+                    <div className="flex-shrink-0">{item.icon}</div>
+                    {isOpen && (
+                      <span className="font-medium">{item.label}</span>
+                    )}
+                  </button>
+                ))}
+              </>
+            )}
           </nav>
         </div>
 
@@ -163,7 +226,16 @@ const SideMenu = ({
             </div>
             {isOpen && (
               <div className="text-left">
-                <div className="font-medium">{user?.username || "사용자"}</div>
+                <div className="flex items-center gap-2">
+                  <div className="font-medium">
+                    {user?.username || "사용자"}
+                  </div>
+                  {isAdmin() && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-900/50 text-yellow-300 border border-yellow-700">
+                      👑 관리자
+                    </span>
+                  )}
+                </div>
                 <div className="text-xs opacity-60">계정 설정</div>
               </div>
             )}

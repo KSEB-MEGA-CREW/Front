@@ -115,6 +115,121 @@ export const authApi = {
     }
   },
 
+  // updateUserProfile 사용자 정보 수정
+  updateUserProfile: async (updateData) => {
+    try {
+      const response = await apiRequest("/api/auth/update-profile", {
+        method: "PUT",
+        body: JSON.stringify(updateData),
+      });
+      
+      // 수정 성공 시 localStorage의 사용자 정보도 업데이트
+      if (response.success && response.data) {
+        const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
+        const updatedUser = { ...currentUser, ...response.data };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+      
+      return response;
+    } catch (error) {
+      console.error("프로필 수정 오류:", error);
+      throw error;
+    }
+  },
+
+  // deleteAccount 계정 삭제
+  deleteAccount: async () => {
+    try {
+      const response = await apiRequest("/api/auth/delete-account", {
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error("계정 삭제 오류:", error);
+      throw error;
+    }
+  },
+
+  // submitSupportTicket 고객 지원 문의 제출
+  submitSupportTicket: async (supportData) => {
+    try {
+      const response = await apiRequest("/api/support/ticket", {
+        method: "POST",
+        body: JSON.stringify(supportData),
+      });
+      return response;
+    } catch (error) {
+      console.error("지원 문의 제출 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTickets 문의 목록 조회 (개인) - 페이징 지원
+  getSupportTickets: async (userId, page = 1, size = 5) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/user/${userId}?page=${page}&size=${size}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getPublicSupportTickets 공개 문의 목록 조회 - 페이징 지원
+  getPublicSupportTickets: async (page = 1, size = 5) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/public?page=${page}&size=${size}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("공개 문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getAllSupportTickets 전체 문의 목록 조회 (관리자용) - 페이징 지원
+  getAllSupportTickets: async (page = 1, size = 5) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/admin?page=${page}&size=${size}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("전체 문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTicketById 특정 문의 상세 조회
+  getSupportTicketById: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("문의 상세 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // submitSupportReply 관리자 답변 작성
+  submitSupportReply: async (ticketId, replyData) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}/reply`, {
+        method: "POST",
+        body: JSON.stringify(replyData),
+      });
+      return response;
+    } catch (error) {
+      console.error("답변 작성 오류:", error);
+      throw error;
+    }
+  },
+
   //logout
   logout: () => {
     localStorage.removeItem("token");
