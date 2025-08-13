@@ -50,15 +50,53 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = ({ token, user }) => {
+    console.log("🔐 AuthContext login 시작:", {
+      tokenExists: !!token,
+      userExists: !!user,
+      userDetails: user,
+    });
+
     if (!token || !user) {
-      console.error("Login failed: Invalid auth data");
-      return;
+      const errorMsg = "Login failed: Invalid auth data";
+      console.error("❌", errorMsg, { token, user });
+
+      // 에러를 상위 컴포넌트로 전파하기 위해 throw
+      throw new Error(!token ? "토큰이 없습니다" : "사용자 정보가 없습니다");
     }
 
-    setToken(token);
-    setUser(user);
-    localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
+    try {
+      // 상태 업데이트
+      setToken(token);
+      setUser(user);
+
+      // localStorage 저장
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+
+      // 성공 로그
+      console.log("✅ AuthContext login 성공:", {
+        tokenStored: !!localStorage.getItem("token"),
+        userStored: !!localStorage.getItem("user"),
+        userRole: user.role,
+        username: user.username,
+      });
+
+      // 관리자 권한 즉시 확인
+      const adminCheck = user?.role === "admin";
+      console.log("👑 관리자 권한 확인:", adminCheck);
+
+      return { success: true };
+    } catch (error) {
+      console.error("❌ localStorage 저장 실패:", error);
+
+      // 실패 시 상태 롤백
+      setToken(null);
+      setUser(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      throw new Error("로그인 정보 저장에 실패했습니다");
+    }
   };
 
   const logout = () => {
@@ -80,30 +118,30 @@ export const AuthProvider = ({ children }) => {
     try {
       // 1. 서버에 사용자 정보 업데이트 요청
       const response = await authApi.updateUserProfile(updatedData);
-      
+
       if (response.success) {
         // 2. 서버에서 반환된 최신 데이터로 로컬 상태 업데이트
         const updatedUser = { ...user, ...response.data };
-        
+
         // 3. localStorage 업데이트
         localStorage.setItem("user", JSON.stringify(updatedUser));
-        
+
         // 4. React 상태 업데이트
         setUser(updatedUser);
-        
+
         return { success: true, data: updatedUser };
       } else {
-        throw new Error(response.message || '프로필 업데이트에 실패했습니다.');
+        throw new Error(response.message || "프로필 업데이트에 실패했습니다.");
       }
     } catch (error) {
       console.error("사용자 정보 업데이트 오류:", error);
       throw error;
     }
   };
-  
+
   // 관리자 권한 확인 함수
   const isAdmin = () => {
-    return user?.role === 'admin' || user?.username === 'admin';
+    return user?.role === "admin";
   };
 
   // ***** 추가된 부분 끝 *****
