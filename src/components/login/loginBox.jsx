@@ -46,6 +46,7 @@ const LoginBox = () => {
         const token = response.data.token;
         const userInfo = response.data.userInfo;
 
+        console.log("🔑 !!!!!!!!!!!!!!!!11추출된 토큰:", response.data.token);
         console.log("🔑 추출된 토큰:", token ? "존재" : "없음");
         console.log("👤 추출된 사용자 정보:", userInfo);
 
@@ -84,7 +85,7 @@ const LoginBox = () => {
             const isAdminByRole = userInfo.role === "admin";
             const isAdminByUsername = userInfo.username === "admin";
             const finalIsAdmin = isAdminByRole || isAdminByUsername;
-            
+
             console.log("👑 관리자 권한 확인:", {
               role: userInfo.role,
               username: userInfo.username,
@@ -96,23 +97,28 @@ const LoginBox = () => {
             // 관리자 로그인 성공 메시지 표시
             if (finalIsAdmin) {
               setError(""); // 기존 에러 메시지 제거
-              
+
               // 임시 성공 메시지 표시 (2초 후 리다이렉트)
-              const adminSuccessMsg = `🔑 관리자 로그인 성공! (${userInfo.username || userInfo.email})`;
+              const adminSuccessMsg = `🔑 관리자 로그인 성공! (${
+                userInfo.username || userInfo.email
+              })`;
               console.log("🎯", adminSuccessMsg);
-              
+
               // UI에 성공 메시지 잠깐 표시
-              const tempDiv = document.createElement('div');
-              tempDiv.className = 'fixed top-4 right-4 z-50 p-4 rounded-lg bg-green-900/90 border border-green-700 text-green-300 font-semibold shadow-lg animate-pulse';
+              const tempDiv = document.createElement("div");
+              tempDiv.className =
+                "fixed top-4 right-4 z-50 p-4 rounded-lg bg-green-900/90 border border-green-700 text-green-300 font-semibold shadow-lg animate-pulse";
               tempDiv.innerHTML = `
                 <div class="flex items-center gap-2">
                   <span>👑</span>
                   <span>관리자 로그인 성공!</span>
                 </div>
-                <div class="text-sm opacity-75">${userInfo.username || userInfo.email}</div>
+                <div class="text-sm opacity-75">${
+                  userInfo.username || userInfo.email
+                }</div>
               `;
               document.body.appendChild(tempDiv);
-              
+
               // 2초 후 메시지 제거하고 리다이렉트
               setTimeout(() => {
                 document.body.removeChild(tempDiv);
@@ -120,7 +126,7 @@ const LoginBox = () => {
                 console.log("🔄 관리자 리다이렉트:", redirectTo);
                 navigate(redirectTo, { replace: true });
               }, 2000);
-              
+
               return; // 즉시 리다이렉트 방지
             }
           }
