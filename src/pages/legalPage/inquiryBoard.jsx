@@ -73,14 +73,15 @@ const InquiryBoard = () => {
 
         switch (viewMode) {
           case "public":
-            if (isMyInquiryFilter && user?.id) {
-              // 내 문의만 보기 (공개+비공개 모두 포함)
-              response = await authApi.getSupportTickets(page, size);
-            } else {
-              // 모든 공개 문의
-              response = await authApi.getPublicSupportTickets(page, size);
-            }
+            // 모든 공개 문의
+            response = await authApi.getPublicSupportTickets(page, size);
             break;
+
+          case "my":
+            // 내 문의만 보기 (공개+비공개 모두 포함)
+            response = await authApi.getSupportTickets(page, size);
+            break;
+
           case "admin":
             if (isAdmin()) {
               response = await authApi.getAllSupportTickets(page, size);
@@ -177,7 +178,7 @@ const InquiryBoard = () => {
     // 비공개 게시글은 작성자 또는 관리자만 열람 가능
     if (!ticket.isPublic) {
       if (isAdminUser && isAdminUser()) return true;
-      if (currentUser?.id && ticket.userId === currentUser.id) return true;
+      if (currentUser?.id && ticket.userId == currentUser.id) return true;
       return false;
     }
 
@@ -199,7 +200,7 @@ const InquiryBoard = () => {
   // 게시글 클릭 핸들러
   const handleTicketClick = (ticket) => {
     const canView = canViewTicket(ticket, user, isAdmin);
-
+    console.log("티켓 클릭:", ticket.id, "열람 가능:", canView);
     if (!canView) {
       alert("비공개 문의입니다. 작성자 또는 관리자만 열람할 수 있습니다.");
       return;
