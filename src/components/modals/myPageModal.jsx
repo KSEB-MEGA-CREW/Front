@@ -35,12 +35,10 @@ const MyPageModal = ({ isOpen, onClose }) => {
   // 청각상태 표시 함수
   const getHearingStatusText = (status) => {
     switch (status) {
-      case "hearing":
-        return "정상청력";
-      case "hard_of_hearing":
-        return "난청";
+      case "NOMAL":
+        return "청인";
       case "deaf":
-        return "농아";
+        return "농인";
       default:
         return "아직 정하지 않음";
     }
@@ -94,10 +92,9 @@ const MyPageModal = ({ isOpen, onClose }) => {
       setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
-
     } catch (error) {
       console.error("프로필 수정 실패:", error);
-      
+
       // 서버 에러 메시지 표시
       if (error.message) {
         setError(error.message);
@@ -301,9 +298,8 @@ const MyPageModal = ({ isOpen, onClose }) => {
                     `}
                   >
                     <option value="">청각상태를 선택하세요</option>
-                    <option value="hearing">정상청력</option>
-                    <option value="hard_of_hearing">난청</option>
-                    <option value="deaf">농아</option>
+                    <option value="NOMAL">청인</option>
+                    <option value="deaf">농인</option>
                   </select>
                 ) : (
                   <p
