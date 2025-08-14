@@ -170,8 +170,8 @@ const SignUpBox = () => {
               <input
                 type="radio"
                 name="hearing"
-                value="hardtohear"
-                checked={formData.hearing === "hardtohear"}
+                value="NORMAL"
+                checked={formData.hearing === "NORMAL"}
                 onChange={handleInputChange}
                 required
                 className="text-blue-600 focus:ring-blue-500"
