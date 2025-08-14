@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
       });
 
       // 관리자 권한 즉시 확인
-      const adminCheck = user?.role === "admin";
+      const adminCheck = user?.role === "ADMIN";
       console.log("👑 관리자 권한 확인:", adminCheck);
 
       return { success: true };
@@ -142,7 +142,7 @@ export const AuthProvider = ({ children }) => {
 
   // 관리자 권한 확인 함수
   const isAdmin = () => {
-    return user?.role === "admin";
+    return user?.role === "ADMIN";
   };
 
   // ***** 추가된 부분 끝 *****

@@ -81,8 +81,8 @@ const LoginBox = () => {
 
           // 관리자 권한 확인
           if (userInfo) {
-            const isAdminByRole = userInfo.role === "admin";
-            const isAdminByUsername = userInfo.username === "admin";
+            const isAdminByRole = userInfo.role === "ADMIN";
+            const isAdminByUsername = userInfo.username === "ADMIN";
             const finalIsAdmin = isAdminByRole || isAdminByUsername;
 
             console.log("👑 관리자 권한 확인:", {
