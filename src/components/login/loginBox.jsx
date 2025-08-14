@@ -42,10 +42,9 @@ const LoginBox = () => {
       console.log("📥 응답 데이터:", response.data);
 
       if (response.success && response.data) {
-        // 다양한 응답 구조에 대응
-        const token = response.data.accessToken;
-        const userInfo =
-          response.data.userInfo || response.data.user || response.data;
+        // 서버에서 { token, userInfo } 구조로 응답
+        const token = response.data.token;
+        const userInfo = response.data.userInfo;
 
         console.log("🔑 추출된 토큰:", token ? "존재" : "없음");
         console.log("👤 추출된 사용자 정보:", userInfo);
