@@ -111,12 +111,13 @@ export const AuthProvider = ({ children }) => {
   /**
    * 사용자 프로필 정보를 서버에 업데이트하고 로컬 상태도 동기화하는 함수.
    * MyPageModal 등에서 사용됩니다.
-   * @param {object} updatedData - 업데이트할 사용자 정보 필드 (예: { username: "새이름", hearingStatus: "hearing" })
+   * @param {object} updatedData - 업데이트할 사용자 정보 필드 (예: { username: "새이름", hearing: "NOMAL" })
    * @returns {Promise} - 성공/실패 결과
    */
   const updateUser = async (updatedData) => {
     try {
       // 1. 서버에 사용자 정보 업데이트 요청
+      console.log("🔄 !!!!사용자 정보 업데이트 요청:", updatedData);
       const response = await authApi.updateUserProfile(updatedData);
 
       if (response.success) {

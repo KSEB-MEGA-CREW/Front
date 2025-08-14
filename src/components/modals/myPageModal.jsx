@@ -21,14 +21,14 @@ const MyPageModal = ({ isOpen, onClose }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [editData, setEditData] = useState({
     username: user?.username || "",
-    hearingStatus: user?.hearingStatus || "",
+    hearing: user?.hearing || "",
   });
 
   // user가 변경될 때마다 editData 동기화
   useEffect(() => {
     setEditData({
       username: user?.username || "",
-      hearingStatus: user?.hearingStatus || "",
+      hearing: user?.hearing || "",
     });
   }, [user]);
 
@@ -51,7 +51,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
       // 편집 모드 취소
       setEditData({
         username: user?.username || "",
-        hearingStatus: user?.hearingStatus || "",
+        hearing: user?.hearing || "",
       });
       setError("");
       setSuccessMessage("");
@@ -82,7 +82,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
       // 이 함수가 API 호출, localStorage, React 상태를 모두 관리함
       await updateUser({
         username: editData.username,
-        hearingStatus: editData.hearingStatus,
+        hearing: editData.hearing,
       });
 
       setIsEditMode(false);
@@ -283,9 +283,9 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 </p>
                 {isEditMode ? (
                   <select
-                    value={editData.hearingStatus}
+                    value={editData.hearing}
                     onChange={(e) =>
-                      handleInputChange("hearingStatus", e.target.value)
+                      handleInputChange("hearing", e.target.value)
                     }
                     className={`
                       w-full mt-1 px-3 py-2 rounded-lg border transition-colors
@@ -307,7 +307,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {getHearingStatusText(user?.hearingStatus)}
+                    {getHearingStatusText(user?.hearing)}
                   </p>
                 )}
               </div>
