@@ -46,7 +46,6 @@ const LoginBox = () => {
         const token = response.data.token;
         const userInfo = response.data.userInfo;
 
-        console.log("🔑 !!!!!!!!!!!!!!!!11추출된 토큰:", response.data.token);
         console.log("🔑 추출된 토큰:", token ? "존재" : "없음");
         console.log("👤 추출된 사용자 정보:", userInfo);
 
@@ -279,6 +278,15 @@ const LoginBox = () => {
         >
           비밀번호를 잊으셨나요?
         </a>
+      </div>
+
+      <div className="text-center">
+        <button
+          onClick={() => navigate("../signup")}
+          className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+        >
+          계정이 없으신가요? 회원가입하기
+        </button>
       </div>
     </div>
   );

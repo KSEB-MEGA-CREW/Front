@@ -1,17 +1,21 @@
-import React, { useState } from "react";
+import React from "react";
 import { LogIn, UserPlus } from "lucide-react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom";
 
 const StartPage = () => {
-  // 'main', 'login', 'signup' 상태를 관리합니다.
-  const [currentView, setCurrentView] = useState("main");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // URL 경로에 따라 현재 뷰를 결정
+  const currentView =
+    location.pathname === "/auth/login"
+      ? "login"
+      : location.pathname === "/auth/signup"
+      ? "signup"
+      : "main";
 
   const handleNavigate = (viewName) => {
-    // 1. 컴포넌트 내부의 뷰 상태를 변경합니다.
-    setCurrentView(viewName);
-
-    // 2. react-router-dom을 통해 URL 경로를 변경합니다.
+    // react-router-dom을 통해 URL 경로를 변경합니다.
     if (viewName === "login") {
       navigate("/auth/login");
     } else if (viewName === "signup") {
@@ -69,7 +73,6 @@ const StartPage = () => {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => {
-            setCurrentView("main");
             navigate("/auth"); // URL도 초기 상태로 되돌리기
           }}
           className="text-gray-400 hover:text-white transition-colors"
