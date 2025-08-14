@@ -1,19 +1,33 @@
-import React, { useState } from 'react';
-import { LogIn, UserPlus } from 'lucide-react';
-import LoginBox from '../login/loginBox';
-import SignUpBox from '../login/signupBox';
+import React, { useState } from "react";
+import { LogIn, UserPlus } from "lucide-react";
+import { Outlet, useNavigate } from "react-router-dom";
 
 const StartPage = () => {
-  const [currentView, setCurrentView] = useState('main'); // 'main', 'login', 'signup'
+  // 'main', 'login', 'signup' 상태를 관리합니다.
+  const [currentView, setCurrentView] = useState("main");
+  const navigate = useNavigate();
+
+  const handleNavigate = (viewName) => {
+    // 1. 컴포넌트 내부의 뷰 상태를 변경합니다.
+    setCurrentView(viewName);
+
+    // 2. react-router-dom을 통해 URL 경로를 변경합니다.
+    if (viewName === "login") {
+      navigate("/auth/login");
+    } else if (viewName === "signup") {
+      navigate("/auth/signup");
+    }
+  };
 
   // 메인 시작 화면
-  if (currentView === 'main') {
+  if (currentView === "main") {
     return (
       <div className="space-y-6">
         <div className="space-y-4">
           {/* 로그인 버튼 */}
           <button
-            onClick={() => setCurrentView('login')}
+            // onClick 핸들러를 화살표 함수로 감싸서 클릭 시에만 함수가 실행되도록 수정
+            onClick={() => handleNavigate("login")}
             className="w-full flex items-center justify-center gap-3 bg-white text-black py-4 px-6 rounded-xl font-semibold text-lg hover:bg-gray-100 transition-colors duration-200 shadow-sm"
           >
             <LogIn size={24} />
@@ -22,7 +36,8 @@ const StartPage = () => {
 
           {/* 회원가입 버튼 */}
           <button
-            onClick={() => setCurrentView('signup')}
+            // 여기도 동일하게 수정
+            onClick={() => handleNavigate("signup")}
             className="w-full flex items-center justify-center gap-3 bg-gray-800 text-white py-4 px-6 rounded-xl font-semibold text-lg hover:bg-gray-700 transition-colors duration-200 border border-gray-700"
           >
             <UserPlus size={24} />
@@ -46,59 +61,48 @@ const StartPage = () => {
     );
   }
 
-  // 로그인 화면
-  if (currentView === 'login') {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3 mb-6">
+  // 로그인 또는 회원가입 화면 (Outlet을 통해 자식 라우트 컴포넌트가 렌더링됨)
+  // 뒤로가기 버튼을 누르면 URL도 그에 맞게 변경해주는 것이 좋습니다.
+  // 여기서는 간단하게 내부 상태만 'main'으로 변경합니다.
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 mb-6">
+        <button
+          onClick={() => {
+            setCurrentView("main");
+            navigate("/auth"); // URL도 초기 상태로 되돌리기
+          }}
+          className="text-gray-400 hover:text-white transition-colors"
+        >
+          ←
+        </button>
+        <h3 className="text-xl font-semibold text-white">
+          {currentView === "login" ? "로그인" : "회원가입"}
+        </h3>
+      </div>
+
+      {/* /auth/login 또는 /auth/signup 경로의 컴포넌트가 여기에 렌더링됩니다. */}
+      <Outlet />
+
+      <div className="text-center">
+        {currentView === "login" ? (
           <button
-            onClick={() => setCurrentView('main')}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            ←
-          </button>
-          <h3 className="text-xl font-semibold text-white">로그인</h3>
-        </div>
-        <LoginBox />
-        <div className="text-center">
-          <button
-            onClick={() => setCurrentView('signup')}
+            onClick={() => handleNavigate("signup")}
             className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
           >
             계정이 없으신가요? 회원가입하기
           </button>
-        </div>
-      </div>
-    );
-  }
-
-  // 회원가입 화면
-  if (currentView === 'signup') {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-3 mb-6">
+        ) : (
           <button
-            onClick={() => setCurrentView('main')}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            ←
-          </button>
-          <h3 className="text-xl font-semibold text-white">회원가입</h3>
-        </div>
-        <SignUpBox />
-        <div className="text-center">
-          <button
-            onClick={() => setCurrentView('login')}
+            onClick={() => handleNavigate("login")}
             className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
           >
             이미 계정이 있으신가요? 로그인하기
           </button>
-        </div>
+        )}
       </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 };
 
 export default StartPage;
