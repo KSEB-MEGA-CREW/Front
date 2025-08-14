@@ -673,8 +673,8 @@ const InquiryBoard = () => {
                           isDarkMode ? "text-gray-400" : "text-gray-500"
                         }`}
                       >
-                        {ticket.createdAt
-                          ? new Date(ticket.createdAt).toLocaleDateString(
+                        {ticket.createdDate
+                          ? new Date(ticket.createdDate).toLocaleDateString(
                               "ko-KR"
                             )
                           : "날짜 없음"}
