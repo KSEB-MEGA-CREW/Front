@@ -81,10 +81,6 @@ const InquiryBoard = () => {
               response = await authApi.getPublicSupportTickets(page, size);
             }
             break;
-
-          case "my":
-            response = await authApi.getSupportTickets(page, size);
-            break;
           case "admin":
             if (isAdmin()) {
               response = await authApi.getAllSupportTickets(page, size);
@@ -212,14 +208,28 @@ const InquiryBoard = () => {
   };
 
   // 내 문의 필터 토글
+  // InquiryBoard.jsx
+
   const toggleMyInquiryFilter = () => {
     if (!user?.id) {
       alert("로그인이 필요합니다.");
       return;
     }
-    setIsMyInquiryFilter(!isMyInquiryFilter);
-    setSearchTerm(""); // 검색어 초기화
-    setSelectedCategory("all"); // 카테고리 초기화
+
+    // 현재 '내 문의' 모드인지 확인
+    if (viewMode === "my") {
+      // 맞다면 -> '공개(public)' 모드로 전환
+      setViewMode("public");
+      setIsMyInquiryFilter(false); // 필터 상태도 명확하게 해제
+    } else {
+      // 아니라면 -> '내 문의(my)' 모드로 전환
+      setViewMode("my");
+      setIsMyInquiryFilter(true); // 필터 상태 활성화
+    }
+
+    // 검색어와 카테고리 초기화는 공통으로 실행
+    setSearchTerm("");
+    setSelectedCategory("all");
   };
 
   // 페이지 변경 함수
