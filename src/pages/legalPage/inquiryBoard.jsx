@@ -26,17 +26,17 @@ const InquiryBoard = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [viewMode, setViewMode] = useState("public"); // 'public', 'my', 'admin'
   const [isMyInquiryFilter, setIsMyInquiryFilter] = useState(false);
-  
+
   // 페이징 상태 관리 (각 모드별 독립적)
   const [currentPage, setCurrentPage] = useState({
     public: 1,
     my: 1,
-    admin: 1
+    admin: 1,
   });
   const [pageInfo, setPageInfo] = useState({
     public: { totalPages: 0, totalElements: 0, size: 5, number: 0 },
     my: { totalPages: 0, totalElements: 0, size: 5, number: 0 },
-    admin: { totalPages: 0, totalElements: 0, size: 5, number: 0 }
+    admin: { totalPages: 0, totalElements: 0, size: 5, number: 0 },
   });
 
   const categories = [
@@ -89,10 +89,12 @@ const InquiryBoard = () => {
             response = await authApi.getPublicSupportTickets(page, size);
         }
 
+        console.log(`[${viewMode} 모드] API 전체 응답:`, response);
+
         if (response.success && response.data) {
           let ticketData;
           let currentPageInfo;
-          
+
           // 서버에서 페이징 정보와 함께 데이터가 온다고 가정
           if (response.data.content) {
             ticketData = response.data.content;
@@ -100,7 +102,7 @@ const InquiryBoard = () => {
               totalPages: response.data.totalPages || 0,
               totalElements: response.data.totalElements || 0,
               size: response.data.size || 5,
-              number: response.data.number || 0
+              number: response.data.number || 0,
             };
           } else {
             // 기존 방식 (배열만 오는 경우)
@@ -109,39 +111,46 @@ const InquiryBoard = () => {
               totalPages: 1,
               totalElements: response.data.length,
               size: 5,
-              number: 0
+              number: 0,
             };
           }
-          
+
+          console.log("처리된 티켓 데이터:", ticketData);
+          console.log("계산된 페이지 정보:", currentPageInfo);
+
           setTickets(ticketData);
-          setPageInfo(prev => ({
+          setPageInfo((prev) => ({
             ...prev,
-            [viewMode]: currentPageInfo
+            [viewMode]: currentPageInfo,
           }));
         } else {
+          console.warn(
+            `[${viewMode} 모드] API 응답 실패 또는 데이터 없음. 응답:`,
+            response
+          );
           setTickets([]);
-          setPageInfo(prev => ({
+          setPageInfo((prev) => ({
             ...prev,
             [viewMode]: {
               totalPages: 0,
               totalElements: 0,
               size: 5,
-              number: 0
-            }
+              number: 0,
+            },
           }));
         }
       } catch (error) {
         console.error("문의 목록 로딩 실패:", error);
         setError("문의 목록을 불러오는데 실패했습니다.");
         setTickets([]);
-        setPageInfo(prev => ({
+        setPageInfo((prev) => ({
           ...prev,
           [viewMode]: {
             totalPages: 0,
             totalElements: 0,
             size: 5,
-            number: 0
-          }
+            number: 0,
+          },
         }));
       } finally {
         setIsLoading(false);
@@ -157,17 +166,17 @@ const InquiryBoard = () => {
   // 권한 체크 헬퍼 함수
   const canViewTicket = (ticket, currentUser, isAdminUser) => {
     if (!ticket) return false;
-    
+
     // 공개 게시글은 모든 사용자가 열람 가능
     if (ticket.isPublic) return true;
-    
+
     // 비공개 게시글은 작성자 또는 관리자만 열람 가능
     if (!ticket.isPublic) {
       if (isAdminUser && isAdminUser()) return true;
       if (currentUser?.id && ticket.userId === currentUser.id) return true;
       return false;
     }
-    
+
     return false;
   };
 
@@ -186,12 +195,12 @@ const InquiryBoard = () => {
   // 게시글 클릭 핸들러
   const handleTicketClick = (ticket) => {
     const canView = canViewTicket(ticket, user, isAdmin);
-    
+
     if (!canView) {
       alert("비공개 문의입니다. 작성자 또는 관리자만 열람할 수 있습니다.");
       return;
     }
-    
+
     navigate(`/ticket/${ticket.id}`);
   };
 
@@ -208,9 +217,9 @@ const InquiryBoard = () => {
 
   // 페이지 변경 함수
   const handlePageChange = (newPage) => {
-    setCurrentPage(prev => ({
+    setCurrentPage((prev) => ({
       ...prev,
-      [viewMode]: newPage
+      [viewMode]: newPage,
     }));
   };
 
@@ -331,19 +340,26 @@ const InquiryBoard = () => {
 
         {/* 내 문의 필터 상태 표시 */}
         {isMyInquiryFilter && (
-          <div className={`
+          <div
+            className={`
             flex items-center justify-between p-3 rounded-lg mb-4
             ${
               isDarkMode
                 ? "bg-blue-500/20 border border-blue-500/30"
                 : "bg-blue-50 border border-blue-200"
             }
-          `}>
+          `}
+          >
             <div className="flex items-center gap-2">
-              <UserCheck size={16} className={isDarkMode ? "text-blue-400" : "text-blue-600"} />
-              <span className={`text-sm font-medium ${
-                isDarkMode ? "text-blue-400" : "text-blue-600"
-              }`}>
+              <UserCheck
+                size={16}
+                className={isDarkMode ? "text-blue-400" : "text-blue-600"}
+              />
+              <span
+                className={`text-sm font-medium ${
+                  isDarkMode ? "text-blue-400" : "text-blue-600"
+                }`}
+              >
                 내 문의만 표시 중 ({pageInfo[viewMode]?.totalElements || 0}개)
               </span>
             </div>
@@ -562,7 +578,7 @@ const InquiryBoard = () => {
               const canView = canViewTicket(ticket, user, isAdmin);
               const displayTitle = getDisplayTitle(ticket, canView);
               const displayContent = getDisplayContent(ticket, canView);
-              
+
               return (
                 <div
                   key={ticket.id}
@@ -580,13 +596,13 @@ const InquiryBoard = () => {
                     }
                   `}
                 >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-lg">
-                      {getCategoryIcon(ticket.category)}
-                    </span>
-                    <span
-                      className={`
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <span className="text-lg">
+                        {getCategoryIcon(ticket.category)}
+                      </span>
+                      <span
+                        className={`
                       px-3 py-1 rounded-full text-xs font-medium
                       ${
                         isDarkMode
@@ -594,13 +610,13 @@ const InquiryBoard = () => {
                           : "bg-blue-100 text-blue-600"
                       }
                     `}
-                    >
-                      {getCategoryLabel(ticket.category)}
-                    </span>
+                      >
+                        {getCategoryLabel(ticket.category)}
+                      </span>
 
-                    {/* 공개/비공개 상태 표시 */}
-                    <span
-                      className={`
+                      {/* 공개/비공개 상태 표시 */}
+                      <span
+                        className={`
                       px-2 py-1 rounded-full text-xs font-medium
                       ${
                         ticket.isPublic
@@ -612,14 +628,14 @@ const InquiryBoard = () => {
                           : "bg-orange-100 text-orange-600"
                       }
                     `}
-                    >
-                      {ticket.isPublic ? "🌐 공개" : "🔒 비공개"}
-                    </span>
+                      >
+                        {ticket.isPublic ? "🌐 공개" : "🔒 비공개"}
+                      </span>
 
-                    {/* 관리자 뷰에서만 사용자명 표시 */}
-                    {viewMode === "admin" && (
-                      <span
-                        className={`
+                      {/* 관리자 뷰에서만 사용자명 표시 */}
+                      {viewMode === "admin" && (
+                        <span
+                          className={`
                         px-2 py-1 rounded-full text-xs font-medium
                         ${
                           isDarkMode
@@ -627,66 +643,76 @@ const InquiryBoard = () => {
                             : "bg-purple-100 text-purple-600"
                         }
                       `}
+                        >
+                          👤 {ticket.userName || "익명"}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar size={14} />
+                      <span
+                        className={`${
+                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
                       >
-                        👤 {ticket.userName || "익명"}
+                        {ticket.createdAt
+                          ? new Date(ticket.createdAt).toLocaleDateString(
+                              "ko-KR"
+                            )
+                          : "날짜 없음"}
                       </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    <Calendar size={14} />
-                    <span
-                      className={`${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {ticket.createdAt
-                        ? new Date(ticket.createdAt).toLocaleDateString("ko-KR")
-                        : "날짜 없음"}
-                    </span>
-                  </div>
-                </div>
-
-                <h3
-                  className={`text-lg font-semibold mb-3 ${
-                    !canView
-                      ? isDarkMode ? "text-gray-500" : "text-gray-500"
-                      : isDarkMode ? "text-white" : "text-gray-900"
-                  }`}
-                >
-                  {displayTitle}
-                </h3>
-
-                <p
-                  className={`text-sm mb-4 ${
-                    !canView
-                      ? isDarkMode ? "text-gray-600" : "text-gray-500"
-                      : isDarkMode ? "text-gray-300" : "text-gray-600"
-                  }`}
-                  style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                >
-                  {displayContent}
-                </p>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <User size={14} />
-                    <span
-                      className={`text-sm ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      {ticket.userName || "익명"}
-                    </span>
+                    </div>
                   </div>
 
-                  {ticket.status && (
-                    <span
-                      className={`
+                  <h3
+                    className={`text-lg font-semibold mb-3 ${
+                      !canView
+                        ? isDarkMode
+                          ? "text-gray-500"
+                          : "text-gray-500"
+                        : isDarkMode
+                        ? "text-white"
+                        : "text-gray-900"
+                    }`}
+                  >
+                    {displayTitle}
+                  </h3>
+
+                  <p
+                    className={`text-sm mb-4 ${
+                      !canView
+                        ? isDarkMode
+                          ? "text-gray-600"
+                          : "text-gray-500"
+                        : isDarkMode
+                        ? "text-gray-300"
+                        : "text-gray-600"
+                    }`}
+                    style={{
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {displayContent}
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <User size={14} />
+                      <span
+                        className={`text-sm ${
+                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                        }`}
+                      >
+                        {ticket.userName || "익명"}
+                      </span>
+                    </div>
+
+                    {ticket.status && (
+                      <span
+                        className={`
                       px-2 py-1 rounded-full text-xs font-medium
                       ${
                         ticket.status === "answered"
@@ -698,15 +724,17 @@ const InquiryBoard = () => {
                           : "bg-yellow-100 text-yellow-600"
                       }
                     `}
-                    >
-                      {ticket.status === "answered" ? "답변 완료" : "답변 대기"}
-                    </span>
-                  )}
-                </div>
+                      >
+                        {ticket.status === "answered"
+                          ? "답변 완료"
+                          : "답변 대기"}
+                      </span>
+                    )}
+                  </div>
                 </div>
               );
             })}
-            
+
             {/* 페이징 컴포넌트 */}
             <Pagination
               currentPage={currentPage[viewMode]}
