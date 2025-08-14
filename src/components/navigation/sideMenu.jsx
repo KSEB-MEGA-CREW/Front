@@ -12,6 +12,7 @@ import {
   Brain,
   Shield,
   Users,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
@@ -239,6 +240,24 @@ const SideMenu = ({
                 <div className="text-xs opacity-60">계정 설정</div>
               </div>
             )}
+          </button>
+
+          {/* 고객지원 버튼 */}
+          <button
+            onClick={() => onNavigate("/customer-support")}
+            className={`
+              w-full flex items-center gap-3 p-3 rounded-lg transition-colors
+              ${
+                isDarkMode
+                  ? "hover:bg-gray-800 text-gray-300 hover:text-white"
+                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+              }
+            `}
+          >
+            <div className="flex-shrink-0">
+              <HelpCircle size={20} />
+            </div>
+            {isOpen && <span className="font-medium">고객지원</span>}
           </button>
 
           {/* 설정 버튼 */}

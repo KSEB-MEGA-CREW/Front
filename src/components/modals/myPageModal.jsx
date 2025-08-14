@@ -339,10 +339,11 @@ const MyPageModal = ({ isOpen, onClose }) => {
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  {user?.createDate
-                    ? new Date(user.createDate).toLocaleDateString("ko-KR", {
+                  {user?.createdDate
+                    ? new Date(user.createdDate).toLocaleDateString("ko-KR", {
                         year: "numeric",
                         month: "2-digit",
+                        day: "2-digit",
                       })
                     : "날짜 없음"}
                 </p>

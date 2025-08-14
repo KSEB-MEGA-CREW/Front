@@ -195,21 +195,6 @@ const SettingsPage = () => {
                   isDarkMode ? 'text-gray-500' : 'text-gray-400'
                 }`} />
               </button>
-              <button 
-                onClick={() => navigate('/customer-support')}
-                className={`
-                  w-full text-left p-3 rounded-lg transition-colors flex items-center justify-between group
-                  ${isDarkMode 
-                    ? 'hover:bg-gray-700 text-gray-300' 
-                    : 'hover:bg-gray-100 text-gray-700'
-                  }
-                `}
-              >
-                <span>고객 지원</span>
-                <ChevronRight size={16} className={`transition-transform group-hover:translate-x-1 ${
-                  isDarkMode ? 'text-gray-500' : 'text-gray-400'
-                }`} />
-              </button>
             </div>
           </div>
         </div>
