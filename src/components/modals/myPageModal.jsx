@@ -37,7 +37,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
     switch (status) {
       case "NORMAL":
         return "청인";
-      case "deaf":
+      case "DEAF":
         return "농인";
       default:
         return "아직 정하지 않음";
@@ -299,7 +299,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                   >
                     <option value="">청각상태를 선택하세요</option>
                     <option value="NORMAL">청인</option>
-                    <option value="deaf">농인</option>
+                    <option value="DEAF">농인</option>
                   </select>
                 ) : (
                   <p
