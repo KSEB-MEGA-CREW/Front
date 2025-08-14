@@ -165,7 +165,7 @@ export const authApi = {
   },
 
   // getSupportTickets 문의 목록 조회 (개인) - 페이징 지원
-  getSupportTickets: async (userId, page = 1, size = 5) => {
+  getSupportTickets: async (page = 1, size = 5) => {
     try {
       const response = await apiRequest(
         `/api/support/my-tickets?page=${page}&size=${size}`,
@@ -173,9 +173,10 @@ export const authApi = {
           method: "GET",
         }
       );
+      console.log("📝 내 문의 목록 응답:", response);
       return response;
     } catch (error) {
-      console.error("문의 목록 조회 오류:", error);
+      console.error("내 문의 목록 조회 오류:", error);
       throw error;
     }
   },
@@ -189,6 +190,8 @@ export const authApi = {
           method: "GET",
         }
       );
+
+      console.log("🎯 공개 문의 응답:", response); // 이 로그 추가
       return response;
     } catch (error) {
       console.error("공개 문의 목록 조회 오류:", error);

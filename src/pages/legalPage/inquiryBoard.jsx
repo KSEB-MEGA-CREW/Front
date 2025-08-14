@@ -73,10 +73,17 @@ const InquiryBoard = () => {
 
         switch (viewMode) {
           case "public":
-            response = await authApi.getPublicSupportTickets(page, size);
+            if (isMyInquiryFilter && user?.id) {
+              // 내 문의만 보기 (공개+비공개 모두 포함)
+              response = await authApi.getSupportTickets(page, size);
+            } else {
+              // 모든 공개 문의
+              response = await authApi.getPublicSupportTickets(page, size);
+            }
             break;
+
           case "my":
-            response = await authApi.getSupportTickets(user.id, page, size);
+            response = await authApi.getSupportTickets(page, size);
             break;
           case "admin":
             if (isAdmin()) {
@@ -159,7 +166,7 @@ const InquiryBoard = () => {
 
     setIsLoading(true);
     fetchTickets();
-  }, [user?.id, viewMode, isAdmin, currentPage]);
+  }, [user?.id, viewMode, isAdmin, currentPage, isMyInquiryFilter]);
 
   // 클라이언트 사이드 필터링 제거 (서버 사이드로 대체)
 
