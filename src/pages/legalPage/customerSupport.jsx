@@ -328,6 +328,14 @@ const CustomerSupport = () => {
               >
                 새로운 문의하기
               </button>
+              <div className="text-center pt-4">
+                <button
+                  onClick={() => navigate("/inquiry-board")}
+                  className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                >
+                  QnA 게시판에서 답변 확인하기
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -463,14 +471,18 @@ const CustomerSupport = () => {
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
                     <div className="ml-3">
-                      <div className={`text-sm font-medium ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}>
+                      <div
+                        className={`text-sm font-medium ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         🔒 비공개 문의
                       </div>
-                      <div className={`text-xs ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}>
+                      <div
+                        className={`text-xs ${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         본인과 관리자만 볼 수 있습니다
                       </div>
                     </div>
@@ -484,14 +496,18 @@ const CustomerSupport = () => {
                       className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
                     />
                     <div className="ml-3">
-                      <div className={`text-sm font-medium ${
-                        isDarkMode ? "text-white" : "text-gray-900"
-                      }`}>
+                      <div
+                        className={`text-sm font-medium ${
+                          isDarkMode ? "text-white" : "text-gray-900"
+                        }`}
+                      >
                         🌐 공개 문의
                       </div>
-                      <div className={`text-xs ${
-                        isDarkMode ? "text-gray-400" : "text-gray-600"
-                      }`}>
+                      <div
+                        className={`text-xs ${
+                          isDarkMode ? "text-gray-400" : "text-gray-600"
+                        }`}
+                      >
                         모든 사용자가 볼 수 있습니다 (FAQ 효과)
                       </div>
                     </div>
@@ -584,7 +600,8 @@ const CustomerSupport = () => {
                       }
                     `}
                   >
-                    <MessageCircle size={16} />내 문의 내역 보기
+                    <MessageCircle size={16} />
+                    QnA 게시판 보기
                   </button>
                 </div>
               </div>
