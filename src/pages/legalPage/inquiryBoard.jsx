@@ -102,10 +102,10 @@ const InquiryBoard = () => {
           if (response.data.content) {
             ticketData = response.data.content;
             currentPageInfo = {
-              totalPages: response.data.totalPages || 0,
-              totalElements: response.data.totalElements || 0,
-              size: response.data.size || 5,
-              number: response.data.number || 0,
+              totalPages: response.data.page.totalPages || 0,
+              totalElements: response.data.page.totalElements || 0,
+              size: response.data.page.size || 5,
+              number: response.data.page.number || 0,
             };
           } else {
             // 기존 방식 (배열만 오는 경우)
@@ -117,6 +117,7 @@ const InquiryBoard = () => {
               number: 0,
             };
           }
+          console.log("응답 데이타:", response.data);
 
           console.log("처리된 티켓 데이터:", ticketData);
           console.log("계산된 페이지 정보:", currentPageInfo);
