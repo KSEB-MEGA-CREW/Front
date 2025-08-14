@@ -30,7 +30,7 @@ const apiRequest = async (url, options = {}) => {
       // 현재 페이지가 로그인 페이지가 아닐 때만 리다이렉트
       if (!window.location.pathname.includes("/auth")) {
         // React Router를 사용하는 곳에서 처리하도록 이벤트 발생
-        window.dispatchEvent(new CustomEvent('auth-expired'));
+        window.dispatchEvent(new CustomEvent("auth-expired"));
       }
       throw new Error("인증이 만료되었습니다.");
     }
@@ -122,14 +122,14 @@ export const authApi = {
         method: "PUT",
         body: JSON.stringify(updateData),
       });
-      
+
       // 수정 성공 시 localStorage의 사용자 정보도 업데이트
       if (response.success && response.data) {
-        const currentUser = JSON.parse(localStorage.getItem("user") || '{}');
+        const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
         const updatedUser = { ...currentUser, ...response.data };
         localStorage.setItem("user", JSON.stringify(updatedUser));
       }
-      
+
       return response;
     } catch (error) {
       console.error("프로필 수정 오류:", error);
@@ -167,9 +167,12 @@ export const authApi = {
   // getSupportTickets 문의 목록 조회 (개인) - 페이징 지원
   getSupportTickets: async (userId, page = 1, size = 5) => {
     try {
-      const response = await apiRequest(`/api/support/tickets/user/${userId}?page=${page}&size=${size}`, {
-        method: "GET",
-      });
+      const response = await apiRequest(
+        `/api/support/my-tickets?page=${page}&size=${size}`,
+        {
+          method: "GET",
+        }
+      );
       return response;
     } catch (error) {
       console.error("문의 목록 조회 오류:", error);
@@ -180,9 +183,12 @@ export const authApi = {
   // getPublicSupportTickets 공개 문의 목록 조회 - 페이징 지원
   getPublicSupportTickets: async (page = 1, size = 5) => {
     try {
-      const response = await apiRequest(`/api/support/tickets/public?page=${page}&size=${size}`, {
-        method: "GET",
-      });
+      const response = await apiRequest(
+        `/api/support/public?page=${page}&size=${size}`,
+        {
+          method: "GET",
+        }
+      );
       return response;
     } catch (error) {
       console.error("공개 문의 목록 조회 오류:", error);
@@ -193,9 +199,12 @@ export const authApi = {
   // getAllSupportTickets 전체 문의 목록 조회 (관리자용) - 페이징 지원
   getAllSupportTickets: async (page = 1, size = 5) => {
     try {
-      const response = await apiRequest(`/api/support/tickets/admin?page=${page}&size=${size}`, {
-        method: "GET",
-      });
+      const response = await apiRequest(
+        `/api/support/admin/tickets?page=${page}&size=${size}`,
+        {
+          method: "GET",
+        }
+      );
       return response;
     } catch (error) {
       console.error("전체 문의 목록 조회 오류:", error);
@@ -206,9 +215,12 @@ export const authApi = {
   // getSupportTicketById 특정 문의 상세 조회
   getSupportTicketById: async (ticketId) => {
     try {
-      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
-        method: "GET",
-      });
+      const response = await apiRequest(
+        `/api/support/admin/tickets/${ticketId}`,
+        {
+          method: "GET",
+        }
+      );
       return response;
     } catch (error) {
       console.error("문의 상세 조회 오류:", error);
@@ -219,10 +231,13 @@ export const authApi = {
   // submitSupportReply 관리자 답변 작성
   submitSupportReply: async (ticketId, replyData) => {
     try {
-      const response = await apiRequest(`/api/support/tickets/${ticketId}/reply`, {
-        method: "POST",
-        body: JSON.stringify(replyData),
-      });
+      const response = await apiRequest(
+        `/api/support/tickets/${ticketId}/reply`,
+        {
+          method: "POST",
+          body: JSON.stringify(replyData),
+        }
+      );
       return response;
     } catch (error) {
       console.error("답변 작성 오류:", error);
