@@ -11,29 +11,35 @@ export default function AboutPage() {
     <div className="min-h-screen text-gray-900 dark:text-white relative flex flex-col">
       {/* 상단 네비게이션 (로그인하지 않은 사용자용) */}
       {!user && (
-        <header className={`w-full py-4 px-6 border-b ${
-          isDarkMode 
-            ? 'bg-gray-900 border-gray-800' 
-            : 'bg-white border-gray-200'
-        }`}>
+        <header
+          className={`w-full py-4 px-6 border-b ${
+            isDarkMode
+              ? "bg-gray-900 border-gray-800"
+              : "bg-white border-gray-200"
+          }`}
+        >
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">수</span>
               </div>
-              <span className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <span
+                className={`font-bold text-lg ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
                 수담
               </span>
             </div>
-            <Link 
-              to="/auth" 
+            <Link
+              to="/auth/signup"
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 isDarkMode
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
-              로그인으로 돌아가기
+              회원가입으로 돌아가기
             </Link>
           </div>
         </header>
