@@ -21,26 +21,24 @@ const MyPageModal = ({ isOpen, onClose }) => {
   const [successMessage, setSuccessMessage] = useState("");
   const [editData, setEditData] = useState({
     username: user?.username || "",
-    hearingStatus: user?.hearingStatus || "",
+    hearing: user?.hearing || "",
   });
 
   // user가 변경될 때마다 editData 동기화
   useEffect(() => {
     setEditData({
       username: user?.username || "",
-      hearingStatus: user?.hearingStatus || "",
+      hearing: user?.hearing || "",
     });
   }, [user]);
 
   // 청각상태 표시 함수
   const getHearingStatusText = (status) => {
     switch (status) {
-      case "hearing":
-        return "정상청력";
-      case "hard_of_hearing":
-        return "난청";
-      case "deaf":
-        return "농아";
+      case "NORMAL":
+        return "청인";
+      case "DEAF":
+        return "농인";
       default:
         return "아직 정하지 않음";
     }
@@ -53,7 +51,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
       // 편집 모드 취소
       setEditData({
         username: user?.username || "",
-        hearingStatus: user?.hearingStatus || "",
+        hearing: user?.hearing || "",
       });
       setError("");
       setSuccessMessage("");
@@ -84,7 +82,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
       // 이 함수가 API 호출, localStorage, React 상태를 모두 관리함
       await updateUser({
         username: editData.username,
-        hearingStatus: editData.hearingStatus,
+        hearing: editData.hearing,
       });
 
       setIsEditMode(false);
@@ -94,10 +92,9 @@ const MyPageModal = ({ isOpen, onClose }) => {
       setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
-
     } catch (error) {
       console.error("프로필 수정 실패:", error);
-      
+
       // 서버 에러 메시지 표시
       if (error.message) {
         setError(error.message);
@@ -286,9 +283,9 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 </p>
                 {isEditMode ? (
                   <select
-                    value={editData.hearingStatus}
+                    value={editData.hearing}
                     onChange={(e) =>
-                      handleInputChange("hearingStatus", e.target.value)
+                      handleInputChange("hearing", e.target.value)
                     }
                     className={`
                       w-full mt-1 px-3 py-2 rounded-lg border transition-colors
@@ -301,9 +298,8 @@ const MyPageModal = ({ isOpen, onClose }) => {
                     `}
                   >
                     <option value="">청각상태를 선택하세요</option>
-                    <option value="hearing">정상청력</option>
-                    <option value="hard_of_hearing">난청</option>
-                    <option value="deaf">농아</option>
+                    <option value="NORMAL">청인</option>
+                    <option value="DEAF">농인</option>
                   </select>
                 ) : (
                   <p
@@ -311,7 +307,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
-                    {getHearingStatusText(user?.hearingStatus)}
+                    {getHearingStatusText(user?.hearing)}
                   </p>
                 )}
               </div>
@@ -343,9 +339,13 @@ const MyPageModal = ({ isOpen, onClose }) => {
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
-                  {user?.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString("ko-KR")
-                    : "2024년 1월 1일"}
+                  {user?.createdDate
+                    ? new Date(user.createdDate).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      })
+                    : "날짜 없음"}
                 </p>
               </div>
             </div>
