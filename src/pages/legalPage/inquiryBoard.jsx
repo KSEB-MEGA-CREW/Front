@@ -331,7 +331,7 @@ const InquiryBoard = () => {
         <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => handleViewModeChange("public")}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
               viewMode === "public"
                 ? "bg-blue-600 text-white"
                 : isDarkMode
@@ -344,7 +344,7 @@ const InquiryBoard = () => {
           {isAdmin() && (
             <button
               onClick={() => handleViewModeChange("admin")}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 viewMode === "admin"
                   ? "bg-red-600 text-white"
                   : isDarkMode
@@ -375,7 +375,7 @@ const InquiryBoard = () => {
                 className={isDarkMode ? "text-blue-400" : "text-blue-600"}
               />
               <span
-                className={`text-sm font-medium ${
+                className={`text-sm font-semibold ${
                   isDarkMode ? "text-blue-400" : "text-blue-600"
                 }`}
               >
@@ -434,7 +434,7 @@ const InquiryBoard = () => {
             <button
               onClick={toggleMyInquiryFilter}
               className={`
-                flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors whitespace-nowrap
+                flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap
                 ${
                   isMyInquiryFilter
                     ? "bg-blue-600 text-white"
@@ -622,7 +622,7 @@ const InquiryBoard = () => {
                       </span>
                       <span
                         className={`
-                      px-3 py-1 rounded-full text-xs font-medium
+                      px-3 py-1 rounded-full text-xs font-semibold
                       ${
                         isDarkMode
                           ? "bg-blue-500/20 text-blue-400"
@@ -636,7 +636,7 @@ const InquiryBoard = () => {
                       {/* 공개/비공개 상태 표시 */}
                       <span
                         className={`
-                      px-2 py-1 rounded-full text-xs font-medium
+                      px-2 py-1 rounded-full text-xs font-semibold
                       ${
                         ticket.isPublic
                           ? isDarkMode
@@ -655,7 +655,7 @@ const InquiryBoard = () => {
                       {viewMode === "admin" && (
                         <span
                           className={`
-                        px-2 py-1 rounded-full text-xs font-medium
+                        px-2 py-1 rounded-full text-xs font-semibold
                         ${
                           isDarkMode
                             ? "bg-purple-500/20 text-purple-400"
@@ -732,7 +732,7 @@ const InquiryBoard = () => {
                     {ticket.status && (
                       <span
                         className={`
-                      px-2 py-1 rounded-full text-xs font-medium
+                      px-2 py-1 rounded-full text-xs font-semibold
                       ${
                         ticket.status === "answered"
                           ? isDarkMode

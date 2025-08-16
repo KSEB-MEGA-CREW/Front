@@ -135,7 +135,7 @@ function StudyWord() {
               <div className="flex flex-col items-center gap-4">
                 <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
                 <p
-                  className={`text-lg font-medium ${
+                  className={`text-lg font-semibold ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -356,7 +356,7 @@ function StudyWord() {
                           문제 {i + 1}
                         </span>
                         <div
-                          className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
                             result.isCorrect
                               ? "bg-green-100 text-green-700"
                               : "bg-red-100 text-red-700"
@@ -558,7 +558,7 @@ function StudyWord() {
                     <Play size={24} className="text-white" />
                   </div>
                   <p
-                    className={`text-2xl leading-relaxed font-medium ${
+                    className={`text-2xl leading-relaxed font-semibold ${
                       isDarkMode ? "text-gray-200" : "text-gray-700"
                     }`}
                   >
@@ -590,7 +590,7 @@ function StudyWord() {
               {quiz.choices.map((choice, idx) => (
                 <button
                   key={idx}
-                  className={`group relative p-6 rounded-2xl text-lg font-medium transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-500/50 ${
+                  className={`group relative p-6 rounded-2xl text-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-500/50 ${
                     selected === null
                       ? isDarkMode
                         ? "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-lg hover:shadow-xl border border-gray-600"

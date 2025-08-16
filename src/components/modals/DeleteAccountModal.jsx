@@ -188,7 +188,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
             onClick={handleDeleteAccount}
             disabled={isLoading || confirmText !== "계정삭제"}
             className={`
-              w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2
+              w-full p-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
               ${
                 isLoading || confirmText !== "계정삭제"
                   ? "bg-gray-400 cursor-not-allowed text-gray-600"
@@ -212,7 +212,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
             onClick={onClose}
             disabled={isLoading}
             className={`
-              w-full p-3 rounded-lg font-medium transition-colors border
+              w-full p-3 rounded-lg font-semibold transition-colors border
               ${
                 isDarkMode
                   ? "border-gray-600 hover:bg-gray-700 text-gray-300"

@@ -78,7 +78,7 @@ const Pagination = ({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className={`
-            flex items-center gap-1 px-3 py-2 rounded-lg font-medium transition-colors
+            flex items-center gap-1 px-3 py-2 rounded-lg font-semibold transition-colors
             ${
               currentPage === 1
                 ? isDarkMode
@@ -110,7 +110,7 @@ const Pagination = ({
                 <button
                   onClick={() => onPageChange(pageNum)}
                   className={`
-                    px-3 py-2 rounded-lg font-medium transition-colors min-w-[40px]
+                    px-3 py-2 rounded-lg font-semibold transition-colors min-w-[40px]
                     ${
                       pageNum === currentPage
                         ? "bg-blue-600 text-white"
@@ -132,7 +132,7 @@ const Pagination = ({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className={`
-            flex items-center gap-1 px-3 py-2 rounded-lg font-medium transition-colors
+            flex items-center gap-1 px-3 py-2 rounded-lg font-semibold transition-colors
             ${
               currentPage === totalPages
                 ? isDarkMode

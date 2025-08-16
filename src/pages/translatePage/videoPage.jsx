@@ -164,7 +164,7 @@ const VideoPage = () => {
                         <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
                             <div className="flex items-center gap-3">
                                 <div className={`
-                                  flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                                  flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
                                   ${isDarkMode 
                                     ? "bg-gray-700 text-gray-200" 
                                     : "bg-gray-100 text-gray-700"
@@ -179,7 +179,7 @@ const VideoPage = () => {
                                 
                                 {isProcessing && (
                                     <div className={`
-                                      flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                                      flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
                                       ${isDarkMode 
                                         ? "bg-red-500/20 text-red-300" 
                                         : "bg-red-100 text-red-700"
@@ -194,7 +194,7 @@ const VideoPage = () => {
                             <div className="flex items-center gap-2">
                                 {isCameraReady && (
                                     <div className={`
-                                      px-3 py-1.5 rounded-full text-sm font-medium
+                                      px-3 py-1.5 rounded-full text-sm font-semibold
                                       ${isDarkMode 
                                         ? "bg-gray-700 text-gray-300" 
                                         : "bg-gray-100 text-gray-700"
@@ -285,7 +285,7 @@ const VideoPage = () => {
                                 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className={`block text-sm font-medium mb-2 ${
+                                        <label className={`block text-sm font-semibold mb-2 ${
                                           isDarkMode ? "text-gray-300" : "text-gray-700"
                                         }`}>
                                           카메라 선택
@@ -310,7 +310,7 @@ const VideoPage = () => {
                                     </div>
                                     
                                     <div>
-                                        <label className={`block text-sm font-medium mb-2 ${
+                                        <label className={`block text-sm font-semibold mb-2 ${
                                           isDarkMode ? "text-gray-300" : "text-gray-700"
                                         }`}>
                                           해상도
@@ -336,7 +336,7 @@ const VideoPage = () => {
                                       isDarkMode ? "border-gray-700" : "border-gray-200"
                                     }`}>
                                         <div className="flex items-center justify-between">
-                                            <span className={`text-sm font-medium ${
+                                            <span className={`text-sm font-semibold ${
                                               isDarkMode ? "text-gray-300" : "text-gray-700"
                                             }`}>
                                               음성 출력

@@ -185,7 +185,7 @@ const AvatarPage = () => {
               <div className="flex items-center gap-3">
                 <div
                   className={`
-                  flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                  flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
                   ${
                     isDarkMode
                       ? "bg-gray-700 text-gray-200"
@@ -208,7 +208,7 @@ const AvatarPage = () => {
                 {isPlaying && currentTranslation && (
                   <div
                     className={`
-                    flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium
+                    flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
                     ${
                       isDarkMode
                         ? "bg-purple-500/20 text-purple-300"
@@ -226,7 +226,7 @@ const AvatarPage = () => {
                 {currentTranslation && (
                   <div
                     className={`
-                    px-3 py-1.5 rounded-full text-sm font-medium
+                    px-3 py-1.5 rounded-full text-sm font-semibold
                     ${
                       isDarkMode
                         ? "bg-gray-700 text-gray-300"
@@ -343,7 +343,7 @@ const AvatarPage = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <span
-                      className={`text-sm font-medium ${
+                      className={`text-sm font-semibold ${
                         isDarkMode ? "text-gray-300" : "text-gray-700"
                       }`}
                     >
@@ -497,7 +497,7 @@ const AvatarPage = () => {
                 <button
                   key={phrase}
                   onClick={() => handlePredefinedSelect(phrase)}
-                  className={`p-3 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`p-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     selectedPredefined === phrase
                       ? "bg-purple-500 text-white shadow-lg"
                       : isDarkMode

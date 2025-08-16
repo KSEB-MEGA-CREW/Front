@@ -250,7 +250,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                   />
                 ) : (
                   <p
-                    className={`font-medium ${
+                    className={`font-semibold ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
@@ -303,7 +303,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                   </select>
                 ) : (
                   <p
-                    className={`font-medium ${
+                    className={`font-semibold ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
@@ -335,7 +335,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                   가입일
                 </p>
                 <p
-                  className={`font-medium ${
+                  className={`font-semibold ${
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
@@ -396,7 +396,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 onClick={handleSave}
                 disabled={isLoading}
                 className={`
-                  w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2
+                  w-full p-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
                   ${
                     isLoading
                       ? "bg-gray-400 cursor-not-allowed"
@@ -420,7 +420,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 onClick={handleEditToggle}
                 disabled={isLoading}
                 className={`
-                  w-full p-3 rounded-lg font-medium transition-colors border
+                  w-full p-3 rounded-lg font-semibold transition-colors border
                   ${
                     isDarkMode
                       ? "border-gray-600 hover:bg-gray-700 text-gray-300"

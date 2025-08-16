@@ -1,27 +1,29 @@
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../Context/themeContext";
 
 const ErrorPage = () => {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
 
   const handleGoHome = () => {
     navigate("/");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className={`min-h-screen flex items-center justify-center ${isDarkMode ? "bg-gray-900" : "bg-gray-50"}`}>
       <div className="text-center px-6">
         {/* 404 Number */}
-        <div className="text-9xl font-bold text-gray-300 mb-4">
+        <div className={`text-9xl font-bold mb-4 ${isDarkMode ? "text-gray-600" : "text-gray-300"}`}>
           404
         </div>
         
         {/* Main Message */}
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        <h1 className={`text-3xl font-bold mb-4 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
           페이지를 찾을 수 없습니다
         </h1>
         
         {/* Subtitle */}
-        <p className="text-lg text-gray-600 mb-8 max-w-md mx-auto">
+        <p className={`text-lg mb-8 max-w-md mx-auto ${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
           요청하신 페이지가 존재하지 않거나 이동되었을 수 있습니다.
         </p>
         
@@ -29,28 +31,32 @@ const ErrorPage = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={handleGoHome}
-            className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200"
           >
             홈으로 돌아가기
           </button>
           
           <button
             onClick={() => window.history.back()}
-            className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors duration-200"
+            className={`px-6 py-3 font-semibold rounded-lg transition-colors duration-200 ${
+              isDarkMode 
+                ? "bg-gray-700 text-gray-300 hover:bg-gray-600" 
+                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
           >
             이전 페이지로
           </button>
         </div>
         
         {/* Additional Help */}
-        <div className="mt-12 text-sm text-gray-500">
+        <div className={`mt-12 text-sm ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}>
           <p>문제가 지속되면 관리자에게 문의해 주세요.</p>
         </div>
         
         {/* Decorative Element */}
         <div className="mt-8">
           <svg 
-            className="w-16 h-16 mx-auto text-gray-300" 
+            className={`w-16 h-16 mx-auto ${isDarkMode ? "text-gray-600" : "text-gray-300"}`} 
             fill="none" 
             stroke="currentColor" 
             viewBox="0 0 24 24" 

@@ -40,7 +40,7 @@ export default function PrivacyPage() {
             </div>
             <Link
               to="/auth/signup"
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 isDarkMode
                   ? "bg-blue-600 hover:bg-blue-700 text-white"
                   : "bg-blue-600 hover:bg-blue-700 text-white"

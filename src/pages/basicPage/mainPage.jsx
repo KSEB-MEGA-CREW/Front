@@ -111,7 +111,7 @@ function MainPage() {
         <div className="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
               <Star className="w-4 h-4 mr-2" />
               AI 기반 수어 번역 서비스
             </div>
@@ -196,7 +196,7 @@ function MainPage() {
                     <Hand className="w-12 h-12" />
                   </div>
                   <div
-                    className={`text-sm mt-2 font-medium text-center ${
+                    className={`text-sm mt-2 font-semibold text-center ${
                       isDarkMode ? "text-gray-300" : "text-gray-600"
                     }`}
                   >
@@ -231,7 +231,7 @@ function MainPage() {
                     <Volume2 className="w-12 h-12" />
                   </div>
                   <div
-                    className={`text-sm mt-2 font-medium text-center ${
+                    className={`text-sm mt-2 font-semibold text-center ${
                       isDarkMode ? "text-gray-300" : "text-gray-600"
                     }`}
                   >
@@ -242,7 +242,7 @@ function MainPage() {
 
               <div className="text-center">
                 <p
-                  className={`text-lg font-medium ${
+                  className={`text-lg font-semibold ${
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >

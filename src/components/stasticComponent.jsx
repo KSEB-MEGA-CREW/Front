@@ -195,7 +195,7 @@ const StasticComponent = () => {
           }`}
         >
           <div className="text-center">
-            <div className="text-red-400 text-sm font-medium">{error}</div>
+            <div className="text-red-400 text-sm font-semibold">{error}</div>
             <button
               onClick={() => window.location.reload()}
               className="mt-2 text-xs text-red-600 hover:text-red-700"
@@ -234,7 +234,7 @@ const StasticComponent = () => {
         </div>
         <div className="text-right">
           <span
-            className={`text-xs px-3 py-1.5 rounded-full font-medium border ${
+            className={`text-xs px-3 py-1.5 rounded-full font-semibold border ${
               isDarkMode
                 ? "text-blue-300 bg-blue-900/30 border-blue-700"
                 : "text-blue-600 bg-blue-50 border-blue-100"
@@ -319,7 +319,7 @@ const StasticComponent = () => {
                           </span>
                         )}
                       </div>
-                      <div className="text-gray-400 text-xs font-medium bg-gray-700/50 px-2 py-1 rounded-full">
+                      <div className="text-gray-400 text-xs font-semibold bg-gray-700/50 px-2 py-1 rounded-full">
                         {new Date(item.date).toLocaleDateString("ko-KR", {
                           month: "short",
                           day: "numeric",
@@ -398,7 +398,7 @@ const StasticComponent = () => {
           >
             <div className="w-4 h-4 bg-emerald-500 rounded-full shadow-sm"></div>
             <span
-              className={`font-medium ${
+              className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -412,7 +412,7 @@ const StasticComponent = () => {
           >
             <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
             <span
-              className={`font-medium ${
+              className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -426,7 +426,7 @@ const StasticComponent = () => {
           >
             <div className="w-4 h-4 bg-amber-500 rounded-full shadow-sm"></div>
             <span
-              className={`font-medium ${
+              className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -440,7 +440,7 @@ const StasticComponent = () => {
           >
             <div className="w-4 h-4 bg-orange-500 rounded-full shadow-sm"></div>
             <span
-              className={`font-medium ${
+              className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -454,7 +454,7 @@ const StasticComponent = () => {
           >
             <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
             <span
-              className={`font-medium ${
+              className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
@@ -468,7 +468,7 @@ const StasticComponent = () => {
           >
             <div className="w-4 h-4 bg-gray-300 rounded-full shadow-sm"></div>
             <span
-              className={`font-medium ${
+              className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
