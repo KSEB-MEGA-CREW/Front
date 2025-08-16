@@ -8,7 +8,7 @@ import {
   Play,
   CheckCircle,
   Star,
-  Zap,
+  Mic,
   Heart,
   Globe,
   Award,
@@ -32,22 +32,22 @@ function MainPage() {
 
   const features = [
     {
-      icon: <Zap className="w-8 h-8" />,
+      icon: <Mic className="w-8 h-8" />,
       title: "실시간 번역",
       description: "AI 기반 실시간 수어 번역으로 즉석에서 소통하세요",
-      gradient: "from-blue-500 to-cyan-500",
+      gradient: "bg-blue-500/50",
     },
     {
       icon: <Users className="w-8 h-8" />,
       title: "양방향 소통",
-      description: "수어와 음성을 자유롭게 번역하여 모두가 소통할 수 있어요",
-      gradient: "from-purple-500 to-pink-500",
+      description: "수어와 문장을 자유롭게 번역하여 모두가 소통할 수 있어요",
+      gradient: "bg-green-500/50",
     },
     {
       icon: <BookOpen className="w-8 h-8" />,
       title: "체계적인 학습",
       description: "단계별 수어 학습으로 실력을 체계적으로 향상시키세요",
-      gradient: "from-green-500 to-emerald-500",
+      gradient: "bg-purple-500/50",
     },
   ];
 
@@ -122,7 +122,7 @@ function MainPage() {
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              <span className="block">수어와 음성을</span>
+              <span className="block">수어와 문장을</span>
               <span className="bg-white bg-clip-text text-transparent">
                 실시간으로 연결
               </span>
@@ -134,7 +134,7 @@ function MainPage() {
                 isDarkMode ? "text-gray-300" : "text-gray-600"
               }`}
             >
-              첨단 AI 기술로 수어와 음성을 즉시 번역하여
+              수어와 문장을 즉시 번역하여
               <br />
               모든 사람이 자유롭게 소통할 수 있는 세상을 만듭니다
             </p>
@@ -235,7 +235,7 @@ function MainPage() {
                       isDarkMode ? "text-gray-300" : "text-gray-600"
                     }`}
                   >
-                    음성
+                    문장
                   </div>
                 </div>
               </div>
@@ -256,8 +256,8 @@ function MainPage() {
                   }`}
                 >
                   {translationDemo
-                    ? "수어를 음성으로 실시간 변환"
-                    : "음성을 수어로 실시간 변환"}
+                    ? "수어를 문장으로 실시간 변환"
+                    : "문장을 수어로 실시간 변환"}
                 </p>
               </div>
             </div>
@@ -448,7 +448,7 @@ function MainPage() {
                 : "bg-gradient-to-r from-blue-50 to-purple-50"
             }`}
           >
-            <Heart className="w-16 h-16 mx-auto mb-6 text-red-500" />
+            <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" />
             <h2
               className={`text-3xl md:text-4xl font-bold mb-6 ${
                 isDarkMode ? "text-white" : "text-gray-900"

@@ -136,7 +136,7 @@ const VideoPage = () => {
   const getConnectionStatusColor = () => {
     switch (connectionStatus) {
       case "connected":
-        return "text-green-400";
+        return "text-green-500";
       case "processing":
         return "text-yellow-400";
       case "disconnected":
@@ -275,8 +275,8 @@ const VideoPage = () => {
             {cameraError ? (
               <div className="w-full h-full flex items-center justify-center p-8">
                 <div className="text-center max-w-md">
-                  <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <AlertCircle size={32} className="text-red-600" />
+                  <div className="w-20 h-20 bg-[#ff5555] rounded-full flex items-center justify-center mx-auto mb-6">
+                    <AlertCircle size={32} className="text-white" />
                   </div>
                   <h3
                     className={`text-xl font-bold mb-3 ${
@@ -294,7 +294,7 @@ const VideoPage = () => {
                   </p>
                   <button
                     onClick={() => restartCamera()}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    className="inline-flex items-center gap-2 px-6 py-3 border-1 border-gray-400 hover:gray-800 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
                   >
                     <RotateCcw size={18} />
                     카메라 재시작
@@ -507,7 +507,7 @@ const VideoPage = () => {
                   >
                     {isProcessing
                       ? "AI가 수어를 분석하고 있어요..."
-                      : "수어를 입력해주세요"}
+                      : "번역 결과"}
                   </span>
                 )}
               </p>

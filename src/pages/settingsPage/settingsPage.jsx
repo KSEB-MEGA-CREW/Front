@@ -128,8 +128,8 @@ const SettingsPage = () => {
                 p-3 rounded-lg
                 ${
                   isDarkMode
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-green-100 text-green-600"
+                    ? "bg-green-500/20 text-green-500"
+                    : "bg-green-100 text-green-700"
                 }
               `}
               >
