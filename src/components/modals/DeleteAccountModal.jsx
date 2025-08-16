@@ -154,9 +154,9 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                 ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-white focus:border-red-500"
-                    : "bg-white border-gray-300 text-gray-900 focus:border-red-500"
+                    : "bg-white border-gray-800 text-gray-900 "
                 }
-                focus:outline-none focus:ring-2 focus:ring-red-500/20
+                focus:outline-none focus:ring-1 focus:ring-gray-700
               `}
             />
           </div>
@@ -191,7 +191,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
               w-full p-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
               ${
                 isLoading || confirmText !== "계정삭제"
-                  ? "bg-gray-400 cursor-not-allowed text-gray-600"
+                  ? "bg-gray-300 cursor-not-allowed text-gray-600"
                   : "bg-red-600 hover:bg-red-700 text-white"
               }
             `}
