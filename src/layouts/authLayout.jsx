@@ -83,19 +83,13 @@ const AuthLayout = () => {
       <div className="flex flex-col md:flex-row w-full min-h-full relative z-10">
         <div className="flex-1 flex items-center justify-center p-8 md:p-0 md:pl-24 text-center md:text-left">
           <div className="text-white">
-            <h1
-              className="text-6xl md:text-8xl font-bold mb-6 md:mb-8 tracking-widest"
-            >
+            <h1 className="text-6xl md:text-8xl mb-6 md:mb-8 tracking-widest">
               수담, 手談
             </h1>
-            <p
-              className="text-2xl md:text-3xl font-semibold mb-4 md:mb-6 tracking-wide"
-            >
+            <p className="text-2xl md:text-3xl mb-4 md:mb-6 tracking-wide">
               "소통의 장벽을 허물다."
             </p>
-            <div
-              className="text-lg md:text-xl leading-relaxed opacity-90 max-w-2xl"
-            >
+            <div className="text-lg md:text-xl leading-relaxed opacity-90 max-w-2xl">
               <p>누구나 자유롭게 이야기하고 이해받을 수 있도록,</p>
               <p>우리는 기술로 세상의 모든 말과 귀가 되어</p>
               <p>경계 없는 소통을 완성합니다.</p>

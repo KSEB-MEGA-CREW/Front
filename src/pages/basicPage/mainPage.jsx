@@ -111,7 +111,7 @@ function MainPage() {
         <div className="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-8 border-2 border-gray-500 text-white">
               <Star className="w-4 h-4 mr-2" />
               AI 기반 수어 번역 서비스
             </div>
@@ -123,7 +123,7 @@ function MainPage() {
               }`}
             >
               <span className="block">수어와 음성을</span>
-              <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
+              <span className="bg-white bg-clip-text text-transparent">
                 실시간으로 연결
               </span>
             </h1>
@@ -141,24 +141,24 @@ function MainPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <button
+              {/* <button
                 onClick={() => navigate("/translate/video")}
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+              > */}
+              <button
+                onClick={() => navigate("/translate/video")}
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-blue-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Play className="w-5 h-5 mr-2" />
                 지금 체험하기
               </button>
-              <button
+              {/* <button
                 onClick={() => navigate("/study")}
-                className={`inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
-                  isDarkMode
-                    ? "border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
-                    : "border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50"
-                }`}
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <BookOpen className="w-5 h-5 mr-2" />
                 학습 시작하기
-              </button>
+              </button> */}
             </div>
 
             {/* Demo Section */}
@@ -174,7 +174,7 @@ function MainPage() {
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                실시간 번역 데모
+                실시간 번역 예시
               </h3>
 
               <div className="flex items-center justify-center space-x-8 mb-6">
@@ -187,7 +187,7 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       translationDemo
-                        ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+                        ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"
@@ -222,7 +222,7 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       !translationDemo
-                        ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30"
+                        ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"
@@ -468,7 +468,7 @@ function MainPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => navigate("/translate/video")}
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-blue-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <CheckCircle className="w-5 h-5 mr-2" />
                 지금 시작하기
