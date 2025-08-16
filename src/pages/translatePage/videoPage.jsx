@@ -404,8 +404,12 @@ const VideoPage = () => {
                         onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
                         className={`p-2 rounded-lg transition-all duration-200 ${
                           isSpeechEnabled
-                            ? "bg-green-100 text-green-600"
-                            : "bg-gray-100 text-gray-400"
+                            ? "border-1 border-gray-600  hover:border-gray-300"
+                            : "border-1 border-gray-600 hover:border-gray-300"
+                        } ${
+                          isDarkMode
+                            ? "bg-gray-700 text-white hover:bg-gray-600"
+                            : "border-1 border-gray-600 text-gray-700 hover:bg-gray-200"
                         }`}
                       >
                         {isSpeechEnabled ? (
@@ -633,10 +637,12 @@ const VideoPage = () => {
               onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
               className={`p-3 lg:p-4 rounded-xl lg:rounded-2xl transition-all duration-200 ${
                 isSpeechEnabled
-                  ? "border-2 border-gray-600 text-white hover:border-gray-300"
-                  : isDarkMode
-                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  ? "border-1 border-gray-600 text-gray-800 hover:border-gray-300"
+                  : "border-1 border-gray-600 text-gray-800 hover:border-gray-300"
+              } ${
+                isDarkMode
+                  ? "bg-gray-700 text-white hover:bg-gray-600"
+                  : "border-1 border-gray-600 text-gray-700 hover:bg-gray-200"
               }`}
               title="음성 출력 토글"
             >

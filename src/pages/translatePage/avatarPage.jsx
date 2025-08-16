@@ -253,7 +253,7 @@ const AvatarPage = () => {
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
                     isDarkMode
                       ? "bg-gray-700 text-gray-200"
-                      : "bg-gray-100 text-gray-700"
+                      : "bg-gray-700 text-gray-200"
                   } ${getStatusColor()}`}
                 >
                   {isUnityLoading || isConversionLoading ? (
@@ -270,13 +270,13 @@ const AvatarPage = () => {
 
                 {isPlaying && currentTranslation && (
                   <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
                       isDarkMode
-                        ? "bg-gray-500 text-purple-300"
-                        : "bg-purple-100 text-purple-700"
+                        ? " bg-gray-700 text-[#ff4444]"
+                        : "bg-gray-700 text-[#ff4444]"
                     }`}
                   >
-                    <div className="w-2 h-2 bg-[#ff5555] rounded-full animate-pulse" />
+                    <div className="w-2 h-2 bg-[#ff4444] rounded-full animate-pulse font-medium" />
                     재생 중: {currentTranslation.text}
                   </div>
                 )}
@@ -399,7 +399,7 @@ const AvatarPage = () => {
                       onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         isSpeechEnabled
-                          ? "bg-green-100 text-green-600"
+                          ? "border-1 border-gray-400 text-white"
                           : "bg-gray-100 text-gray-400"
                       }`}
                     >
@@ -419,15 +419,15 @@ const AvatarPage = () => {
                       <button
                         onClick={resetAvatar}
                         disabled={!isUnityLoaded}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-blue-100 hover:bg-blue-200 disabled:bg-gray-100 text-blue-700 disabled:text-gray-400 rounded-lg transition-all duration-200 text-sm"
+                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-blue-500 hover:bg-blue-200 disabled:bg-gray-100 text-white disabled:text-gray-400 rounded-lg transition-all duration-200 text-sm"
                       >
                         <User size={16} />
-                        아바타 리셋
+                        리셋
                       </button>
                       <button
                         onClick={handleStopAnimation}
                         disabled={!isPlaying}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 text-red-700 disabled:text-gray-400 rounded-lg transition-all duration-200 text-sm"
+                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-[#ff4444] hover:bg-gray-600 disabled:border-1 disabled:border-gray-400 disabled:bg-gray-800 text-white disabled:text-gray-400 rounded-lg transition-all duration-200 text-sm"
                       >
                         <Square size={16} />
                         정지

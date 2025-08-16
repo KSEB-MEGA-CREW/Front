@@ -79,8 +79,8 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
           }`}
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-red-500/20">
-              <AlertTriangle size={24} className="text-red-500" />
+            <div className="p-2 rounded-lg bg-[#ff4444]">
+              <AlertTriangle size={24} className="text-gray-100" />
             </div>
             <h2
               className={`text-xl font-bold ${

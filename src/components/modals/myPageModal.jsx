@@ -182,7 +182,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 ${
                   isDarkMode
                     ? "border-2 border-gray-600 text-white"
-                    : "border-2 border-gray-600 text-white"
+                    : "border-2 border-gray-600 text-gray-700"
                 }
               `}
               >
