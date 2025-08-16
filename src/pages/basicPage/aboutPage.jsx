@@ -2,10 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function AboutPage() {
   const { user } = useAuth();
   const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen text-gray-900 dark:text-white relative flex flex-col">
@@ -47,6 +50,24 @@ export default function AboutPage() {
 
       {/* 메인 콘텐츠 */}
       <main className="flex-grow container mx-auto px-6 py-20 max-w-4xl">
+        {/* 로그인된 사용자를 위한 돌아가기 버튼 */}
+        {user && (
+          <div className="flex items-center gap-4 mb-8">
+            <button
+              onClick={() => navigate("/")}
+              className={`
+                p-2 rounded-lg transition-colors
+                ${
+                  isDarkMode
+                    ? "hover:bg-gray-800 text-gray-400 hover:text-white"
+                    : "hover:bg-white text-gray-600 hover:text-gray-900"
+                }
+              `}
+            >
+              <ArrowLeft size={24} />
+            </button>
+          </div>
+        )}
         <h1 className="text-4xl font-bold mb-8 drop-shadow-lg">서비스 소개</h1>
 
         <section className="mb-8">
