@@ -272,11 +272,11 @@ const AvatarPage = () => {
                   <div
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
                       isDarkMode
-                        ? "bg-purple-500/20 text-purple-300"
+                        ? "bg-gray-500 text-purple-300"
                         : "bg-purple-100 text-purple-700"
                     }`}
                   >
-                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
+                    <div className="w-2 h-2 bg-[#ff5555] rounded-full animate-pulse" />
                     재생 중: {currentTranslation.text}
                   </div>
                 )}
@@ -330,7 +330,7 @@ const AvatarPage = () => {
                   </p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
                   >
                     <RotateCcw size={18} />
                     페이지 새로고침
@@ -360,7 +360,7 @@ const AvatarPage = () => {
                     >
                       <Loader
                         size={24}
-                        className="animate-spin text-purple-600"
+                        className="animate-spin text-blue-500"
                       />
                       {isUnityLoading
                         ? "Unity 아바타 로딩 중..."
@@ -466,7 +466,7 @@ const AvatarPage = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="수어로 변환할 텍스트를 입력하세요..."
-                className={`w-full h-32 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 border ${
+                className={`w-full h-32 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 border ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
                     : "bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-500"
@@ -481,13 +481,8 @@ const AvatarPage = () => {
                     isConversionLoading ||
                     isPlaying
                   }
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:transform-none text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-blue-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:transform-none text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
                 >
-                  {isConversionLoading ? (
-                    <Loader size={18} className="animate-spin" />
-                  ) : (
-                    <Sparkles size={18} />
-                  )}
                   수어 변환
                 </button>
                 <button
@@ -525,7 +520,7 @@ const AvatarPage = () => {
                   onClick={() => handlePredefinedSelect(phrase)}
                   className={`p-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     selectedPredefined === phrase
-                      ? "bg-purple-500 text-white shadow-lg"
+                      ? "bg-blue-500 text-white shadow-lg"
                       : isDarkMode
                       ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-700"

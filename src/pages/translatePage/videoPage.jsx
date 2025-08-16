@@ -73,7 +73,7 @@ const VideoPage = () => {
       stopFrameExtraction();
       setStatusMessage("수화 인식 중단");
     }
-    setTimeout(() => setStatusMessage(""), 1500);
+    setTimeout(() => setStatusMessage(""), 1100);
   };
 
   // 결과 처리 - 개선된 번역 결과 처리
@@ -82,7 +82,7 @@ const VideoPage = () => {
       if (result.status === "SUBMITTED") {
         setStatusMessage("AI 분석 중...");
         setConnectionStatus("processing");
-        setTimeout(() => setStatusMessage(""), 1500);
+        setTimeout(() => setStatusMessage(""), 1100);
       }
       if (result.translatedText) {
         const newTranslation = {
@@ -189,7 +189,7 @@ const VideoPage = () => {
                                   flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
                                   ${
                                     isDarkMode
-                                      ? "bg-gray-700 text-gray-200"
+                                      ? " bg-gray-700 border-gray-600 text-gray-300"
                                       : "bg-gray-100 text-gray-700"
                                   } ${getConnectionStatusColor()}
                                 `}
@@ -199,7 +199,7 @@ const VideoPage = () => {
                     {connectionStatus === "connected"
                       ? "연결됨"
                       : connectionStatus === "processing"
-                      ? "분석 중"
+                      ? "분석중"
                       : "연결 끊김"}
                   </span>
                 </div>
@@ -210,13 +210,13 @@ const VideoPage = () => {
                                       flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
                                       ${
                                         isDarkMode
-                                          ? "bg-red-500/20 text-red-300"
-                                          : "bg-red-100 text-red-700"
+                                          ? "bg-gray-700 border-gray-600 text-[#ff5555]"
+                                          : " text-red-700"
                                       }
                                     `}
                   >
-                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-                    수어 분석 중
+                    <div className="w-2 h-2 bg-[#ff5555] rounded-full animate-pulse" />
+                    수어 분석중
                   </div>
                 )}
               </div>

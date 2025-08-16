@@ -121,7 +121,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-gray-50"
+            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
           }`}
         >
           <div className="flex justify-center items-center min-h-screen">
@@ -157,7 +157,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-gray-50"
+            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
           }`}
         >
           <div className="flex flex-col items-center justify-center min-h-screen px-4">
@@ -219,7 +219,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen px-4 py-8 ${
-            isDarkMode ? "bg-gray-900" : "bg-gray-50"
+            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
           }`}
         >
           <div className="max-w-4xl mx-auto">
@@ -303,7 +303,9 @@ function StudyWord() {
 
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-bold text-gray-300">
+                        <span className={`text-sm font-bold ${
+                          isDarkMode ? "text-gray-300" : "text-gray-600"
+                        }`}>
                           문제 {i + 1}
                         </span>
                         <div
@@ -343,7 +345,11 @@ function StudyWord() {
                         </span>
 
                         {!result.isCorrect && (
-                          <span className="text-xs text-white border-1 border-gray-500 px-2 py-1 rounded-full">
+                          <span className={`text-xs px-2 py-1 rounded-full border ${
+                            isDarkMode 
+                              ? "text-white border-gray-500" 
+                              : "text-red-700 bg-red-50 border-red-200"
+                          }`}>
                             선택:{" "}
                             {result.quiz.choices[result.selected].word ||
                               result.quiz.choices[result.selected].meaning}
@@ -366,7 +372,11 @@ function StudyWord() {
                 기록 확인하기
               </button>
               <button
-                className="inline-flex items-center gap-3 px-8 py-4 border-2 border-gray-600 text-white hover:border-gray-300 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl"
+                className={`inline-flex items-center gap-3 px-8 py-4 border-2 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl ${
+                  isDarkMode
+                    ? "border-gray-600 text-white hover:border-gray-300"
+                    : "border-gray-400 text-gray-700 hover:border-gray-600 bg-white hover:bg-gray-50"
+                }`}
                 onClick={handleRetry}
               >
                 <RotateCcw size={20} />
@@ -386,7 +396,7 @@ function StudyWord() {
     <BasicLayout>
       <div
         className={`min-h-screen px-4 py-8 ${
-          isDarkMode ? "bg-gray-900" : "bg-gray-50"
+          isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
         }`}
       >
         <div className="max-w-4xl mx-auto">
@@ -399,7 +409,7 @@ function StudyWord() {
               ${
                 isDarkMode
                   ? "bg-gray-700/50 border-gray-600"
-                  : "bg-gray-50 border-gray-200"
+                  : "bg-white border-gray-300 shadow-md"
               }
             `}
             >
@@ -477,7 +487,7 @@ function StudyWord() {
                   selected === null
                     ? isDarkMode
                       ? "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-lg hover:shadow-xl border border-gray-600"
-                      : "bg-white hover:bg-gray-50 text-gray-800 shadow-lg hover:shadow-xl border border-gray-200"
+                      : "bg-white hover:bg-blue-50 text-gray-800 shadow-md hover:shadow-lg border border-gray-300"
                     : ""
                 } ${
                   selected !== null && idx === selected
@@ -501,7 +511,7 @@ function StudyWord() {
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                         selected === null
                           ? isDarkMode
-                            ? "bg-gray-600 text-gray-200 group-hover:bg-gray-500"
+                            ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]0"
                             : "bg-gray-100 text-gray-700 group-hover:bg-gray-200"
                           : ""
                       } ${

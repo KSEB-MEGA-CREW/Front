@@ -178,7 +178,7 @@ const CustomerSupport = () => {
               24시간 이내 답변
             </p>
             <p
-              className={`font-semibold ${
+              className={`font-medium ${
                 isDarkMode ? "text-blue-400" : "text-blue-600"
               }`}
             >
@@ -205,7 +205,7 @@ const CustomerSupport = () => {
               <Phone
                 size={24}
                 className={`${
-                  isDarkMode ? "text-green-400" : "text-green-600"
+                  isDarkMode ? "text-green-500" : "text-green-700"
                 }`}
               />
             </div>
@@ -224,8 +224,8 @@ const CustomerSupport = () => {
               평일 09:00~18:00
             </p>
             <p
-              className={`font-semibold ${
-                isDarkMode ? "text-green-400" : "text-green-600"
+              className={`font-medium ${
+                isDarkMode ? "text-green-500" : "text-green-700"
               }`}
             >
               010-3738-1882
@@ -270,7 +270,7 @@ const CustomerSupport = () => {
               즉시 응답
             </p>
             <p
-              className={`font-semibold ${
+              className={`font-medium ${
                 isDarkMode ? "text-purple-400" : "text-purple-600"
               }`}
             >
@@ -382,24 +382,9 @@ const CustomerSupport = () => {
               </div>
 
               {/* 사용자 정보 표시 */}
-              <div
-                className={`
-                p-4 rounded-lg border-l-4 border-blue-500
-                ${isDarkMode ? "bg-blue-900/20" : "bg-blue-50"}
-              `}
-              >
-                <div
-                  className={`text-sm ${
-                    isDarkMode ? "text-blue-200" : "text-blue-600"
-                  }`}
-                >
-                  <p className="font-semibold mb-1">문의자 정보</p>
-                  <p>사용자명: {user?.username || "익명"}</p>
-                </div>
-              </div>
 
               {/* 제목 */}
-              <div>
+              <div className="mt-10">
                 <label
                   className={`block text-sm font-semibold mb-2 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
