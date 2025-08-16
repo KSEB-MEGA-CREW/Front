@@ -182,7 +182,7 @@ const CustomerSupport = () => {
                 isDarkMode ? "text-blue-400" : "text-blue-600"
               }`}
             >
-              support@sudam.com
+              dissolve1882@naver.com
             </p>
           </div>
 
@@ -228,7 +228,7 @@ const CustomerSupport = () => {
                 isDarkMode ? "text-green-400" : "text-green-600"
               }`}
             >
-              02-1234-5678
+              010-3738-1882
             </p>
           </div>
 
