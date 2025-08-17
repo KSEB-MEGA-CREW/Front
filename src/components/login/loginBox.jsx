@@ -120,7 +120,7 @@ const LoginBox = () => {
                 const redirectTo = searchParams.get("redirect") || "/";
                 console.log("🔄 관리자 리다이렉트:", redirectTo);
                 navigate(redirectTo, { replace: true });
-              }, 200000);
+              }, 2000);
 
               return; // 즉시 리다이렉트 방지
             }
