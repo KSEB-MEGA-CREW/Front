@@ -77,13 +77,17 @@ const TicketDetail = () => {
       );
 
       if (response.success && response.data) {
-        // 일반 사용자의 경우, 한 번 더 본인의 문의가 맞는지 확인합니다.
-        if (!isAdmin() && response.data.userId !== user?.id) {
-          setError("이 문의에 접근할 권한이 없습니다.");
-          setTicket(null);
-        } else {
+        if (response.data.isPublic === true) {
           setTicket(response.data);
           setError("");
+        } else {
+          if (!isAdmin() && response.data.userId !== user?.id) {
+            setError("이 문의에 접근할 권한이 없습니다.");
+            setTicket(null);
+          } else {
+            setTicket(response.data);
+            setError("");
+          }
         }
       } else {
         setError(response.message || "문의를 찾을 수 없습니다.");
