@@ -85,6 +85,10 @@ const TicketDetail = () => {
         response
       );
 
+      console.log("생성 날짜", ticket.createdDate);
+      console.log("수정 날짜", ticket.lastEditedDate);
+      console.log("관리자 응답 날짜", ticket.adminResponseDate);
+
       if (response.success && response.data) {
         if (response.data.isPublic === true) {
           setTicket(response.data);
