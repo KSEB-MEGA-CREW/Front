@@ -245,6 +245,46 @@ export const authApi = {
   },
 
   // submitSupportReply 관리자 답변 작성
+  // 게시글 수정
+  updateSupportTicket: async (ticketId, ticketData) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "PUT",
+        body: JSON.stringify(ticketData),
+      });
+      return response;
+    } catch (error) {
+      console.error("게시글 수정 오류:", error);
+      throw error;
+    }
+  },
+
+  // 게시글 삭제 (일반 사용자)
+  deleteSupportTicket: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error("게시글 삭제 오류:", error);
+      throw error;
+    }
+  },
+
+  // 게시글 삭제 (관리자)
+  deleteSupportTicketByAdmin: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/admin/tickets/${ticketId}`, {
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error("관리자 게시글 삭제 오류:", error);
+      throw error;
+    }
+  },
+
   submitSupportReply: async (ticketId, replyData) => {
     try {
       const response = await apiRequest(

@@ -10,6 +10,8 @@ import {
   Send,
   Eye,
   EyeOff,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -23,6 +25,15 @@ const TicketDetail = () => {
   const [error, setError] = useState("");
   const [replyContent, setReplyContent] = useState("");
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    subject: "",
+    content: "",
+    category: "",
+    isPublic: false,
+  });
 
   const categories = [
     { id: "TECHNICAL", label: "기술적 문제", icon: "⚙️" },
@@ -149,6 +160,94 @@ const TicketDetail = () => {
     }
   };
 
+  // 수정 모드 시작
+  const handleEditStart = () => {
+    setIsEditing(true);
+    setEditFormData({
+      subject: ticket.subject,
+      content: ticket.content,
+      category: ticket.category,
+      isPublic: ticket.isPublic,
+    });
+  };
+
+  // 수정 취소
+  const handleEditCancel = () => {
+    setIsEditing(false);
+    setEditFormData({
+      subject: "",
+      content: "",
+      category: "",
+      isPublic: false,
+    });
+  };
+
+  // 게시글 수정
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!editFormData.subject.trim() || !editFormData.content.trim()) {
+      setError("제목과 내용을 모두 입력해주세요.");
+      return;
+    }
+
+    try {
+      const response = await authApi.updateSupportTicket(
+        ticketId,
+        editFormData
+      );
+
+      if (response.success) {
+        await fetchTicket(); // 수정된 내용 다시 불러오기
+        setIsEditing(false);
+        setError("");
+      } else {
+        throw new Error(response.message || "게시글 수정에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("게시글 수정 오류:", error);
+      setError(error.message || "게시글 수정 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 게시글 삭제
+  const handleDelete = async () => {
+    setIsDeleting(true);
+
+    try {
+      let response;
+
+      // 관리자인 경우 관리자 삭제 API 사용
+      if (isAdmin()) {
+        response = await authApi.deleteSupportTicketByAdmin(ticketId);
+      } else {
+        response = await authApi.deleteSupportTicket(ticketId);
+      }
+
+      if (response.success) {
+        // 삭제 성공 시 문의게시판으로 이동
+        navigate("/inquiry-board");
+      } else {
+        throw new Error(response.message || "게시글 삭제에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("게시글 삭제 오류:", error);
+      setError(error.message || "게시글 삭제 중 오류가 발생했습니다.");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
+
+  // 권한 체크 함수
+  const canEdit = () => {
+    return ticket && user && (ticket.userId == user.id || isAdmin());
+  };
+
+  const canDelete = () => {
+    return ticket && user && (ticket.userId == user.id || isAdmin());
+  };
+
   // 로딩 상태 UI
   if (isLoading) {
     return (
@@ -262,80 +361,249 @@ const TicketDetail = () => {
           }`}
         >
           {/* 메타 정보 */}
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="text-lg">{getCategoryIcon(ticket.category)}</span>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
-                isDarkMode
-                  ? "border-1 border-gray-400 text-white"
-                  : "border-1 border-gray-400 text-gray-800"
-              }`}
-            >
-              <User size={12} />
-              {ticket.userName || "익명"}
-            </span>
-            <span
-              className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                isDarkMode
-                  ? "bg-blue-500/20 text-blue-400"
-                  : "bg-blue-100 text-blue-600"
-              }`}
-            >
-              {getCategoryLabel(ticket.category)}
-            </span>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
-                ticket.isPublic
-                  ? isDarkMode
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-green-100 text-green-600"
-                  : isDarkMode
-                  ? "bg-orange-500/20 text-orange-400"
-                  : "bg-orange-100 text-orange-600"
-              }`}
-            >
-              {ticket.isPublic ? <Eye size={12} /> : <EyeOff size={12} />}
-              {ticket.isPublic ? "공개" : "비공개"}
-            </span>
-            <span
-              className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
-                isDarkMode
-                  ? "bg-gray-600 text-gray-300"
-                  : "bg-gray-200 text-gray-600"
-              }`}
-            >
-              <Calendar size={12} />
-              {ticket.createdDate
-                ? new Date(ticket.createdDate).toLocaleDateString("ko-KR")
-                : "날짜 없음"}
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="text-lg">
+                {getCategoryIcon(ticket.category)}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                  isDarkMode
+                    ? "border-1 border-gray-400 text-white"
+                    : "border-1 border-gray-400 text-gray-800"
+                }`}
+              >
+                <User size={12} />
+                {ticket.userName || "익명"}
+              </span>
+              <span
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  isDarkMode
+                    ? "bg-blue-500/20 text-blue-400"
+                    : "bg-blue-100 text-blue-600"
+                }`}
+              >
+                {getCategoryLabel(ticket.category)}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                  ticket.isPublic
+                    ? isDarkMode
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-green-100 text-green-600"
+                    : isDarkMode
+                    ? "bg-orange-500/20 text-orange-400"
+                    : "bg-orange-100 text-orange-600"
+                }`}
+              >
+                {ticket.isPublic ? <Eye size={12} /> : <EyeOff size={12} />}
+                {ticket.isPublic ? "공개" : "비공개"}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                  isDarkMode
+                    ? "bg-gray-600 text-gray-300"
+                    : "bg-gray-200 text-gray-600"
+                }`}
+              >
+                <Calendar size={12} />
+                {ticket.modifiedDate &&
+                ticket.modifiedDate !== ticket.createdDate
+                  ? `수정됨 ${new Date(ticket.modifiedDate).toLocaleDateString(
+                      "ko-KR"
+                    )}`
+                  : ticket.createdDate
+                  ? new Date(ticket.createdDate).toLocaleDateString("ko-KR")
+                  : "날짜 없음"}
+              </span>
+            </div>
+
+            {/* 수정/삭제 버튼 */}
+            {(canEdit() || canDelete()) && !isEditing && (
+              <div className="flex gap-2">
+                {canEdit() && (
+                  <button
+                    onClick={handleEditStart}
+                    className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+                      isDarkMode
+                        ? "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
+                        : "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
+                    }`}
+                  >
+                    <Pencil size={14} />
+                  </button>
+                )}
+                {canDelete() && (
+                  <button
+                    onClick={() => setShowDeleteModal(true)}
+                    className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
+                      isDarkMode
+                        ? "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
+                        : " border-1 border-gray-300 hover:bg-gray-600 text-white"
+                    }`}
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* 제목 */}
-          <h2
-            className={`text-2xl font-bold mb-4 ${
-              isDarkMode ? "text-white" : "text-gray-900"
-            }`}
-          >
-            {ticket.subject}
-          </h2>
+          {/* 수정 폼 */}
+          {isEditing ? (
+            <form onSubmit={handleEditSubmit} className="space-y-4 mb-6">
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  카테고리
+                </label>
+                <select
+                  value={editFormData.category}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({
+                      ...prev,
+                      category: e.target.value,
+                    }))
+                  }
+                  className={`w-full px-3 py-2 rounded-lg border ${
+                    isDarkMode
+                      ? "bg-gray-700 border-gray-600 text-white"
+                      : "bg-white border-gray-300 text-gray-900"
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+                >
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.icon} {category.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          {/* 내용 */}
-          <div
-            className={`p-4 rounded-lg border mb-6 ${
-              isDarkMode
-                ? "bg-gray-700 border-gray-600"
-                : "bg-gray-50 border-gray-200"
-            }`}
-          >
-            <p
-              className={`text-sm whitespace-pre-wrap ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
-              }`}
-            >
-              {ticket.content}
-            </p>
-          </div>
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  제목
+                </label>
+                <input
+                  type="text"
+                  value={editFormData.subject}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({
+                      ...prev,
+                      subject: e.target.value,
+                    }))
+                  }
+                  className={`w-full px-3 py-2 rounded-lg border ${
+                    isDarkMode
+                      ? "bg-gray-700 border-gray-600 text-white"
+                      : "bg-white border-gray-300 text-gray-900"
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+                  placeholder="제목을 입력해주세요"
+                />
+              </div>
+
+              <div>
+                <label
+                  className={`block text-sm font-medium mb-2 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  내용
+                </label>
+                <textarea
+                  value={editFormData.content}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({
+                      ...prev,
+                      content: e.target.value,
+                    }))
+                  }
+                  rows={8}
+                  className={`w-full px-3 py-2 rounded-lg border resize-none ${
+                    isDarkMode
+                      ? "bg-gray-700 border-gray-600 text-white"
+                      : "bg-white border-gray-300 text-gray-900"
+                  } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+                  placeholder="내용을 입력해주세요"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <label
+                  className={`flex items-center gap-2 cursor-pointer ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={editFormData.isPublic}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({
+                        ...prev,
+                        isPublic: e.target.checked,
+                      }))
+                    }
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                  공개 게시글
+                </label>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                >
+                  수정 완료
+                </button>
+                <button
+                  type="button"
+                  onClick={handleEditCancel}
+                  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                    isDarkMode
+                      ? "bg-gray-600 hover:bg-gray-700 text-white"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-700"
+                  }`}
+                >
+                  취소
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              {/* 제목 */}
+              <h2
+                className={`text-2xl font-bold mb-4 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                {ticket.subject}
+              </h2>
+
+              {/* 내용 */}
+              <div
+                className={`p-4 rounded-lg border mb-6 ${
+                  isDarkMode
+                    ? "bg-gray-700 border-gray-600"
+                    : "bg-gray-50 border-gray-200"
+                }`}
+              >
+                <p
+                  className={`text-sm whitespace-pre-wrap ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  {ticket.content}
+                </p>
+              </div>
+            </>
+          )}
 
           {/* 답변 */}
           {ticket.reply && (
@@ -368,8 +636,8 @@ const TicketDetail = () => {
                       isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    {ticket.reply.createdAt
-                      ? new Date(ticket.reply.createdAt).toLocaleDateString(
+                    {ticket.reply.createdDate
+                      ? new Date(ticket.reply.createdDate).toLocaleDateString(
                           "ko-KR"
                         )
                       : ""}
@@ -435,6 +703,68 @@ const TicketDetail = () => {
             </div>
           )}
         </div>
+
+        {/* 삭제 확인 모달 */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div
+              className={`p-6 rounded-2xl shadow-xl max-w-md w-full mx-4 ${
+                isDarkMode ? "bg-gray-800" : "bg-white"
+              }`}
+            >
+              <h3
+                className={`text-lg font-semibold mb-4 ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                게시글 삭제 확인
+              </h3>
+              <p
+                className={`mb-6 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                }`}
+              >
+                정말로 이 게시글을 삭제하시겠습니까?
+                <br />
+                삭제된 게시글은 복구할 수 없습니다.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
+                    isDeleting
+                      ? "bg-gray-400 cursor-not-allowed text-white"
+                      : "bg-red-600 hover:bg-red-700 text-white"
+                  }`}
+                >
+                  {isDeleting ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      삭제 중...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={16} />
+                      삭제
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={isDeleting}
+                  className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    isDarkMode
+                      ? "bg-gray-600 hover:bg-gray-700 text-white"
+                      : "bg-gray-300 hover:bg-gray-400 text-gray-700"
+                  }`}
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

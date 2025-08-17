@@ -55,7 +55,7 @@ const Pagination = ({
   const endItem = Math.min(currentPage * pageSize, totalElements);
 
   if (totalPages < 1) {
-    return null; // 페이지가 1개 이하면 페이징 표시 안함
+    return null; // 페이지가 0개 이하면 페이징 표시 안함
   }
 
   return (
