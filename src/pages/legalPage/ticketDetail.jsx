@@ -361,7 +361,7 @@ const TicketDetail = () => {
           }`}
         >
           {/* 메타 정보 */}
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-lg">
                 {getCategoryIcon(ticket.category)}
@@ -379,8 +379,8 @@ const TicketDetail = () => {
               <span
                 className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
                   isDarkMode
-                    ? "bg-gray-600 text-gray-300"
-                    : "bg-gray-200 text-gray-600"
+                    ? "border-1 border-gray-600 bg-gray-700 text-gray-300"
+                    : "border-1 border-gray-200 bg-gray-50 text-gray-600"
                 }`}
               >
                 <Calendar size={12} />

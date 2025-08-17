@@ -612,7 +612,7 @@ const InquiryBoard = () => {
                       ${
                         isDarkMode
                           ? "border-1 border-gray-300 text-gray-200"
-                          : "bg-blue-100 text-blue-600"
+                          : "border-1 border-gray-400 text-gray-800"
                       }
                     `}
                       >

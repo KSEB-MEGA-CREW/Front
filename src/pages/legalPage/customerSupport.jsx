@@ -584,7 +584,7 @@ const CustomerSupport = () => {
         {/* FAQ 섹션 */}
         <div
           className={`
-          p-8 rounded-2xl shadow-lg border
+          p-8 rounded-2xl shadow-lg border 
           ${
             isDarkMode
               ? "bg-gray-800 border-gray-700"
@@ -603,12 +603,16 @@ const CustomerSupport = () => {
             <details
               className={`
               p-4 rounded-lg border
-              ${isDarkMode ? "border-gray-600" : "border-gray-200"}
+              ${
+                isDarkMode
+                  ? "border-gray-600 hover:bg-gray-700"
+                  : "border-gray-200 hover:bg-gray-100"
+              }
             `}
             >
               <summary
                 className={`font-semibold cursor-pointer ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  isDarkMode ? "text-white " : "text-gray-900"
                 }`}
               >
                 비밀번호를 잊어버렸어요
@@ -626,7 +630,11 @@ const CustomerSupport = () => {
             <details
               className={`
               p-4 rounded-lg border
-              ${isDarkMode ? "border-gray-600" : "border-gray-200"}
+                            ${
+                              isDarkMode
+                                ? "border-gray-600 hover:bg-gray-700"
+                                : "border-gray-200 hover:bg-gray-100"
+                            }
             `}
             >
               <summary
@@ -650,7 +658,11 @@ const CustomerSupport = () => {
             <details
               className={`
               p-4 rounded-lg border
-              ${isDarkMode ? "border-gray-600" : "border-gray-200"}
+                           ${
+                             isDarkMode
+                               ? "border-gray-600 hover:bg-gray-700"
+                               : "border-gray-200 hover:bg-gray-100"
+                           }
             `}
             >
               <summary
