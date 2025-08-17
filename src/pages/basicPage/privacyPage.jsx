@@ -2,38 +2,51 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function PrivacyPage() {
   const { user } = useAuth();
   const { isDarkMode } = useTheme();
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen text-gray-900 dark:text-white relative flex flex-col">
       {/* 상단 네비게이션 (로그인하지 않은 사용자용) */}
       {!user && (
-        <header className={`w-full py-4 px-6 border-b ${
-          isDarkMode 
-            ? 'bg-gray-900 border-gray-800' 
-            : 'bg-white border-gray-200'
-        }`}>
+        <header
+          className={`w-full py-4 px-6 border-b ${
+            isDarkMode
+              ? "bg-gray-900 border-gray-800"
+              : "bg-white border-gray-200"
+          }`}
+        >
           <div className="max-w-4xl mx-auto flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">수</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                <img
+                  src="/icon.png"
+                  alt="수담 로고"
+                  className="w-full h-full object-cover"
+                />
               </div>
-              <span className={`font-bold text-lg ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <span
+                className={`font-bold text-lg ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
                 수담
               </span>
             </div>
-            <Link 
-              to="/auth" 
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            <Link
+              to="/auth/signup"
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                 isDarkMode
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
-              로그인으로 돌아가기
+              회원가입으로 돌아가기
             </Link>
           </div>
         </header>
@@ -41,6 +54,24 @@ export default function PrivacyPage() {
 
       {/* 메인 콘텐츠 */}
       <main className="flex-grow container mx-auto px-6 py-20 max-w-4xl overflow-y-auto">
+        {/* 로그인된 사용자를 위한 돌아가기 버튼 */}
+        {user && (
+          <div className="flex items-center gap-4 mb-8">
+            <button
+              onClick={() => navigate("/")}
+              className={`
+                p-2 rounded-lg transition-colors
+                ${
+                  isDarkMode
+                    ? "hover:bg-gray-800 text-gray-400 hover:text-white"
+                    : "hover:bg-white text-gray-600 hover:text-gray-900"
+                }
+              `}
+            >
+              <ArrowLeft size={24} />
+            </button>
+          </div>
+        )}
         <h1 className="text-4xl font-bold mb-8 drop-shadow-lg">
           개인정보처리방침
         </h1>

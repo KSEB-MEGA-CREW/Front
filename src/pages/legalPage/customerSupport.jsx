@@ -182,7 +182,7 @@ const CustomerSupport = () => {
                 isDarkMode ? "text-blue-400" : "text-blue-600"
               }`}
             >
-              support@sudam.com
+              dissolve1882@naver.com
             </p>
           </div>
 
@@ -205,7 +205,7 @@ const CustomerSupport = () => {
               <Phone
                 size={24}
                 className={`${
-                  isDarkMode ? "text-green-400" : "text-green-600"
+                  isDarkMode ? "text-green-500" : "text-green-700"
                 }`}
               />
             </div>
@@ -225,10 +225,10 @@ const CustomerSupport = () => {
             </p>
             <p
               className={`font-medium ${
-                isDarkMode ? "text-green-400" : "text-green-600"
+                isDarkMode ? "text-green-500" : "text-green-700"
               }`}
             >
-              02-1234-5678
+              010-3738-1882
             </p>
           </div>
 
@@ -342,7 +342,7 @@ const CustomerSupport = () => {
               {/* 카테고리 선택 */}
               <div>
                 <label
-                  className={`block text-sm font-medium mb-3 ${
+                  className={`block text-sm font-semibold mb-3 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -372,7 +372,7 @@ const CustomerSupport = () => {
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-lg">{category.icon}</span>
-                        <span className="text-sm font-medium">
+                        <span className="text-sm font-semibold">
                           {category.label}
                         </span>
                       </div>
@@ -382,26 +382,11 @@ const CustomerSupport = () => {
               </div>
 
               {/* 사용자 정보 표시 */}
-              <div
-                className={`
-                p-4 rounded-lg border-l-4 border-blue-500
-                ${isDarkMode ? "bg-blue-900/20" : "bg-blue-50"}
-              `}
-              >
-                <div
-                  className={`text-sm ${
-                    isDarkMode ? "text-blue-200" : "text-blue-600"
-                  }`}
-                >
-                  <p className="font-medium mb-1">문의자 정보</p>
-                  <p>사용자명: {user?.username || "익명"}</p>
-                </div>
-              </div>
 
               {/* 제목 */}
-              <div>
+              <div className="mt-10">
                 <label
-                  className={`block text-sm font-medium mb-2 ${
+                  className={`block text-sm font-semibold mb-2 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -428,7 +413,7 @@ const CustomerSupport = () => {
               {/* 메시지 */}
               <div>
                 <label
-                  className={`block text-sm font-medium mb-2 ${
+                  className={`block text-sm font-semibold mb-2 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -455,7 +440,7 @@ const CustomerSupport = () => {
               {/* 공개/비공개 선택 */}
               <div>
                 <label
-                  className={`block text-sm font-medium mb-3 ${
+                  className={`block text-sm font-semibold mb-3 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -472,7 +457,7 @@ const CustomerSupport = () => {
                     />
                     <div className="ml-3">
                       <div
-                        className={`text-sm font-medium ${
+                        className={`text-sm font-semibold ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
@@ -497,7 +482,7 @@ const CustomerSupport = () => {
                     />
                     <div className="ml-3">
                       <div
-                        className={`text-sm font-medium ${
+                        className={`text-sm font-semibold ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
@@ -569,7 +554,7 @@ const CustomerSupport = () => {
                         isDarkMode ? "text-blue-200" : "text-blue-600"
                       }`}
                     >
-                      <p className="font-medium mb-1">문의 전 확인사항</p>
+                      <p className="font-semibold mb-1">문의 전 확인사항</p>
                       <ul className="space-y-1 text-xs">
                         <li>
                           • 기술적 문제의 경우 구체적인 오류 메시지나 상황을

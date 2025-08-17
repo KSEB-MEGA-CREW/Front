@@ -161,7 +161,7 @@ const SignUpBox = () => {
 
         {/* 청각상태 선택 */}
         <div className="border border-gray-700 rounded-lg p-4 bg-gray-800">
-          <label className="block text-white font-medium mb-2">청각상태</label>
+          <label className="block text-white font-semibold mb-2">청각상태</label>
           <p className="text-xs text-gray-400 mb-4">
             맞춤형 수어 번역 서비스 제공을 위해 수집됩니다
           </p>

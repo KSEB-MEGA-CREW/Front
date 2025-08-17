@@ -8,7 +8,7 @@ import {
   Play,
   CheckCircle,
   Star,
-  Zap,
+  Mic,
   Heart,
   Globe,
   Award,
@@ -32,22 +32,22 @@ function MainPage() {
 
   const features = [
     {
-      icon: <Zap className="w-8 h-8" />,
+      icon: <Mic className="w-8 h-8" />,
       title: "실시간 번역",
       description: "AI 기반 실시간 수어 번역으로 즉석에서 소통하세요",
-      gradient: "from-blue-500 to-cyan-500",
+      gradient: "bg-blue-500/50",
     },
     {
       icon: <Users className="w-8 h-8" />,
       title: "양방향 소통",
-      description: "수어와 음성을 자유롭게 번역하여 모두가 소통할 수 있어요",
-      gradient: "from-purple-500 to-pink-500",
+      description: "수어와 문장을 자유롭게 번역하여 모두가 소통할 수 있어요",
+      gradient: "bg-green-500/50",
     },
     {
       icon: <BookOpen className="w-8 h-8" />,
       title: "체계적인 학습",
       description: "단계별 수어 학습으로 실력을 체계적으로 향상시키세요",
-      gradient: "from-green-500 to-emerald-500",
+      gradient: "bg-purple-500/50",
     },
   ];
 
@@ -111,7 +111,13 @@ function MainPage() {
         <div className="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-8 bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+            <div
+              className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-8 border-2 ${
+                isDarkMode
+                  ? "border-gray-500 text-white"
+                  : "border-1 border-gray-500 text-gray-800"
+              }`}
+            >
               <Star className="w-4 h-4 mr-2" />
               AI 기반 수어 번역 서비스
             </div>
@@ -122,10 +128,8 @@ function MainPage() {
                 isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              <span className="block">수어와 음성을</span>
-              <span className="bg-gradient-to-r from-blue-500 to-purple-500 bg-clip-text text-transparent">
-                실시간으로 연결
-              </span>
+              <span className="block">수어와 문장을</span>
+              <span className="bg-white bg-clip-text">실시간으로 연결</span>
             </h1>
 
             {/* Subtitle */}
@@ -134,31 +138,31 @@ function MainPage() {
                 isDarkMode ? "text-gray-300" : "text-gray-600"
               }`}
             >
-              첨단 AI 기술로 수어와 음성을 즉시 번역하여
+              수어와 문장을 즉시 번역하여
               <br />
               모든 사람이 자유롭게 소통할 수 있는 세상을 만듭니다
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <button
+              {/* <button
                 onClick={() => navigate("/translate/video")}
                 className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+              > */}
+              <button
+                onClick={() => navigate("/translate/video")}
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-blue-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <Play className="w-5 h-5 mr-2" />
                 지금 체험하기
               </button>
-              <button
+              {/* <button
                 onClick={() => navigate("/study")}
-                className={`inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl border-2 transition-all duration-200 hover:scale-105 ${
-                  isDarkMode
-                    ? "border-gray-600 text-gray-300 hover:border-gray-500 hover:bg-gray-800"
-                    : "border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50"
-                }`}
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <BookOpen className="w-5 h-5 mr-2" />
                 학습 시작하기
-              </button>
+              </button> */}
             </div>
 
             {/* Demo Section */}
@@ -174,7 +178,7 @@ function MainPage() {
                   isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
-                실시간 번역 데모
+                실시간 번역 예시
               </h3>
 
               <div className="flex items-center justify-center space-x-8 mb-6">
@@ -187,7 +191,9 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       translationDemo
-                        ? "bg-blue-500 text-white shadow-lg shadow-blue-500/30"
+                        ? isDarkMode
+                          ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
+                          : "border-1 border-blue-500 text-gray-700 bg-blue-50 shadow-lg shadow-blue-500/30"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"
@@ -196,7 +202,7 @@ function MainPage() {
                     <Hand className="w-12 h-12" />
                   </div>
                   <div
-                    className={`text-sm mt-2 font-medium text-center ${
+                    className={`text-sm mt-2 font-semibold text-center ${
                       isDarkMode ? "text-gray-300" : "text-gray-600"
                     }`}
                   >
@@ -222,7 +228,9 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       !translationDemo
-                        ? "bg-purple-500 text-white shadow-lg shadow-purple-500/30"
+                        ? isDarkMode
+                          ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
+                          : "border-1 border-blue-500 text-gray-700 bg-blue-50 shadow-lg shadow-blue-500/30"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"
@@ -231,24 +239,24 @@ function MainPage() {
                     <Volume2 className="w-12 h-12" />
                   </div>
                   <div
-                    className={`text-sm mt-2 font-medium text-center ${
+                    className={`text-sm mt-2 font-semibold text-center ${
                       isDarkMode ? "text-gray-300" : "text-gray-600"
                     }`}
                   >
-                    음성
+                    문장
                   </div>
                 </div>
               </div>
 
               <div className="text-center">
                 <p
-                  className={`text-lg font-medium ${
+                  className={`text-lg font-semibold ${
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
                   {translationDemo
-                    ? "🤟 '안녕하세요' → 🎵 '안녕하세요'"
-                    : "🎵 '반갑습니다' → 🤟 '반갑습니다'"}
+                    ? "🖐 '안녕하세요' → 💬 '안녕하세요'"
+                    : "💬 '반갑습니다' → 🖐 '반갑습니다'"}
                 </p>
                 <p
                   className={`text-sm mt-2 ${
@@ -256,8 +264,8 @@ function MainPage() {
                   }`}
                 >
                   {translationDemo
-                    ? "수어를 음성으로 실시간 변환"
-                    : "음성을 수어로 실시간 변환"}
+                    ? "수어를 문장으로 실시간 변환"
+                    : "문장을 수어로 실시간 변환"}
                 </p>
               </div>
             </div>
@@ -448,7 +456,7 @@ function MainPage() {
                 : "bg-gradient-to-r from-blue-50 to-purple-50"
             }`}
           >
-            <Heart className="w-16 h-16 mx-auto mb-6 text-red-500" />
+            <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" />
             <h2
               className={`text-3xl md:text-4xl font-bold mb-6 ${
                 isDarkMode ? "text-white" : "text-gray-900"
@@ -468,7 +476,7 @@ function MainPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={() => navigate("/translate/video")}
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-xl bg-blue-500 text-white hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
               >
                 <CheckCircle className="w-5 h-5 mr-2" />
                 지금 시작하기

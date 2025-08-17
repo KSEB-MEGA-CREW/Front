@@ -181,8 +181,8 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 w-24 h-24 mx-auto rounded-full flex items-center justify-center text-3xl font-bold
                 ${
                   isDarkMode
-                    ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white"
-                    : "bg-gradient-to-br from-blue-400 to-purple-500 text-white"
+                    ? "border-2 border-gray-600 text-white"
+                    : "border-2 border-gray-600 text-gray-700"
                 }
               `}
               >
@@ -250,7 +250,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                   />
                 ) : (
                   <p
-                    className={`font-medium ${
+                    className={`font-semibold ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
@@ -266,8 +266,8 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 p-2 rounded-lg
                 ${
                   isDarkMode
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-green-100 text-green-600"
+                    ? "bg-green-500/20 text-green-500"
+                    : "bg-green-100 text-green-700"
                 }
               `}
               >
@@ -303,7 +303,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                   </select>
                 ) : (
                   <p
-                    className={`font-medium ${
+                    className={`font-semibold ${
                       isDarkMode ? "text-white" : "text-gray-900"
                     }`}
                   >
@@ -335,7 +335,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                   가입일
                 </p>
                 <p
-                  className={`font-medium ${
+                  className={`font-semibold ${
                     isDarkMode ? "text-white" : "text-gray-900"
                   }`}
                 >
@@ -396,7 +396,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 onClick={handleSave}
                 disabled={isLoading}
                 className={`
-                  w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2
+                  w-full p-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
                   ${
                     isLoading
                       ? "bg-gray-400 cursor-not-allowed"
@@ -420,7 +420,7 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 onClick={handleEditToggle}
                 disabled={isLoading}
                 className={`
-                  w-full p-3 rounded-lg font-medium transition-colors border
+                  w-full p-3 rounded-lg font-semibold transition-colors border
                   ${
                     isDarkMode
                       ? "border-gray-600 hover:bg-gray-700 text-gray-300"

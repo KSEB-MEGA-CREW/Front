@@ -14,64 +14,90 @@ const COLOR_THEMES = {
     name: "초록색",
     colors: {
       "no-quiz": "bg-gray-300",
-      "0": "bg-red-400",
+      0: "bg-gray-500",
       "1-20": "bg-green-200",
       "21-40": "bg-green-300",
       "41-60": "bg-green-400",
       "61-80": "bg-green-500",
       "81-99": "bg-green-600",
-      "100": "bg-green-700"
-    }
+      100: "bg-green-700",
+    },
   },
   blue: {
     name: "파란색",
     colors: {
       "no-quiz": "bg-gray-300",
-      "0": "bg-red-400",
+      0: "bg-gray-500",
       "1-20": "bg-blue-200",
       "21-40": "bg-blue-300",
       "41-60": "bg-blue-400",
       "61-80": "bg-blue-500",
       "81-99": "bg-blue-600",
-      "100": "bg-blue-700"
-    }
+      100: "bg-blue-700",
+    },
   },
   purple: {
     name: "보라색",
     colors: {
       "no-quiz": "bg-gray-300",
-      "0": "bg-red-400",
+      0: "bg-gray-500",
       "1-20": "bg-purple-200",
       "21-40": "bg-purple-300",
       "41-60": "bg-purple-400",
       "61-80": "bg-purple-500",
       "81-99": "bg-purple-600",
-      "100": "bg-purple-700"
-    }
-  }
+      100: "bg-purple-700",
+    },
+  },
 };
 
 // ✅ 색상 및 범례 정보 생성 함수
 const createAccuracyLevels = (theme) => [
-  { range: "no-quiz", label: "안푼 날", color: COLOR_THEMES[theme].colors["no-quiz"] },
+  {
+    range: "no-quiz",
+    label: "안푼 날",
+    color: COLOR_THEMES[theme].colors["no-quiz"],
+  },
   { range: "0", label: "0%", color: COLOR_THEMES[theme].colors["0"] },
   { range: "1-20", label: "1-20%", color: COLOR_THEMES[theme].colors["1-20"] },
-  { range: "21-40", label: "21-40%", color: COLOR_THEMES[theme].colors["21-40"] },
-  { range: "41-60", label: "41-60%", color: COLOR_THEMES[theme].colors["41-60"] },
-  { range: "61-80", label: "61-80%", color: COLOR_THEMES[theme].colors["61-80"] },
-  { range: "81-99", label: "81-99%", color: COLOR_THEMES[theme].colors["81-99"] },
+  {
+    range: "21-40",
+    label: "21-40%",
+    color: COLOR_THEMES[theme].colors["21-40"],
+  },
+  {
+    range: "41-60",
+    label: "41-60%",
+    color: COLOR_THEMES[theme].colors["41-60"],
+  },
+  {
+    range: "61-80",
+    label: "61-80%",
+    color: COLOR_THEMES[theme].colors["61-80"],
+  },
+  {
+    range: "81-99",
+    label: "81-99%",
+    color: COLOR_THEMES[theme].colors["81-99"],
+  },
   { range: "100", label: "100%", color: COLOR_THEMES[theme].colors["100"] },
 ];
 function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
   const [activeDate, setActiveDate] = useState(new Date());
   const [quizHistory, setQuizHistory] = useState({});
   const [loading, setLoading] = useState(true);
-  const [colorTheme, setColorTheme] = useState('green');
-  
+  const [colorTheme, setColorTheme] = useState("green");
+
   // 현재 테마에 따른 ACCURACY_LEVELS 생성 (메모화)
-  const ACCURACY_LEVELS = useMemo(() => createAccuracyLevels(colorTheme), [colorTheme]);
-  const allRanges = useMemo(() => ACCURACY_LEVELS.map((l) => l.range), [ACCURACY_LEVELS]);
-  
+  const ACCURACY_LEVELS = useMemo(
+    () => createAccuracyLevels(colorTheme),
+    [colorTheme]
+  );
+  const allRanges = useMemo(
+    () => ACCURACY_LEVELS.map((l) => l.range),
+    [ACCURACY_LEVELS]
+  );
+
   // ✅ 필터링 상태를 Set으로 관리하여 여러 범위를 동시에 선택/해제
   const [activeRanges, setActiveRanges] = useState(new Set());
 
@@ -373,7 +399,9 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
 
       {/* 색상 테마 선택기 */}
       <div className="flex justify-center items-center gap-2 mb-4">
-        <span className={`text-xs ${isModal ? "text-gray-400" : "text-gray-500"}`}>
+        <span
+          className={`text-xs ${isModal ? "text-gray-400" : "text-gray-500"}`}
+        >
           색상 테마:
         </span>
         {Object.entries(COLOR_THEMES).map(([themeKey, theme]) => (
@@ -386,8 +414,8 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
                   ? "bg-gray-700 text-white"
                   : "bg-blue-100 text-blue-700"
                 : isModal
-                  ? "text-gray-400 hover:bg-gray-700 hover:text-white"
-                  : "text-gray-600 hover:bg-gray-100"
+                ? "text-gray-400 hover:bg-gray-700 hover:text-white"
+                : "text-gray-600 hover:bg-gray-100"
             }`}
           >
             {theme.name}

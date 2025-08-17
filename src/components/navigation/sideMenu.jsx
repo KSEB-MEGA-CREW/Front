@@ -8,7 +8,7 @@ import {
   LogOut,
   MessageSquare,
   UserCircle,
-  Bot,
+  Hand,
   Brain,
   Shield,
   Users,
@@ -41,13 +41,13 @@ const SideMenu = ({
     },
     {
       icon: <MessageSquare size={20} />,
-      label: "수어 → 텍스트",
+      label: "수어 번역",
       path: "/translate/video",
       onClick: () => onNavigate("/translate/video"),
     },
     {
-      icon: <Bot size={20} />,
-      label: "텍스트 → 아바타",
+      icon: <Hand size={20} />,
+      label: "문장 번역",
       path: "/translate/avatar",
       onClick: () => onNavigate("/translate/avatar"),
     },
@@ -158,7 +158,7 @@ const SideMenu = ({
                 `}
               >
                 <div className="flex-shrink-0">{item.icon}</div>
-                {isOpen && <span className="font-medium">{item.label}</span>}
+                {isOpen && <span className="font-semibold">{item.label}</span>}
               </button>
             ))}
 
@@ -199,7 +199,7 @@ const SideMenu = ({
                   >
                     <div className="flex-shrink-0">{item.icon}</div>
                     {isOpen && (
-                      <span className="font-medium">{item.label}</span>
+                      <span className="font-semibold">{item.label}</span>
                     )}
                   </button>
                 ))}
@@ -228,11 +228,11 @@ const SideMenu = ({
             {isOpen && (
               <div className="text-left">
                 <div className="flex items-center gap-2">
-                  <div className="font-medium">
+                  <div className="font-semibold">
                     {user?.username || "사용자"}
                   </div>
                   {isAdmin() && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-900/50 text-yellow-300 border border-yellow-700">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-yellow-900/50 text-yellow-300 border border-yellow-700">
                       👑 관리자
                     </span>
                   )}
@@ -257,7 +257,7 @@ const SideMenu = ({
             <div className="flex-shrink-0">
               <HelpCircle size={20} />
             </div>
-            {isOpen && <span className="font-medium">고객지원</span>}
+            {isOpen && <span className="font-semibold">고객지원</span>}
           </button>
 
           {/* 설정 버튼 */}
@@ -275,7 +275,7 @@ const SideMenu = ({
             <div className="flex-shrink-0">
               <Settings size={20} />
             </div>
-            {isOpen && <span className="font-medium">설정</span>}
+            {isOpen && <span className="font-semibold">설정</span>}
           </button>
 
           {/* 로그아웃 버튼 */}
@@ -294,7 +294,7 @@ const SideMenu = ({
               <LogOut size={20} />
             </div>
             {isOpen && ( // isOpen이 true일 때만 텍스트 렌더링
-              <span className="font-medium">로그아웃</span>
+              <span className="font-semibold">로그아웃</span>
             )}
           </LogoutButton>
         </div>

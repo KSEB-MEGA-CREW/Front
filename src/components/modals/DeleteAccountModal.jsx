@@ -79,8 +79,8 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
           }`}
         >
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-red-500/20">
-              <AlertTriangle size={24} className="text-red-500" />
+            <div className="p-2 rounded-lg bg-[#ff4444]">
+              <AlertTriangle size={24} className="text-gray-100" />
             </div>
             <h2
               className={`text-xl font-bold ${
@@ -154,9 +154,9 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
                 ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-white focus:border-red-500"
-                    : "bg-white border-gray-300 text-gray-900 focus:border-red-500"
+                    : "bg-white border-gray-800 text-gray-900 "
                 }
-                focus:outline-none focus:ring-2 focus:ring-red-500/20
+                focus:outline-none focus:ring-1 focus:ring-gray-700
               `}
             />
           </div>
@@ -188,10 +188,10 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
             onClick={handleDeleteAccount}
             disabled={isLoading || confirmText !== "계정삭제"}
             className={`
-              w-full p-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2
+              w-full p-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2
               ${
                 isLoading || confirmText !== "계정삭제"
-                  ? "bg-gray-400 cursor-not-allowed text-gray-600"
+                  ? "bg-gray-300 cursor-not-allowed text-gray-600"
                   : "bg-red-600 hover:bg-red-700 text-white"
               }
             `}
@@ -212,7 +212,7 @@ const DeleteAccountModal = ({ isOpen, onClose }) => {
             onClick={onClose}
             disabled={isLoading}
             className={`
-              w-full p-3 rounded-lg font-medium transition-colors border
+              w-full p-3 rounded-lg font-semibold transition-colors border
               ${
                 isDarkMode
                   ? "border-gray-600 hover:bg-gray-700 text-gray-300"

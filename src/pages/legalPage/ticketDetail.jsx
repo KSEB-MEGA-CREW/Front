@@ -208,7 +208,7 @@ const TicketDetail = () => {
           <div className="flex flex-wrap items-center gap-3 mb-6">
             <span className="text-lg">{getCategoryIcon(ticket.category)}</span>
             <span className={`
-              px-3 py-1 rounded-full text-xs font-medium
+              px-3 py-1 rounded-full text-xs font-semibold
               ${isDarkMode 
                 ? 'bg-blue-500/20 text-blue-400' 
                 : 'bg-blue-100 text-blue-600'
@@ -218,7 +218,7 @@ const TicketDetail = () => {
             </span>
             
             <span className={`
-              px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1
+              px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1
               ${ticket.isPublic 
                 ? isDarkMode
                   ? 'bg-green-500/20 text-green-400'
@@ -233,7 +233,7 @@ const TicketDetail = () => {
             </span>
 
             <span className={`
-              px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1
+              px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1
               ${isDarkMode 
                 ? 'bg-purple-500/20 text-purple-400' 
                 : 'bg-purple-100 text-purple-600'
@@ -244,7 +244,7 @@ const TicketDetail = () => {
             </span>
 
             <span className={`
-              px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1
+              px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1
               ${isDarkMode 
                 ? 'bg-gray-600 text-gray-300' 
                 : 'bg-gray-200 text-gray-600'
@@ -294,7 +294,7 @@ const TicketDetail = () => {
               `}>
                 <div className="flex items-center gap-2 mb-2">
                   <User size={14} className="text-blue-500" />
-                  <span className={`text-sm font-medium ${
+                  <span className={`text-sm font-semibold ${
                     isDarkMode ? 'text-blue-400' : 'text-blue-600'
                   }`}>
                     {ticket.reply.adminName || 'Admin'}
