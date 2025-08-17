@@ -397,7 +397,7 @@ const TicketDetail = () => {
                 }`}
               >
                 {ticket.isPublic ? <Eye size={12} /> : <EyeOff size={12} />}
-                {ticket.isPublic ? "공개" : "비공개"}
+                {ticket.isPublic ? "공개" : "🔒"}
               </span>
               <span
                 className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
@@ -706,7 +706,10 @@ const TicketDetail = () => {
 
         {/* 삭제 확인 모달 */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50" style={{backdropFilter: 'blur(4px)'}}>
+          <div
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50"
+            style={{ backdropFilter: "blur(4px)" }}
+          >
             <div
               className={`p-6 rounded-2xl shadow-xl max-w-md w-full mx-4 ${
                 isDarkMode ? "bg-gray-800" : "bg-white"
@@ -765,6 +768,16 @@ const TicketDetail = () => {
             </div>
           </div>
         )}
+
+        {/* <div className="text-center">
+          <button
+            onClick={() => navigate("/inquiry-board")}
+            className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors inline-flex items-center gap-2"
+          >
+            <MessageSquare size={18} />
+            게시판으로 돌아가기
+          </button>
+        </div> */}
       </div>
     </div>
   );
