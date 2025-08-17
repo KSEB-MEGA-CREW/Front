@@ -1,142 +1,110 @@
-import { MediaPipeService } from './MediaPipeService';
-import { VIDEO_CONFIG } from '../constants/videoConfig';
+// services/FrameProcessor.js
 import { keypointUtils } from '../utils/keypointUtils';
 import { performanceLogger } from '../utils/performanceUtils';
 
 export class FrameProcessor {
     constructor() {
-        this.mediaPipe = new MediaPipeService();
+        this.hands = null;
+        this.isReady = false;
         this.frameIndex = 0;
-        this.keyPointBuffer = [];
-        this.isInitialized = false;
-        this.lastProcessTime = 0;
+        this.frameBuffer = [];
     }
 
     async initialize() {
         try {
-            performanceLogger.startTimer('frame_processor_init');
+            // MediaPipe Hands 초기화
+            if (typeof window !== 'undefined' && window.Hands) {
+                this.hands = new window.Hands({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
 
-            await this.mediaPipe.initialize();
-            this.isInitialized = true;
+                this.hands.setOptions({
+                    maxNumHands: 2,
+                    modelComplexity: 1,
+                    minDetectionConfidence: 0.7,
+                    minTrackingConfidence: 0.5
+                });
 
-            const initTime = performanceLogger.endTimer('frame_processor_init');
-            console.log(`✅ FrameProcessor initialized in ${Math.round(initTime)}ms`);
+                this.hands.onResults((results) => {
+                    this.lastResults = results;
+                });
 
-            return true;
+                this.isReady = true;
+                console.log('✅ FrameProcessor initialized');
+            } else {
+                throw new Error('MediaPipe Hands not loaded');
+            }
         } catch (error) {
-            console.error('❌ FrameProcessor initialization failed:', error);
-            this.isInitialized = false;
+            console.error('FrameProcessor initialization failed:', error);
             throw error;
         }
     }
 
     async extractKeypoints(videoElement, sessionId) {
-        if (!this.isInitialized) {
-            throw new Error('FrameProcessor not initialized');
+        if (!this.isReady || !videoElement) {
+            throw new Error('FrameProcessor not ready or video element missing');
         }
-
-        if (!videoElement || videoElement.videoWidth === 0) {
-            throw new Error('Video element not ready');
-        }
-
-        // 프레임 레이트 제어
-        const now = performance.now();
-        if (now - this.lastProcessTime < VIDEO_CONFIG.FRAME_INTERVAL) {
-            return null; // 아직 처리할 시간이 아님
-        }
-        this.lastProcessTime = now;
 
         try {
-            performanceLogger.startTimer('total_frame_processing');
+            performanceLogger.startTimer('keypointExtraction');
 
-            // MediaPipe로 키포인트 추출
-            const keypoints = await this.mediaPipe.extractKeypoints(videoElement);
+            // MediaPipe 처리
+            await this.hands.send({ image: videoElement });
 
-            if (!keypoints) {
-                return null; // MediaPipe 처리 스킵됨
-            }
+            // 키포인트 추출
+            const keypoints = keypointUtils.normalizeKeypoints(this.lastResults || {});
 
-            // 키포인트 유효성 검증
-            if (!keypointUtils.validateKeypoints(keypoints)) {
-                console.warn('Invalid keypoints detected, skipping frame');
-                return null;
-            }
-
-            // 버퍼에 추가
-            this.keyPointBuffer.push(keypoints);
+            // 프레임 버퍼에 추가
+            this.frameBuffer.push(keypoints);
             this.frameIndex++;
 
-            console.log(`📊 Frame ${this.frameIndex}: Buffer size ${this.keyPointBuffer.length}/${VIDEO_CONFIG.KEYPOINT_BUFFER_SIZE}`);
+            const extractionTime = performanceLogger.endTimer('keypointExtraction');
 
-            // 10프레임 수집 완료 확인
-            if (this.keyPointBuffer.length >= VIDEO_CONFIG.KEYPOINT_BUFFER_SIZE) {
-                // 시퀀스 유효성 검증
-                if (!keypointUtils.validateSequence(this.keyPointBuffer)) {
-                    console.warn('Invalid keypoint sequence, clearing buffer');
-                    this.keyPointBuffer = [];
-                    return null;
-                }
-
-                const batchKeypoints = [...this.keyPointBuffer];
-                this.keyPointBuffer = []; // 버퍼 초기화
-
-                const totalTime = performanceLogger.endTimer('total_frame_processing');
-                performanceLogger.addMetric('totalProcessing', totalTime, {
+            // 10프레임 배치 완성 시 반환
+            if (this.frameBuffer.length >= 10) {
+                const batchData = {
+                    keypoints: [...this.frameBuffer],
                     frameIndex: this.frameIndex,
-                    batchSize: batchKeypoints.length
-                });
-
-                console.log(`🎯 Batch ready: ${batchKeypoints.length} frames collected`);
-
-                return {
-                    keypoints: batchKeypoints,
-                    frameIndex: this.frameIndex,
-                    sessionId,
-                    timestamp: Date.now(),
-                    batchSize: batchKeypoints.length
+                    batchSize: this.frameBuffer.length,
+                    sessionId
                 };
+
+                // 버퍼 초기화
+                this.frameBuffer = [];
+
+                performanceLogger.addMetric('keypointExtraction', extractionTime);
+
+                return batchData;
             }
 
-            performanceLogger.endTimer('total_frame_processing');
-            return null; // 아직 배치 크기 미달
+            return null;
 
         } catch (error) {
-            performanceLogger.endTimer('total_frame_processing');
-            console.error('Frame processing error:', error);
+            console.error('Keypoint extraction failed:', error);
             throw error;
         }
     }
 
-    getCurrentBufferSize() {
-        return this.keyPointBuffer.length;
-    }
-
-    getFrameIndex() {
-        return this.frameIndex;
+    isReady() {
+        return this.isReady;
     }
 
     resetFrameIndex() {
         this.frameIndex = 0;
-        this.keyPointBuffer = [];
-        this.lastProcessTime = 0;
-        console.log('🔄 Frame processor reset');
+        this.frameBuffer = [];
     }
 
-    isReady() {
-        return this.isInitialized && this.mediaPipe.isReady();
+    getCurrentBufferSize() {
+        return this.frameBuffer.length;
     }
 
     cleanup() {
-        try {
-            this.mediaPipe.cleanup();
-            this.keyPointBuffer = [];
-            this.frameIndex = 0;
-            this.isInitialized = false;
-            this.lastProcessTime = 0;
-
-            console.log('🧹 FrameProcessor cleaned up');
-        } catch (error) {
-            console.error('FrameProcessor cleanup error:', error);
+        if (this.hands) {
+            this.hands.close();
+            this.hands = null;
         }
+        this.isReady = false;
+        this.frameBuffer = [];
+        console.log('🧹 FrameProcessor cleaned up');
     }
 }

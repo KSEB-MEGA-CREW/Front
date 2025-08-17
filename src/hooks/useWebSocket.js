@@ -1,6 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { WebSocketService } from '../services/WebSocketService';
-import { useAuth } from '../Context/authContext';
 
 export const useWebSocket = () => {
     const [isConnected, setIsConnected] = useState(false);
@@ -9,7 +8,6 @@ export const useWebSocket = () => {
     const [lastResult, setLastResult] = useState(null);
     const [sessionStats, setSessionStats] = useState(null);
 
-    const { user } = useAuth();
     const wsService = useRef(new WebSocketService());
     const stateCheckInterval = useRef(null);
 
@@ -28,22 +26,23 @@ export const useWebSocket = () => {
         };
     }, []);
 
-    const connect = useCallback(async () => {
-        if (!user?.id) {
-            const errorMsg = '사용자 인증이 필요합니다.';
-            setError(errorMsg);
-            throw new Error(errorMsg);
-        }
-
-        const token = localStorage.getItem('token');
+    // 토큰과 userId를 받는 connect 함수
+    const connect = useCallback(async (token, userId) => { // token과 userId를 인자로 받아야 함
         if (!token) {
             const errorMsg = '인증 토큰이 없습니다.';
             setError(errorMsg);
             throw new Error(errorMsg);
         }
 
+        if (!userId) {
+            const errorMsg = '사용자 ID가 없습니다.';
+            setError(errorMsg);
+            throw new Error(errorMsg);
+        }
+
         try {
             setError(null);
+            console.log(`🔐 Connecting with token: ${token.substring(0, 10)}... and userId: ${userId}`);
 
             await wsService.current.connect(token);
 
@@ -76,58 +75,37 @@ export const useWebSocket = () => {
             setIsConnected(false);
             throw err;
         }
-    }, [user?.id]);
+    }, []);
 
     const sendFrame = useCallback((keypoints, frameIndex) => {
         if (!isConnected) {
             throw new Error('WebSocket이 연결되지 않았습니다.');
         }
 
-        if (!Array.isArray(keypoints) || keypoints.length === 0) {
-            throw new Error('유효하지 않은 키포인트 데이터입니다.');
-        }
-
-        try {
-            wsService.current.sendFrame(keypoints, frameIndex);
-        } catch (error) {
-            setError(error.message);
-            throw error;
-        }
+        return wsService.current.sendFrame(keypoints, frameIndex);
     }, [isConnected]);
 
     const disconnect = useCallback(() => {
         wsService.current.disconnect();
         setIsConnected(false);
         setConnectionState('CLOSED');
-        setError(null);
         setLastResult(null);
         setSessionStats(null);
     }, []);
 
-    // 컴포넌트 언마운트 시 정리
-    useEffect(() => {
-        return () => {
-            disconnect();
-            if (stateCheckInterval.current) {
-                clearInterval(stateCheckInterval.current);
-            }
-        };
-    }, [disconnect]);
+    const clearError = useCallback(() => {
+        setError(null);
+    }, []);
 
     return {
-        // 상태
         isConnected,
         connectionState,
         error,
         lastResult,
         sessionStats,
-
-        // 메서드
-        connect,
-        sendFrame,
+        connect,      // 이제 토큰과 userId를 받음
         disconnect,
-
-        // 유틸리티
-        clearError: useCallback(() => setError(null), [])
+        sendFrame,
+        clearError
     };
 };

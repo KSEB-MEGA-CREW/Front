@@ -13,9 +13,11 @@ export const VIDEO_CONFIG = {
 
 export const API_CONFIG = {
     BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
-    WEBSOCKET_URL: import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws', // proxy 제거 -> 웹소켓 연결로 대체
+    WEBSOCKET_URL: import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws',
+
     ENDPOINTS: {
-        VERIFY_TOKEN: '/api/auth/verify-token'
+        VERIFY_TOKEN: '/api/auth/verify-token',
+        HEALTH_CHECK: '/api/auth/health'
     }
 };
 
