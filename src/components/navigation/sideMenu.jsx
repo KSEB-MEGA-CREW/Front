@@ -168,7 +168,8 @@ const SideMenu = ({
                 {/* 구분선 */}
                 <div
                   className={`border-t my-4 ${
-                    isDarkMode ? "border-gray-700" : "border-gray-200"
+                    // my-4를 추가해 위아래 여백을 줍니다.
+                    isDarkMode ? "border-gray-700" : "border-gray-400" // 오타를 수정했습니다.
                   }`}
                 />
 
@@ -189,13 +190,14 @@ const SideMenu = ({
                     key={`admin-${index}`}
                     onClick={item.onClick}
                     className={`
-                      w-full flex items-center gap-3 p-3 rounded-lg transition-colors border-l-2 border-yellow-500
-                      ${
-                        isDarkMode
-                          ? "hover:bg-yellow-900/20 text-yellow-300 hover:text-yellow-200 bg-yellow-900/10"
-                          : "hover:bg-yellow-50 text-yellow-700 hover:text-yellow-800 bg-yellow-50/50"
-                      }
-                    `}
+                     w-full flex items-center gap-3 p-3 rounded-lg transition-colors
+                     ${
+                       /* 👈 이 부분을 일반 메뉴와 동일하게 수정했습니다 */
+                       isDarkMode
+                         ? "hover:bg-gray-800 text-gray-300 hover:text-white"
+                         : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
+                     }
+                  `}
                   >
                     <div className="flex-shrink-0">{item.icon}</div>
                     {isOpen && (
@@ -232,8 +234,18 @@ const SideMenu = ({
                     {user?.username || "사용자"}
                   </div>
                   {isAdmin() && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-yellow-900/50 text-yellow-300 border border-yellow-700">
-                      👑 관리자
+                    <span
+                      className={`
+                          inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border
+                         ${
+                           // isDarkMode에 따라 다른 스타일을 적용합니다.
+                           isDarkMode
+                             ? " text-yellow-300 border-yellow-700" // 다크 모드 스타일
+                             : " text-yellow-800 border-yellow-300" // 라이트 모드 스타일
+                         }
+                        `}
+                    >
+                      관리자
                     </span>
                   )}
                 </div>
