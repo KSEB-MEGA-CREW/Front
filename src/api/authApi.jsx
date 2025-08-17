@@ -215,8 +215,8 @@ export const authApi = {
     }
   },
 
-  // getSupportTicketById 특정 문의 상세 조회
-  getSupportTicketById: async (ticketId) => {
+  // getSupportTicketByAdminId 관리자 특정 문의 상세 조회
+  getSupportTicketByAdminId: async (ticketId) => {
     try {
       const response = await apiRequest(
         `/api/support/admin/tickets/${ticketId}`,
@@ -224,6 +224,19 @@ export const authApi = {
           method: "GET",
         }
       );
+      return response;
+    } catch (error) {
+      console.error("문의 상세 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTicketById 특정 문의 상세 조회
+  getSupportTicketById: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "GET",
+      });
       return response;
     } catch (error) {
       console.error("문의 상세 조회 오류:", error);
