@@ -656,10 +656,10 @@ const TicketDetail = () => {
                       isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    {ticket.adminResponse.adminResponseDate
-                      ? new Date(
-                          ticket.adminResponse.adminResponseDate
-                        ).toLocaleDateString("ko-KR")
+                    {ticket.adminResponseDate
+                      ? new Date(ticket.adminResponseDate).toLocaleDateString(
+                          "ko-KR"
+                        )
                       : "날짜 없음"}
                   </span>
                 </div>
