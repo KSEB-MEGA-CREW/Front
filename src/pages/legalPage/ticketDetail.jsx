@@ -427,7 +427,7 @@ const TicketDetail = () => {
                     className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
                       isDarkMode
                         ? "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
-                        : "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
+                        : "border-1 border-gray-300 hover:bg-gray-200 hover:border-0 text-gray-800"
                     }`}
                   >
                     <Pencil size={14} />
@@ -439,7 +439,7 @@ const TicketDetail = () => {
                     className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
                       isDarkMode
                         ? "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
-                        : " border-1 border-gray-300 hover:bg-gray-600 text-white"
+                        : " border-1 border-gray-300 hover:bg-gray-200 text-gray-800"
                     }`}
                   >
                     <Trash2 size={14} />
@@ -706,7 +706,7 @@ const TicketDetail = () => {
 
         {/* 삭제 확인 모달 */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black bg-opacity-20 backdrop-blur-none flex items-center justify-center z-50">
             <div
               className={`p-6 rounded-2xl shadow-xl max-w-md w-full mx-4 ${
                 isDarkMode ? "bg-gray-800" : "bg-white"
