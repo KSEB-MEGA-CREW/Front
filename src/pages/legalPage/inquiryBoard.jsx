@@ -42,11 +42,11 @@ const InquiryBoard = () => {
 
   const categories = [
     { id: "all", label: "전체", icon: "📋" },
-    { id: "technical", label: "기술적 문제", icon: "⚙️" },
-    { id: "account", label: "계정 관련", icon: "👤" },
-    { id: "learning", label: "학습 문의", icon: "📚" },
-    { id: "feature", label: "기능 제안", icon: "💡" },
-    { id: "other", label: "기타", icon: "❓" },
+    { id: "TECHNICAL", label: "기술적 문제", icon: "⚙️" },
+    { id: "ACCOUNT", label: "계정 관련", icon: "👤" },
+    { id: "LEARNING", label: "학습 문의", icon: "📚" },
+    { id: "FEATURE", label: "기능 제안", icon: "💡" },
+    { id: "OTHER", label: "기타", icon: "❓" },
   ];
 
   const getCategoryLabel = (categoryId) => {
