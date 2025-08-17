@@ -1,4 +1,4 @@
-import { MEDIAPIPE_CONFIG } from '../constants/videoConfig';
+import { MEDIAPIPE_CONFIG } from '../constants/videoConfig.js'; // .js 확장자 추가
 
 export const keypointUtils = {
     /**
@@ -18,14 +18,9 @@ export const keypointUtils = {
                 this.addHandKeypoints(keypoints, detectedHands[i], worldLandmarks[i]);
             }
 
-            // 감지된 손이 1개 미만인 경우 빈 손으로 채움
+            // 감지된 손이 2개 미만인 경우 빈 손으로 채움
             while (keypoints.length < MEDIAPIPE_CONFIG.KEYPOINT_DIMENSIONS) {
-                const currentHandCount = Math.floor(keypoints.length / 97);
-                const remainingHands = 2 - currentHandCount;
-
-                for (let i = 0; i < remainingHands; i++) {
-                    this.addEmptyHandKeypoints(keypoints);
-                }
+                this.addEmptyHandKeypoints(keypoints);
             }
 
             // 정확히 194차원 보장
@@ -61,11 +56,9 @@ export const keypointUtils = {
             }
         }
 
-        // 2. 3D 월드 랜드마크 추가 (처음 11개만 사용하여 33차원)
-        if (worldLandmarks && worldLandmarks.length > 0) {
-            const maxWorldPoints = Math.min(11, worldLandmarks.length);
-
-            for (let i = 0; i < maxWorldPoints; i++) {
+        // 2. 3D 월드 랜드마크 추가 (전체 21개 사용하여 63차원) - 수정됨
+        if (worldLandmarks && worldLandmarks.length >= 21) {
+            for (let i = 0; i < 21; i++) { // 전체 21개 사용
                 const point = worldLandmarks[i];
                 keypoints.push(
                     Number(point.x.toFixed(6)),
@@ -73,28 +66,20 @@ export const keypointUtils = {
                     Number(point.z.toFixed(6))
                 );
             }
-
-            // 11개 미만인 경우 나머지를 0으로 채움
-            const remainingWorldPoints = 33 - (maxWorldPoints * 3);
-            for (let i = 0; i < remainingWorldPoints; i++) {
-                keypoints.push(0.0);
-            }
         } else {
-            // 월드 랜드마크가 없으면 33개 0으로 채움
-            for (let i = 0; i < 33; i++) {
+            // 월드 랜드마크가 없으면 63개 0으로 채움
+            for (let i = 0; i < 63; i++) {
                 keypoints.push(0.0);
             }
         }
 
-        // 3. 한 손당 정확히 97차원 보장
-        const expectedLength = Math.floor((keypoints.length - 1) / 97) * 97 + 97;
-        while (keypoints.length < expectedLength) {
-            keypoints.push(0.0);
-        }
+        // 3. 추가 메타데이터 (31차원) - 수정됨
+        const currentHandLength = keypoints.length;
+        const expectedHandLength = Math.floor(currentHandLength / 97) * 97 + 97;
+        const remainingDimensions = expectedHandLength - currentHandLength;
 
-        // 97차원 초과시 자르기
-        if (keypoints.length > expectedLength) {
-            keypoints.splice(expectedLength);
+        for (let i = 0; i < remainingDimensions; i++) {
+            keypoints.push(0.0);
         }
     },
 
@@ -199,8 +184,8 @@ export const keypointUtils = {
         const hands = this.separateHands(keypoints);
         let count = 0;
 
-        if (this.isHandDetected(hands.firstHand)) count++;
-        if (this.isHandDetected(hands.secondHand)) count++;
+        if (hands.firstHand && this.isHandDetected(hands.firstHand)) count++;
+        if (hands.secondHand && this.isHandDetected(hands.secondHand)) count++;
 
         return count;
     },
@@ -237,11 +222,16 @@ export const keypointUtils = {
             issues.push('Contains extreme values');
         }
 
-        // 연속성 확인 (급격한 변화 감지)
+        // 연속성 확인 (급격한 변화 감지) - 개선됨
         let hasJumps = false;
-        for (let i = 3; i < 63; i += 3) { // 2D 랜드마크만 확인
-            const current = keypoints.slice(i, i + 3);
-            const previous = keypoints.slice(i - 3, i);
+        const landmarks2D = keypoints.slice(0, 63); // 첫 번째 손의 2D 랜드마크만 확인
+
+        for (let i = 3; i < landmarks2D.length; i += 3) {
+            const current = landmarks2D.slice(i, i + 3);
+            const previous = landmarks2D.slice(i - 3, i);
+
+            // 이전 점이 모두 0이면 스킵 (손이 감지되지 않은 경우)
+            if (previous.every(p => Math.abs(p) < 0.001)) continue;
 
             const distance = Math.sqrt(
                 Math.pow(current[0] - previous[0], 2) +

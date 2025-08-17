@@ -1,5 +1,4 @@
 // 성능 최적화 및 측정 유틸리티
-// 성능 최적화 및 측정 유틸리티
 
 export class PerformanceLogger {
     constructor() {
