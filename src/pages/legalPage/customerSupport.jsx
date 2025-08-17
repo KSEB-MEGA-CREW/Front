@@ -104,19 +104,6 @@ const CustomerSupport = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* 헤더 */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate("/settings")}
-            className={`
-              p-2 rounded-lg transition-colors
-              ${
-                isDarkMode
-                  ? "hover:bg-gray-800 text-gray-400 hover:text-white"
-                  : "hover:bg-white text-gray-600 hover:text-gray-900"
-              }
-            `}
-          >
-            <ArrowLeft size={24} />
-          </button>
           <div className="flex items-center gap-3">
             <div
               className={`

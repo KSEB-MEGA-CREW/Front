@@ -321,7 +321,7 @@ const TicketDetail = () => {
     >
       <div className="max-w-4xl mx-auto space-y-8">
         {/* 헤더 */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/inquiry-board")}
             className={`p-2 rounded-lg transition-colors ${
@@ -578,7 +578,7 @@ const TicketDetail = () => {
 
               {/* 내용 */}
               <div
-                className={`p-4 rounded-lg border mb-2 ${
+                className={`p-4 rounded-lg border mb-3 ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600"
                     : "bg-gray-50 border-gray-200"
