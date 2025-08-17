@@ -596,7 +596,7 @@ const InquiryBoard = () => {
                           ? "bg-gray-800 border-gray-700 opacity-75"
                           : "bg-gray-100 border-gray-200 opacity-75"
                         : isDarkMode
-                        ? "bg-gray-800 border-gray-700 hover:bg-gray-750"
+                        ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
                         : "bg-white border-gray-200 hover:bg-gray-50"
                     }
                   `}
