@@ -54,22 +54,13 @@ const Pagination = ({
   const startItem = (currentPage - 1) * pageSize + 1;
   const endItem = Math.min(currentPage * pageSize, totalElements);
 
-  if (totalPages <= 1) {
-    return null; // 페이지가 1개 이하면 페이징 표시 안함
+  if (totalPages < 1) {
+    return null; // 페이지가 0개 이하면 페이징 표시 안함
   }
 
   return (
     <div className="flex flex-col items-center gap-4 mt-8">
       {/* 현재 페이지 정보 */}
-      {showInfo && (
-        <div
-          className={`text-sm ${
-            isDarkMode ? "text-gray-400" : "text-gray-600"
-          }`}
-        >
-          전체 {totalElements}개 중 {startItem}-{endItem}개 표시
-        </div>
-      )}
 
       {/* 페이징 버튼들 */}
       <div className="flex items-center gap-2">
@@ -113,7 +104,7 @@ const Pagination = ({
                     px-3 py-2 rounded-lg font-semibold transition-colors min-w-[40px]
                     ${
                       pageNum === currentPage
-                        ? "bg-blue-600 text-white"
+                        ? "bg-blue-500 text-white"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                         : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
@@ -170,7 +161,11 @@ const Pagination = ({
           >
             처음으로
           </button>
-          <span className={`text-xs ${isDarkMode ? "text-gray-500" : "text-gray-400"}`}>
+          <span
+            className={`text-xs ${
+              isDarkMode ? "text-gray-500" : "text-gray-400"
+            }`}
+          >
             |
           </span>
           <button

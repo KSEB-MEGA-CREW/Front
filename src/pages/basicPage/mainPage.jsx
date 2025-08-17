@@ -111,8 +111,13 @@ function MainPage() {
         <div className="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8">
           <div className="text-center">
             {/* Badge */}
-            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-8 border-2 border-gray-500 text-white">
-              <Star className="w-4 h-4 mr-2" />
+            <div
+              className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-8 border-2 ${
+                isDarkMode
+                  ? "border-gray-500 text-white"
+                  : "border-1 border-gray-500 text-gray-800"
+              }`}
+            >
               AI 기반 수어 번역 서비스
             </div>
 
@@ -123,9 +128,7 @@ function MainPage() {
               }`}
             >
               <span className="block">수어와 문장을</span>
-              <span className="bg-white bg-clip-text text-transparent">
-                실시간으로 연결
-              </span>
+              <span className="bg-white bg-clip-text">실시간으로 연결</span>
             </h1>
 
             {/* Subtitle */}
@@ -166,7 +169,7 @@ function MainPage() {
               className={`max-w-4xl mx-auto p-8 rounded-2xl border ${
                 isDarkMode
                   ? "bg-gray-800 border-gray-700"
-                  : "bg-gray-50 border-gray-200"
+                  : "bg-[#f1f3f5] border-gray-200"
               }`}
             >
               <h3
@@ -187,7 +190,9 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       translationDemo
-                        ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
+                        ? isDarkMode
+                          ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
+                          : "border-1 border-blue-500 text-gray-700 bg-blue-50 shadow-lg shadow-blue-500/30"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"
@@ -222,7 +227,9 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       !translationDemo
-                        ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
+                        ? isDarkMode
+                          ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
+                          : "border-1 border-blue-500 text-gray-700 bg-blue-50 shadow-lg shadow-blue-500/30"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"
@@ -247,8 +254,8 @@ function MainPage() {
                   }`}
                 >
                   {translationDemo
-                    ? "🤟 '안녕하세요' → 🎵 '안녕하세요'"
-                    : "🎵 '반갑습니다' → 🤟 '반갑습니다'"}
+                    ? "🖐 '안녕하세요' → 💬 '안녕하세요'"
+                    : "💬 '반갑습니다' → 🖐 '반갑습니다'"}
                 </p>
                 <p
                   className={`text-sm mt-2 ${
@@ -266,7 +273,9 @@ function MainPage() {
       </section>
 
       {/* Stats Section */}
-      <section className={`py-16 ${isDarkMode ? "bg-gray-800" : "bg-gray-50"}`}>
+      <section
+        className={`py-16 ${isDarkMode ? "bg-gray-800" : "bg-[#f1f3f5]"}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2
@@ -381,7 +390,9 @@ function MainPage() {
       </section>
 
       {/* Projects Section */}
-      <section className={`py-20 ${isDarkMode ? "bg-gray-800" : "bg-gray-50"}`}>
+      <section
+        className={`py-20 ${isDarkMode ? "bg-gray-800" : "bg-[#f1f3f5]"}`}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2
@@ -445,7 +456,7 @@ function MainPage() {
             className={`p-12 rounded-3xl ${
               isDarkMode
                 ? "bg-gradient-to-r from-gray-800 to-gray-900"
-                : "bg-gradient-to-r from-blue-50 to-purple-50"
+                : "bg-gradient-to-r from-[#f1f3f5] to-gray-50"
             }`}
           >
             <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" />
@@ -483,7 +494,7 @@ function MainPage() {
         className={`py-12 ${
           isDarkMode
             ? "bg-gray-900 border-t border-gray-800"
-            : "bg-gray-100 border-t border-gray-200"
+            : "bg-[#f1f3f5] border-t border-gray-200"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

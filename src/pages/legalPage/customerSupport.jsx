@@ -104,19 +104,6 @@ const CustomerSupport = () => {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* 헤더 */}
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate("/settings")}
-            className={`
-              p-2 rounded-lg transition-colors
-              ${
-                isDarkMode
-                  ? "hover:bg-gray-800 text-gray-400 hover:text-white"
-                  : "hover:bg-white text-gray-600 hover:text-gray-900"
-              }
-            `}
-          >
-            <ArrowLeft size={24} />
-          </button>
           <div className="flex items-center gap-3">
             <div
               className={`
@@ -178,7 +165,7 @@ const CustomerSupport = () => {
               24시간 이내 답변
             </p>
             <p
-              className={`font-semibold ${
+              className={`font-medium ${
                 isDarkMode ? "text-blue-400" : "text-blue-600"
               }`}
             >
@@ -205,7 +192,7 @@ const CustomerSupport = () => {
               <Phone
                 size={24}
                 className={`${
-                  isDarkMode ? "text-green-400" : "text-green-600"
+                  isDarkMode ? "text-green-500" : "text-green-700"
                 }`}
               />
             </div>
@@ -224,8 +211,8 @@ const CustomerSupport = () => {
               평일 09:00~18:00
             </p>
             <p
-              className={`font-semibold ${
-                isDarkMode ? "text-green-400" : "text-green-600"
+              className={`font-medium ${
+                isDarkMode ? "text-green-500" : "text-green-700"
               }`}
             >
               010-3738-1882
@@ -270,7 +257,7 @@ const CustomerSupport = () => {
               즉시 응답
             </p>
             <p
-              className={`font-semibold ${
+              className={`font-medium ${
                 isDarkMode ? "text-purple-400" : "text-purple-600"
               }`}
             >
@@ -382,24 +369,9 @@ const CustomerSupport = () => {
               </div>
 
               {/* 사용자 정보 표시 */}
-              <div
-                className={`
-                p-4 rounded-lg border-l-4 border-blue-500
-                ${isDarkMode ? "bg-blue-900/20" : "bg-blue-50"}
-              `}
-              >
-                <div
-                  className={`text-sm ${
-                    isDarkMode ? "text-blue-200" : "text-blue-600"
-                  }`}
-                >
-                  <p className="font-semibold mb-1">문의자 정보</p>
-                  <p>사용자명: {user?.username || "익명"}</p>
-                </div>
-              </div>
 
               {/* 제목 */}
-              <div>
+              <div className="mt-10">
                 <label
                   className={`block text-sm font-semibold mb-2 ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
@@ -612,7 +584,7 @@ const CustomerSupport = () => {
         {/* FAQ 섹션 */}
         <div
           className={`
-          p-8 rounded-2xl shadow-lg border
+          p-8 rounded-2xl shadow-lg border 
           ${
             isDarkMode
               ? "bg-gray-800 border-gray-700"
@@ -631,12 +603,16 @@ const CustomerSupport = () => {
             <details
               className={`
               p-4 rounded-lg border
-              ${isDarkMode ? "border-gray-600" : "border-gray-200"}
+              ${
+                isDarkMode
+                  ? "border-gray-600 hover:bg-gray-700"
+                  : "border-gray-200 hover:bg-gray-100"
+              }
             `}
             >
               <summary
                 className={`font-semibold cursor-pointer ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  isDarkMode ? "text-white " : "text-gray-900"
                 }`}
               >
                 비밀번호를 잊어버렸어요
@@ -654,7 +630,11 @@ const CustomerSupport = () => {
             <details
               className={`
               p-4 rounded-lg border
-              ${isDarkMode ? "border-gray-600" : "border-gray-200"}
+                            ${
+                              isDarkMode
+                                ? "border-gray-600 hover:bg-gray-700"
+                                : "border-gray-200 hover:bg-gray-100"
+                            }
             `}
             >
               <summary
@@ -678,7 +658,11 @@ const CustomerSupport = () => {
             <details
               className={`
               p-4 rounded-lg border
-              ${isDarkMode ? "border-gray-600" : "border-gray-200"}
+                           ${
+                             isDarkMode
+                               ? "border-gray-600 hover:bg-gray-700"
+                               : "border-gray-200 hover:bg-gray-100"
+                           }
             `}
             >
               <summary

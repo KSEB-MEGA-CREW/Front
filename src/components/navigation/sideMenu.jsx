@@ -47,7 +47,7 @@ const SideMenu = ({
     },
     {
       icon: <Hand size={20} />,
-      label: "문장 번역",
+      label: "수어 생성",
       path: "/translate/avatar",
       onClick: () => onNavigate("/translate/avatar"),
     },
@@ -71,12 +71,6 @@ const SideMenu = ({
       path: "/inquiry",
       onClick: () => onNavigate("/inquiry-board"),
     },
-    {
-      icon: <Users size={20} />,
-      label: "사용자 관리(추후 추가?)",
-      path: "/admin/users",
-      onClick: () => onNavigate("/admin/users"),
-    },
   ];
 
   return (
@@ -97,7 +91,7 @@ const SideMenu = ({
         ${
           isDarkMode
             ? "bg-gray-900 border-r border-gray-800"
-            : "bg-white border-r border-gray-200"
+            : "bg-[#e9ecef] border-r border-gray-200"
         }
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
@@ -133,7 +127,7 @@ const SideMenu = ({
             className={`p-2 rounded-lg transition-colors ${
               isDarkMode
                 ? "hover:bg-gray-800 text-gray-300"
-                : "hover:bg-gray-100 text-gray-600"
+                : "hover:bg-gray-300 text-gray-600"
             }`}
           >
             {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
@@ -153,7 +147,7 @@ const SideMenu = ({
                   ${
                     isDarkMode
                       ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                      : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                      : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
                   }
                 `}
               >
@@ -168,7 +162,8 @@ const SideMenu = ({
                 {/* 구분선 */}
                 <div
                   className={`border-t my-4 ${
-                    isDarkMode ? "border-gray-700" : "border-gray-200"
+                    // my-4를 추가해 위아래 여백을 줍니다.
+                    isDarkMode ? "border-gray-700" : "border-gray-400" // 오타를 수정했습니다.
                   }`}
                 />
 
@@ -189,13 +184,14 @@ const SideMenu = ({
                     key={`admin-${index}`}
                     onClick={item.onClick}
                     className={`
-                      w-full flex items-center gap-3 p-3 rounded-lg transition-colors border-l-2 border-yellow-500
-                      ${
-                        isDarkMode
-                          ? "hover:bg-yellow-900/20 text-yellow-300 hover:text-yellow-200 bg-yellow-900/10"
-                          : "hover:bg-yellow-50 text-yellow-700 hover:text-yellow-800 bg-yellow-50/50"
-                      }
-                    `}
+                     w-full flex items-center gap-3 p-3 rounded-lg transition-colors
+                     ${
+                       /* 👈 이 부분을 일반 메뉴와 동일하게 수정했습니다 */
+                       isDarkMode
+                         ? "hover:bg-gray-800 text-gray-300 hover:text-white"
+                         : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
+                     }
+                  `}
                   >
                     <div className="flex-shrink-0">{item.icon}</div>
                     {isOpen && (
@@ -218,7 +214,7 @@ const SideMenu = ({
               ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
             `}
           >
@@ -232,8 +228,18 @@ const SideMenu = ({
                     {user?.username || "사용자"}
                   </div>
                   {isAdmin() && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-yellow-900/50 text-yellow-300 border border-yellow-700">
-                      👑 관리자
+                    <span
+                      className={`
+                          inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border
+                         ${
+                           // isDarkMode에 따라 다른 스타일을 적용합니다.
+                           isDarkMode
+                             ? " text-yellow-300 border-yellow-700" // 다크 모드 스타일
+                             : " text-yellow-800 border-yellow-300" // 라이트 모드 스타일
+                         }
+                        `}
+                    >
+                      관리자
                     </span>
                   )}
                 </div>
@@ -250,7 +256,7 @@ const SideMenu = ({
               ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
             `}
           >
@@ -268,7 +274,7 @@ const SideMenu = ({
               ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
             `}
           >
