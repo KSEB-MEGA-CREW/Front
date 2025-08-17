@@ -566,16 +566,38 @@ const TicketDetail = () => {
             </form>
           ) : (
             <>
-              {/* 제목 */}
-              <h2
-                className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+              <label
+                className={`block text-sm font-semibold mb-2 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
-                {ticket.subject}
-              </h2>
+                제목 *
+              </label>
+              <div
+                className={`p-4 rounded-lg border mb-3 ${
+                  isDarkMode
+                    ? "bg-gray-700 border-gray-600"
+                    : "bg-gray-50 border-gray-200"
+                }`}
+              >
+                {/* 제목 */}
+                <h2
+                  className={`text-xl font-semibold mb-4 ${
+                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                  }`}
+                >
+                  {ticket.subject}
+                </h2>
+              </div>
 
               {/* 내용 */}
+              <label
+                className={`block text-sm font-semibold mb-2 mt-6 ${
+                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
+              >
+                문의 내용 *
+              </label>
               <div
                 className={`p-4 rounded-lg border mb-3 ${
                   isDarkMode
@@ -606,7 +628,7 @@ const TicketDetail = () => {
           </div>
 
           {/* 답변 */}
-          {ticket.reply && (
+          {ticket.adminResponse && (
             <div className="space-y-4 mt-8">
               <h3
                 className={`text-lg font-semibold ${
@@ -629,18 +651,18 @@ const TicketDetail = () => {
                       isDarkMode ? "text-blue-400" : "text-blue-600"
                     }`}
                   >
-                    {ticket.reply.adminName || "Admin"}
+                    {ticket.adminResponse.adminName || "Admin"}
                   </span>
                   <span
                     className={`text-xs ${
                       isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    {ticket.reply.createdDate
-                      ? new Date(ticket.reply.createdDate).toLocaleDateString(
-                          "ko-KR"
-                        )
-                      : ""}
+                    {ticket.adminResponse.createdDate
+                      ? new Date(
+                          ticket.adminResponse.createdDate
+                        ).toLocaleDateString("ko-KR")
+                      : "날짜 없음"}
                   </span>
                 </div>
                 <p
@@ -648,14 +670,14 @@ const TicketDetail = () => {
                     isDarkMode ? "text-blue-200" : "text-blue-700"
                   }`}
                 >
-                  {ticket.reply.content}
+                  {ticket.adminResponse}
                 </p>
               </div>
             </div>
           )}
 
           {/* 관리자 답변 작성 폼 */}
-          {isAdmin() && !ticket.reply && (
+          {isAdmin() && !ticket.adminResponse && (
             <div className="mt-8 pt-8 border-t border-gray-300 dark:border-gray-600">
               <h3
                 className={`text-lg font-semibold mb-4 ${
