@@ -106,15 +106,11 @@ const LoginBox = () => {
               // UI에 성공 메시지 잠깐 표시
               const tempDiv = document.createElement("div");
               tempDiv.className =
-                "fixed top-4 right-4 z-50 p-4 rounded-lg bg-green-900/90 border border-green-700 text-green-300 font-semibold shadow-lg animate-pulse";
+                "fixed top-4 right-4 z-50 p-3 rounded-lg bg-green-900/90 border border-green-700 text-green-300 font-semibold shadow-lg animate-pulse";
               tempDiv.innerHTML = `
                 <div class="flex items-center gap-2">
-                  <span>👑</span>
                   <span>관리자 로그인 성공!</span>
                 </div>
-                <div class="text-sm opacity-75">${
-                  userInfo.username || userInfo.email
-                }</div>
               `;
               document.body.appendChild(tempDiv);
 

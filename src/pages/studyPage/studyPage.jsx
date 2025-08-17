@@ -303,9 +303,11 @@ function StudyWord() {
 
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className={`text-sm font-bold ${
-                          isDarkMode ? "text-gray-300" : "text-gray-600"
-                        }`}>
+                        <span
+                          className={`text-sm font-bold ${
+                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                          }`}
+                        >
                           문제 {i + 1}
                         </span>
                         <div
@@ -345,11 +347,13 @@ function StudyWord() {
                         </span>
 
                         {!result.isCorrect && (
-                          <span className={`text-xs px-2 py-1 rounded-full border ${
-                            isDarkMode 
-                              ? "text-white border-gray-500" 
-                              : "text-red-700 bg-red-50 border-red-200"
-                          }`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded-full border ${
+                              isDarkMode
+                                ? "text-white border-gray-500"
+                                : "text-red-700 bg-red-50 border-red-200"
+                            }`}
+                          >
                             선택:{" "}
                             {result.quiz.choices[result.selected].word ||
                               result.quiz.choices[result.selected].meaning}
@@ -396,7 +400,7 @@ function StudyWord() {
     <BasicLayout>
       <div
         className={`min-h-screen px-4 py-8 ${
-          isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
+          isDarkMode ? "bg-gray-900" : "bg-gray-50]"
         }`}
       >
         <div className="max-w-4xl mx-auto">
