@@ -580,7 +580,7 @@ const TicketDetail = () => {
               >
                 {/* 제목 */}
                 <h2
-                  className={`text-xl font-semibold mb-4 ${
+                  className={`text-sx whitespace-pre-wrap ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
@@ -604,7 +604,7 @@ const TicketDetail = () => {
                 }`}
               >
                 <p
-                  className={`text-sm whitespace-pre-wrap ${
+                  className={`text-sx whitespace-pre-wrap ${
                     isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
