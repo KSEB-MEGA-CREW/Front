@@ -64,7 +64,7 @@ export const useTextToSignAPI = () => {
   }, [user?.id]);
 
   const clearError = useCallback(() => {
-    setError(nul);
+    setError(null);
   }, []);
 
   const abortRequests = useCallback(() => {

@@ -1,207 +1,251 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from "react";
-import { FrameProcessor } from "../services/FrameProcessor";
+import { FrameProcessor } from '../services/FrameProcessor';
 import { VIDEO_CONFIG } from "../constants/videoConfig";
-import { useSignLanguageAPI } from "./useSignLanguageAPI";
+import { useWebSocket } from "./useWebSocket";
 import { performanceLogger, FPSCalculator } from "../utils/performanceUtils";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from 'uuid';
 import { useAuth } from "../Context/authContext";
-
-// 프레임 추출 로직 -> useSignLanguageAPI hook 활용
 
 export const useFrameExtraction = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const { user } = useAuth();
+  const [status, setStatus] = useState('idle'); // idle, initializing, processing, error
 
-  // UUID는 고유 ID, 중복될 확률 거의 없음
-  // Universally Unique Identifier
-  // 분산 환경을 지원 및 보안 강화
-  // UUID 한 번만 생성하고 유지
+  const { user } = useAuth();
   const sessionId = useMemo(() => uuidv4(), []);
 
   const frameProcessor = useRef(new FrameProcessor());
   const intervalRef = useRef(null);
-  const lastSubmissionTime = useRef(0);
-
-  // 성능 측정용
   const fpsCalculator = useRef(new FPSCalculator());
   const sessionStartTime = useRef(null);
+  const frameCount = useRef(0);
 
-  // API 통신 훅 사용
-  const { submitFrame, error: apiError, clearError } = useSignLanguageAPI();
+  const {
+    isConnected,
+    connectionState,
+    error: wsError,
+    lastResult,
+    sessionStats,
+    connect,
+    sendFrame,
+    disconnect,
+    clearError: clearWsError
+  } = useWebSocket();
 
-  // frame extraction starts
-  const startFrameExtraction = useCallback(
-    (videoElement) => {
-      console.log("=== startFrameExtraction 호출됨 ===");
-      console.log("videoElement:", videoElement);
-      console.log("videoElement.videoWidth:", videoElement?.videoWidth);
-      console.log("isProcessing:", isProcessing);
+  // WebSocket 결과 업데이트
+  useEffect(() => {
+    if (lastResult?.prediction) {
+      setResult(lastResult.prediction);
+      setStatus('processing');
 
-      if (!videoElement || isProcessing) {
-        console.log("=== 조건 불만족으로 리턴 ===");
-        return;
+      console.log(`🎯 Prediction received: ${lastResult.prediction.label} (${(lastResult.prediction.confidence * 100).toFixed(1)}%)`);
+    }
+  }, [lastResult]);
+
+  // 에러 처리
+  useEffect(() => {
+    if (wsError) {
+      setError(wsError);
+      setStatus('error');
+    }
+  }, [wsError]);
+
+  // 사용자 인증 확인
+  const validateUser = useCallback(() => {
+    if (!user?.id) {
+      throw new Error('사용자 인증이 필요합니다.');
+    }
+    return true;
+  }, [user?.id]);
+
+  // 초기화
+  const initialize = useCallback(async () => {
+    setStatus('initializing');
+    setError(null);
+    clearWsError();
+
+    try {
+      validateUser();
+
+      // FrameProcessor 초기화
+      if (!frameProcessor.current.isReady()) {
+        await frameProcessor.current.initialize();
       }
 
-      // user 인증 확인 추가
-      if (!user?.id) {
-        setError("사용자 인증이 필요합니다.");
-        return;
+      // WebSocket 연결
+      if (!isConnected) {
+        await connect();
       }
+
+      console.log('✅ Frame extraction system initialized');
+      return true;
+
+    } catch (err) {
+      const errorMsg = err.message || 'Initialization failed';
+      setError(errorMsg);
+      setStatus('error');
+      throw new Error(errorMsg);
+    }
+  }, [validateUser, isConnected, connect, clearWsError]);
+
+  // 프레임 추출 시작
+  const startFrameExtraction = useCallback(async (videoElement) => {
+    console.log("🚀 === 프레임 추출 시작 ===");
+    console.log(`📊 세션 ID: ${sessionId}`);
+    console.log(`👤 사용자 ID: ${user?.id}`);
+    console.log(`⚙️ 설정: MediaPipe + WebSocket, 10프레임 배치`);
+
+    if (!videoElement || isProcessing) {
+      console.log("=== 조건 불만족으로 리턴 ===");
+      return;
+    }
+
+    try {
+      // 초기화
+      await initialize();
 
       setIsProcessing(true);
-      setError(null);
-      clearError();
+      setStatus('processing');
       frameProcessor.current.resetFrameIndex();
       sessionStartTime.current = Date.now();
-
-      const cycleStartTime = Date.now();
-
-      console.log("🚀 === 프레임 추출 세션 시작 ===");
-      console.log(`📊 세션 ID: ${sessionId}`);
-      // console.log(`👤 사용자 ID: ${user.id}`);
-      console.log(
-        `⚙️  설정: ${VIDEO_CONFIG.CANVAS_WIDTH}x${VIDEO_CONFIG.CANVAS_HEIGHT}, ${VIDEO_CONFIG.FRAME_INTERVAL}ms 간격`
-      );
-      console.log("================================\n");
+      frameCount.current = 0;
 
       // 성능 메트릭 초기화
       performanceLogger.clearMetrics();
 
+      // 프레임 처리 인터벌 시작
       intervalRef.current = setInterval(async () => {
-        console.log("=== Interval 실행됨 ==="); // 이 로그가 나오는지 확인
-
         try {
-          const now = Date.now();
-
-          // frame rate 제어 -> 설정 상수에 맞게 유지
-          if (now - lastSubmissionTime.current < VIDEO_CONFIG.FRAME_INTERVAL) {
-            return;
-          }
-
-          lastSubmissionTime.current = now;
-
-          // 전체 처리 시간 측정 시작
-          performanceLogger.startTimer("total_processing");
-
-          // frame extraction -> 백엔드 FrameRequest 구조에 맞춤
-          const frameRequest = frameProcessor.current.extractFrame(
-            videoElement,
-            sessionId // 생성된 sessionId 사용
-          );
-
-          // 백엔드(API)로 비동기 전송
-          const extractResult = await submitFrame(frameRequest);
-
-          // 전체 처리 시간 계산
-          const totalProcessingTime =
-            performanceLogger.endTimer("total_processing");
+          frameCount.current++;
 
           // FPS 계산
           fpsCalculator.current.tick();
 
-          if (extractResult?.success) {
-            // frame 추출 후 전송 성공 응답 처리
-            setResult(extractResult.data);
+          // 키포인트 추출 및 배치 처리
+          const batchData = await frameProcessor.current.extractKeypoints(
+            videoElement,
+            sessionId
+          );
 
-            // 총 처리 시간 로그
+          // 10프레임 배치 완료시 WebSocket 전송
+          if (batchData && isConnected) {
+            console.log(`📡 Sending batch: ${batchData.batchSize} frames`);
+
+            await sendFrame(batchData.keypoints, batchData.frameIndex);
+
+            // 성능 로깅
             performanceLogger.logPerformance(
-              "🎯 전체 처리",
-              totalProcessingTime,
-              { frameIndex: frameRequest.frameIndex }
-            );
-
-            performanceLogger.addMetric(
-              "totalProcessing",
-              totalProcessingTime,
+              '📦 Batch sent',
+              0, // 전송 시간은 WebSocketService에서 측정
               {
-                frameIndex: frameRequest.frameIndex,
+                frameIndex: batchData.frameIndex,
+                batchSize: batchData.batchSize
               }
             );
 
-            // 주기적인 성능 리포트 (20프레임마다)
-            if (
-              frameRequest.frameIndex > 0 &&
-              frameRequest.frameIndex % 20 === 0
-            ) {
+            // 주기적 성능 리포트 (매 5번째 배치마다)
+            if (batchData.frameIndex % 50 === 0) {
               performanceLogger.printReport();
             }
           }
+
         } catch (err) {
-          console.error("Frame processing error:", err);
+          console.error('Frame processing cycle error:', err);
           setError(err.message);
 
-          // 사이클 시간 계산 수정
-          const cycleEndTime = Date.now();
-          console.log(`Cycle time: ${cycleEndTime - cycleStartTime}ms`);
-
-          // 인증 오류 시 처리 중단
-          if (err.message.includes("인증")) {
+          // 치명적 에러인 경우 처리 중단
+          if (err.message.includes('인증') || err.message.includes('WebSocket')) {
             stopFrameExtraction();
           }
         }
-
-        // 사이클 시간 체크 (디버깅용)
-        const cycleTime = performance.now() - cycleStartTime;
-        if (cycleTime > VIDEO_CONFIG.FRAME_INTERVAL * 1.5) {
-          console.warn(
-            `⚠️  처리 시간 초과: ${Math.round(cycleTime)}ms (목표: ${
-              VIDEO_CONFIG.FRAME_INTERVAL
-            }ms)`
-          );
-        }
       }, VIDEO_CONFIG.FRAME_INTERVAL);
-    },
-    [isProcessing, sessionId, submitFrame, clearError]
-  );
+
+      console.log('================================\n');
+
+    } catch (err) {
+      console.error('Frame extraction start failed:', err);
+      setError(err.message);
+      setIsProcessing(false);
+      setStatus('error');
+    }
+  }, [isProcessing, sessionId, user?.id, initialize, isConnected, sendFrame]);
 
   // 프레임 추출 중단
   const stopFrameExtraction = useCallback(() => {
+    console.log('\n🏁 === 프레임 추출 세션 종료 ===');
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-    setIsProcessing(false);
-    lastSubmissionTime.current = 0;
 
-    // 세션 종료 로그
+    setIsProcessing(false);
+    setStatus('idle');
+
+    // 세션 통계 로그
     if (sessionStartTime.current) {
       const sessionDuration = Date.now() - sessionStartTime.current;
-      console.log("\n🏁 === 프레임 추출 세션 종료 ===");
-      console.log(`⏱️  총 세션 시간: ${Math.round(sessionDuration)}ms`);
+      console.log(`⏱️ 총 세션 시간: ${Math.round(sessionDuration)}ms`);
+      console.log(`📊 총 처리 프레임: ${frameCount.current}개`);
 
-      // 최종 성능 리포트
-      performanceLogger.printReport();
-      console.log("===============================\n");
+      if (sessionStats) {
+        console.log(`🎯 예측 횟수: ${sessionStats.prediction_count}회`);
+        console.log(`📈 배치 전송: ${Math.floor(sessionStats.frame_count / 10)}회`);
+      }
     }
-  }, []);
 
-  // 정리 cleanup
+    // 최종 성능 리포트
+    performanceLogger.printReport();
+    console.log('===============================\n');
+
+    // WebSocket 연결 종료
+    disconnect();
+  }, [disconnect, sessionStats]);
+
+  // 정리 함수
   const cleanup = useCallback(() => {
     stopFrameExtraction();
     frameProcessor.current.cleanup();
+    performanceLogger.clearMetrics();
   }, [stopFrameExtraction]);
 
-  // API 에러를 메인 에러로 전파
-  useEffect(() => {
-    if (apiError) {
-      setError(apiError);
-    }
-  }, [apiError]);
-
-  // component 언마운트 시 정리
+  // 컴포넌트 언마운트 시 정리
   useEffect(() => {
     return cleanup;
   }, [cleanup]);
 
+  // 연결 상태 디버깅
+  useEffect(() => {
+    console.log(`🔌 WebSocket State: ${connectionState}, Connected: ${isConnected}`);
+  }, [connectionState, isConnected]);
+
   return {
+    // 상태
     isProcessing,
     result,
     error,
-    sessionId, // 디버깅용으로 노출 -> 운영시 제거
+    status,
+    sessionStats,
+
+    // WebSocket 상태
+    isConnected,
+    connectionState,
+
+    // 세션 정보 (디버깅용)
+    sessionId,
+    frameCount: frameCount.current,
+    bufferSize: frameProcessor.current?.getCurrentBufferSize?.() || 0,
+
+    // 메서드
     startFrameExtraction,
     stopFrameExtraction,
     cleanup,
+
+    // 유틸리티
+    clearError: useCallback(() => {
+      setError(null);
+      clearWsError();
+    }, [clearWsError])
   };
 };
