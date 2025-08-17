@@ -400,7 +400,7 @@ const AvatarPage = () => {
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         isSpeechEnabled
                           ? "border-1 border-gray-400 text-white"
-                          : "bg-gray-100 text-gray-400"
+                          : "border-1 border-gray-400 text-white"
                       }`}
                     >
                       {isSpeechEnabled ? (
