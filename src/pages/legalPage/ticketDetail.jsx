@@ -706,7 +706,7 @@ const TicketDetail = () => {
 
         {/* 삭제 확인 모달 */}
         {showDeleteModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-20 backdrop-blur-none flex items-center justify-center z-50">
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50" style={{backdropFilter: 'blur(4px)'}}>
             <div
               className={`p-6 rounded-2xl shadow-xl max-w-md w-full mx-4 ${
                 isDarkMode ? "bg-gray-800" : "bg-white"
