@@ -109,12 +109,8 @@ const LoginBox = () => {
                 "fixed top-4 right-4 z-50 p-4 rounded-lg bg-green-900/90 border border-green-700 text-green-300 font-semibold shadow-lg animate-pulse";
               tempDiv.innerHTML = `
                 <div class="flex items-center gap-2">
-                  <span>👑</span>
                   <span>관리자 로그인 성공!</span>
                 </div>
-                <div class="text-sm opacity-75">${
-                  userInfo.username || userInfo.email
-                }</div>
               `;
               document.body.appendChild(tempDiv);
 
@@ -124,7 +120,7 @@ const LoginBox = () => {
                 const redirectTo = searchParams.get("redirect") || "/";
                 console.log("🔄 관리자 리다이렉트:", redirectTo);
                 navigate(redirectTo, { replace: true });
-              }, 2000);
+              }, 200000);
 
               return; // 즉시 리다이렉트 방지
             }

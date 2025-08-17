@@ -71,12 +71,6 @@ const SideMenu = ({
       path: "/inquiry",
       onClick: () => onNavigate("/inquiry-board"),
     },
-    {
-      icon: <Users size={20} />,
-      label: "사용자 관리(추후 추가?)",
-      path: "/admin/users",
-      onClick: () => onNavigate("/admin/users"),
-    },
   ];
 
   return (
