@@ -56,11 +56,25 @@ const TicketDetail = () => {
       // 분기 처리: 관리자인 경우와 일반 사용자인 경우 다른 API를 호출합니다.
       if (isAdmin()) {
         // 관리자용 API 호출
+        console.log(
+          `%c[API 요청] 관리자용 문의 상세 조회 (ID: ${ticketId})`,
+          "color: #71a4d4; font-weight: bold;"
+        );
         response = await authApi.getSupportTicketByAdminId(ticketId);
       } else {
         // 일반 사용자용 API 호출
+        console.log(
+          `%c[API 요청] 사용자용 문의 상세 조회 (ID: ${ticketId})`,
+          "color: #71a4d4; font-weight: bold;"
+        );
         response = await authApi.getSupportTicketById(ticketId);
       }
+
+      console.log(
+        "%c[API 응답] 문의 상세 정보:",
+        "color: #5a9b5a; font-weight: bold;",
+        response
+      );
 
       if (response.success && response.data) {
         // 일반 사용자의 경우, 한 번 더 본인의 문의가 맞는지 확인합니다.
@@ -92,7 +106,6 @@ const TicketDetail = () => {
     e.preventDefault();
 
     if (!replyContent.trim()) {
-      // alert() 대신 사용할 수 있는 UI 피드백 컴포넌트가 있다면 사용하는 것이 좋습니다.
       console.warn("답변 내용이 비어있습니다.");
       return;
     }
@@ -105,19 +118,27 @@ const TicketDetail = () => {
         adminName: user?.username || "admin",
       };
 
+      console.log(
+        `%c[API 요청] 관리자 답변 제출 (ID: ${ticketId})`,
+        "color: #71a4d4; font-weight: bold;",
+        replyData
+      );
       const response = await authApi.submitSupportReply(ticketId, replyData);
+      console.log(
+        "%c[API 응답] 답변 제출 결과:",
+        "color: #5a9b5a; font-weight: bold;",
+        response
+      );
 
       if (response.success) {
         // 답변 등록 성공 후, 문의 정보를 다시 불러와 상태를 업데이트합니다.
         await fetchTicket();
         setReplyContent("");
-        // 성공 알림 UI가 있다면 여기에 추가
       } else {
         throw new Error(response.message || "답변 등록에 실패했습니다.");
       }
     } catch (error) {
       console.error("답변 등록 오류:", error);
-      // 에러 알림 UI가 있다면 여기에 추가
       setError(error.message || "답변 등록 중 오류가 발생했습니다.");
     } finally {
       setIsSubmittingReply(false);
