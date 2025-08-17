@@ -173,7 +173,7 @@ const VideoPage = () => {
         <div className="flex-1 relative p-4">
           <div
             className={`
-                      w-full h-full rounded-3xl shadow-2xl overflow-hidden relative border
+                      w-full h-full rounded-3xl  overflow-hidden relative border
                       ${
                         isDarkMode
                           ? "bg-gray-800 border-gray-700"

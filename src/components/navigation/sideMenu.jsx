@@ -47,7 +47,7 @@ const SideMenu = ({
     },
     {
       icon: <Hand size={20} />,
-      label: "문장 번역",
+      label: "수어 생성",
       path: "/translate/avatar",
       onClick: () => onNavigate("/translate/avatar"),
     },
@@ -97,7 +97,7 @@ const SideMenu = ({
         ${
           isDarkMode
             ? "bg-gray-900 border-r border-gray-800"
-            : "bg-white border-r border-gray-200"
+            : "bg-[#e9ecef] border-r border-gray-200"
         }
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
@@ -133,7 +133,7 @@ const SideMenu = ({
             className={`p-2 rounded-lg transition-colors ${
               isDarkMode
                 ? "hover:bg-gray-800 text-gray-300"
-                : "hover:bg-gray-100 text-gray-600"
+                : "hover:bg-gray-300 text-gray-600"
             }`}
           >
             {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
@@ -153,7 +153,7 @@ const SideMenu = ({
                   ${
                     isDarkMode
                       ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                      : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                      : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
                   }
                 `}
               >
@@ -218,7 +218,7 @@ const SideMenu = ({
               ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
             `}
           >
@@ -250,7 +250,7 @@ const SideMenu = ({
               ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
             `}
           >
@@ -268,7 +268,7 @@ const SideMenu = ({
               ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-100 text-gray-700 hover:text-gray-900"
+                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
             `}
           >
