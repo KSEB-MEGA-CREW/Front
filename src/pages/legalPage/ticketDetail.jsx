@@ -8,8 +8,6 @@ import {
   Calendar,
   User,
   Send,
-  Eye,
-  EyeOff,
   Pencil,
   Trash2,
 } from "lucide-react";
@@ -651,17 +649,15 @@ const TicketDetail = () => {
                       isDarkMode ? "text-blue-400" : "text-blue-600"
                     }`}
                   >
-                    {ticket.adminResponse.adminName || "Admin"}
+                    {ticket.adminName || "관리자"}
                   </span>
                   <span
                     className={`text-xs ${
                       isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    {ticket.adminResponse.createdDate
-                      ? new Date(
-                          ticket.adminResponse.createdDate
-                        ).toLocaleDateString("ko-KR")
+                    {ticket.createdDate
+                      ? new Date(ticket.createdDate).toLocaleDateString("ko-KR")
                       : "날짜 없음"}
                   </span>
                 </div>
