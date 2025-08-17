@@ -92,7 +92,7 @@ const TicketDetail = () => {
           setTicket(response.data);
           setError("");
         } else {
-          if (!isAdmin() && response.data.userId !== user?.id) {
+          if (!isAdmin() && response.data.userId != user?.id) {
             setError("이 문의에 접근할 권한이 없습니다.");
             setTicket(null);
           } else {
@@ -367,38 +367,15 @@ const TicketDetail = () => {
                 {getCategoryIcon(ticket.category)}
               </span>
               <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold ${
                   isDarkMode
                     ? "border-1 border-gray-400 text-white"
                     : "border-1 border-gray-400 text-gray-800"
                 }`}
               >
-                <User size={12} />
-                {ticket.userName || "익명"}
-              </span>
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  isDarkMode
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-blue-100 text-blue-600"
-                }`}
-              >
                 {getCategoryLabel(ticket.category)}
               </span>
-              <span
-                className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
-                  ticket.isPublic
-                    ? isDarkMode
-                      ? "bg-green-500/20 text-green-400"
-                      : "bg-green-100 text-green-600"
-                    : isDarkMode
-                    ? "bg-orange-500/20 text-orange-400"
-                    : "bg-orange-100 text-orange-600"
-                }`}
-              >
-                {ticket.isPublic ? <Eye size={12} /> : <EyeOff size={12} />}
-                {ticket.isPublic ? "공개" : "🔒"}
-              </span>
+
               <span
                 className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
                   isDarkMode
@@ -415,6 +392,19 @@ const TicketDetail = () => {
                   : ticket.createdDate
                   ? new Date(ticket.createdDate).toLocaleDateString("ko-KR")
                   : "날짜 없음"}
+              </span>
+              <span
+                className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
+                  ticket.isPublic
+                    ? isDarkMode
+                      ? ""
+                      : ""
+                    : isDarkMode
+                    ? "bg-orange-500/20 text-orange-400"
+                    : "bg-orange-100 text-orange-600"
+                }`}
+              >
+                {ticket.isPublic ? "" : "🔒"}
               </span>
             </div>
 
@@ -451,7 +441,7 @@ const TicketDetail = () => {
 
           {/* 수정 폼 */}
           {isEditing ? (
-            <form onSubmit={handleEditSubmit} className="space-y-4 mb-6">
+            <form onSubmit={handleEditSubmit} className="space-y-4 mb-4">
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 ${
@@ -588,7 +578,7 @@ const TicketDetail = () => {
 
               {/* 내용 */}
               <div
-                className={`p-4 rounded-lg border mb-6 ${
+                className={`p-4 rounded-lg border mb-2 ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600"
                     : "bg-gray-50 border-gray-200"
@@ -605,9 +595,20 @@ const TicketDetail = () => {
             </>
           )}
 
+          <div className="flex items-center gap-2 ">
+            <User size={14} />
+            <span
+              className={`text-xs ${
+                isDarkMode ? "text-gray-400" : "text-gray-500"
+              }`}
+            >
+              {ticket.userName || "익명"}
+            </span>
+          </div>
+
           {/* 답변 */}
           {ticket.reply && (
-            <div className="space-y-4">
+            <div className="space-y-4 mt-8">
               <h3
                 className={`text-lg font-semibold ${
                   isDarkMode ? "text-white" : "text-gray-900"
