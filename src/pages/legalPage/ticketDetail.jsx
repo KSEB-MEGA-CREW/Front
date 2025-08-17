@@ -85,10 +85,6 @@ const TicketDetail = () => {
         response
       );
 
-      console.log("생성 날짜", ticket.createdDate || "없음");
-      console.log("수정 날짜", ticket.lastEditedDate || "없음");
-      console.log("관리자 응답 날짜", ticket.adminResponseDate || "없음");
-
       if (response.success && response.data) {
         if (response.data.isPublic === true) {
           setTicket(response.data);
@@ -660,10 +656,10 @@ const TicketDetail = () => {
                       isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    {ticket.adminResponseDate
-                      ? new Date(ticket.adminResponseDate).toLocaleDateString(
-                          "ko-KR"
-                        )
+                    {ticket.adminResponse.adminResponseDate
+                      ? new Date(
+                          ticket.adminResponse.adminResponseDate
+                        ).toLocaleDateString("ko-KR")
                       : "날짜 없음"}
                   </span>
                 </div>
