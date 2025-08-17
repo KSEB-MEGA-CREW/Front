@@ -1,104 +1,223 @@
-import { VIDEO_CONFIG } from "../constants/videoConfig";
+// src/services/FrameProcessor.js
+import { keypointUtils } from "../utils/keypointUtils.js";
+import { performanceLogger } from "../utils/performanceUtils.js";
+import { MEDIAPIPE_CONFIG } from "../constants/videoConfig.js";
+console.log('🔄 FrameProcessor.js 모듈 로드됨');
 
-// frame 처리/변환
 export class FrameProcessor {
     constructor() {
-        this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.canvas.width = VIDEO_CONFIG.CANVAS_WIDTH;
-        this.canvas.height = VIDEO_CONFIG.CANVAS_HEIGHT;
+        this.hands = null;
+        this.isReady = false;
         this.frameIndex = 0;
+        this.frameBuffer = [];
+        this.isProcessing = false;
+        this.initPromise = null;
+        this.loadingTimeout = null;
     }
 
-    // 비디오에서 프레임 추출 <- 백엔드 FrameRequest dto 구조에 맞춰서 작성
-    // userId는 API 훅에서 처리
-    extractFrame(videoElement, sessionId) {
+    async initialize() {
+        console.log('🔄 FrameProcessor 초기화 시작...');
+
+        if (this.initPromise) {
+            console.log('⏳ 이미 초기화 중...');
+            return this.initPromise;
+        }
+
+        this.initPromise = this._initialize();
+        return this.initPromise;
+    }
+
+    async _initialize() {
+        try {
+            // 1. 브라우저 환경 확인
+            if (typeof window === 'undefined') {
+                throw new Error('❌ 브라우저 환경이 아닙니다');
+            }
+
+            // 2. MediaPipe 라이브러리 대기 (최대 5초)
+            await this.waitForMediaPipe();
+
+            // 3. Hands 인스턴스 생성
+            console.log('🤲 MediaPipe Hands 인스턴스 생성 중...');
+            this.hands = new window.Hands({
+                locateFile: (file) => {
+                    const url = `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+                    console.log(`📁 MediaPipe 파일 로드: ${url}`);
+                    return url;
+                }
+            });
+
+            // 4. 설정 적용
+            this.hands.setOptions({
+                maxNumHands: MEDIAPIPE_CONFIG.MAX_NUM_HANDS,
+                modelComplexity: MEDIAPIPE_CONFIG.MODEL_COMPLEXITY,
+                minDetectionConfidence: MEDIAPIPE_CONFIG.MIN_DETECTION_CONFIDENCE,
+                minTrackingConfidence: MEDIAPIPE_CONFIG.MIN_TRACKING_CONFIDENCE
+            });
+
+            // 5. 초기화 완료
+            this.isReady = true;
+            this.initPromise = null;
+
+            console.log('✅ FrameProcessor 초기화 완료');
+            return true;
+
+        } catch (error) {
+            console.error('❌ FrameProcessor 초기화 실패:', error);
+            this.isReady = false;
+            this.initPromise = null;
+
+            // 초기화 실패 시 정리
+            this.cleanup();
+            throw error;
+        }
+    }
+
+    // MediaPipe 라이브러리 로드 대기
+    async waitForMediaPipe() {
+        const maxWaitTime = 5000; // 5초
+        const checkInterval = 100; // 100ms마다 확인
+        let waitTime = 0;
+
+        return new Promise((resolve, reject) => {
+            const checkMediaPipe = () => {
+                if (window.Hands) {
+                    console.log('✅ MediaPipe Hands 로드 완료');
+                    resolve();
+                    return;
+                }
+
+                waitTime += checkInterval;
+                if (waitTime >= maxWaitTime) {
+                    reject(new Error('❌ MediaPipe 라이브러리 로드 타임아웃 (5초)'));
+                    return;
+                }
+
+                console.log(`⏳ MediaPipe 로드 대기 중... (${waitTime}ms)`);
+                setTimeout(checkMediaPipe, checkInterval);
+            };
+
+            checkMediaPipe();
+        });
+    }
+
+    async extractKeypoints(videoElement, sessionId) {
+        if (!this.isReady || !this.hands) {
+            throw new Error('❌ FrameProcessor가 초기화되지 않았습니다');
+        }
+
         if (!videoElement || videoElement.videoWidth === 0) {
-            throw new Error('Video element not ready');
+            throw new Error('❌ 비디오 요소가 준비되지 않았습니다');
         }
 
-        // Canvas에 현재 프레임 그리기
-        this.ctx.drawImage(
-            videoElement,
-            0, 0,
-            this.canvas.width,
-            this.canvas.height
-        );
-
-        // Base64로 변환 (data:image/jpeg;base64, 접두사 제거)
-        const dataURL = this.canvas.toDataURL('image/jpeg', VIDEO_CONFIG.QUALITY);
-        const frameData = dataURL.split(',')[1]; // Base64 부분만 추출
-
-        // 파일 크기 체크 => 필요 시 추가
-        const sizeInBytes = this.getBase64Size(frameData);
-        if (sizeInBytes > VIDEO_CONFIG.MAX_FILE_SIZE) {
-            console.warn(`Frame size too large: ${sizeInBytes} bytes`);
-
-            // 자동 압축 처리
-            return this.compressFrame(videoElement, sessionId);
+        if (this.isProcessing) {
+            console.log('⏭️ 이전 프레임 처리 중... 스킵');
+            return null;
         }
 
-        const frameRequest = {
-            frameData: frameData,
-            timestamp: Date.now(),
-            sessionId: sessionId,
-            frameIndex: this.frameIndex++
-        };
+        try {
+            this.isProcessing = true;
+            performanceLogger.startTimer('keypointExtraction');
 
-        return frameRequest;
+            // MediaPipe 처리
+            const results = await this.processFrame(videoElement);
+
+            // 키포인트 추출
+            const keypoints = keypointUtils.normalizeKeypoints(results || {});
+
+            // 프레임 버퍼에 추가
+            this.frameBuffer.push(keypoints);
+            this.frameIndex++;
+
+            const extractionTime = performanceLogger.endTimer('keypointExtraction');
+
+            // 10프레임 배치 완성 시 반환
+            if (this.frameBuffer.length >= 10) {
+                const batchData = {
+                    keypoints: [...this.frameBuffer],
+                    frameIndex: this.frameIndex,
+                    batchSize: this.frameBuffer.length,
+                    sessionId
+                };
+
+                this.frameBuffer = [];
+                performanceLogger.addMetric('keypointExtraction', extractionTime);
+
+                console.log(`📦 배치 완성: ${batchData.batchSize}프레임`);
+                return batchData;
+            }
+
+            console.log(`📊 버퍼 상태: ${this.frameBuffer.length}/10 프레임`);
+            return null;
+
+        } catch (error) {
+            console.error('❌ 키포인트 추출 실패:', error);
+            throw error;
+        } finally {
+            this.isProcessing = false;
+        }
     }
 
-    // 압축 처리 메서드 추가
-    compressFrame(videoElement, sessionId) {
-        // 해상도를 절반으로 줄임
-        const smallCanvas = document.createElement('canvas');
-        const smallCtx = smallCanvas.getContext('2d');
-        smallCanvas.width = this.canvas.width / 2;
-        smallCanvas.height = this.canvas.height / 2;
+    processFrame(videoElement) {
+        return new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error('MediaPipe 처리 타임아웃 (100ms)'));
+            }, 100);
 
-        smallCtx.drawImage(
-            videoElement,
-            0, 0,
-            smallCanvas.width,
-            smallCanvas.height
-        );
+            // 결과 콜백 설정 (한 번만 실행)
+            const handleResults = (results) => {
+                clearTimeout(timeout);
+                this.hands.onResults(() => { }); // 콜백 초기화
+                resolve(results);
+            };
 
-        // 품질도 더 낮춤
-        const compressedDataURL = smallCanvas.toDataURL('image/jpeg', 0.3);
-        const compressedFrameData = compressedDataURL.split(',')[1];
+            this.hands.onResults(handleResults);
 
-        const compressedSize = this.getBase64Size(compressedFrameData);
-        console.log(`🗜️ 압축된 프레임 크기: ${Math.round(compressedSize / 1024)}KB`);
-
-        // 임시 캔버스 정리
-        smallCanvas.remove();
-
-        const frameRequest = {
-            frameData: compressedFrameData,
-            timestamp: Date.now(),
-            sessionId: sessionId,
-            frameIndex: this.frameIndex++
-        };
-
-        return frameRequest;
+            try {
+                this.hands.send({ image: videoElement });
+            } catch (error) {
+                clearTimeout(timeout);
+                reject(error);
+            }
+        });
     }
 
-    // Base64 크기 계산
-    getBase64Size(base64String) {
-        return Math.round((base64String.length * 3) / 4);
+    isReady() {
+        return this.isReady && this.hands !== null;
     }
 
-    // frame index reset
     resetFrameIndex() {
         this.frameIndex = 0;
+        this.frameBuffer = [];
+        console.log('🔄 프레임 인덱스 리셋');
     }
 
-    // 메모리 정리
+    getCurrentBufferSize() {
+        return this.frameBuffer.length;
+    }
+
     cleanup() {
-        if (this.canvas) {
-            this.canvas.remove();
-            this.canvas = null;
-            this.ctx = null;
+        try {
+            console.log('🧹 FrameProcessor 정리 시작...');
+
+            if (this.loadingTimeout) {
+                clearTimeout(this.loadingTimeout);
+                this.loadingTimeout = null;
+            }
+
+            if (this.hands) {
+                this.hands.close();
+                this.hands = null;
+            }
+
+            this.isReady = false;
+            this.isProcessing = false;
+            this.frameBuffer = [];
+            this.initPromise = null;
+
+            console.log('✅ FrameProcessor 정리 완료');
+        } catch (error) {
+            console.error('❌ FrameProcessor 정리 오류:', error);
         }
     }
 }

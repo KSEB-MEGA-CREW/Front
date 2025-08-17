@@ -1,23 +1,21 @@
 import { useState, useCallback } from "react";
-// 카메라 설정/제어
 
 export const useCameraService = () => {
     const [availableDevices, setAvailableDevices] = useState([]);
     const [supportedConstraints, setSupportedConstraints] = useState(null);
 
-    // 사용 가능한 카메라 디바이스 목록
     const getAvailableDevices = useCallback(async () => {
         try {
             const devices = await navigator.mediaDevices.enumerateDevices();
             const videoDevices = devices.filter(device => device.kind === 'videoinput');
             setAvailableDevices(videoDevices);
             return videoDevices;
-        } catch {
+        } catch (err) {
+            console.error('Failed to get devices:', err);
             return [];
         }
     }, []);
 
-    // 지원되는 제약 조건 확인
     const getSupportedConstraints = useCallback(async () => {
         if (!supportedConstraints) {
             const constraints = navigator.mediaDevices.getSupportedConstraints();
@@ -27,7 +25,6 @@ export const useCameraService = () => {
         return supportedConstraints;
     }, [supportedConstraints]);
 
-    // 최적의 카메라 제약조건 생성
     const createOptimalConstraints = useCallback((options = {}) => {
         const {
             preferredDeviceId,
@@ -55,7 +52,6 @@ export const useCameraService = () => {
             audio: false
         };
 
-        // 특정 디바이스 ID가 지정된 경우
         if (preferredDeviceId) {
             constraints.video.deviceId = { exact: preferredDeviceId };
             delete constraints.video.facingMode;
@@ -64,7 +60,6 @@ export const useCameraService = () => {
         return constraints;
     }, []);
 
-    // 카메라 정보 수집
     const getCameraInfo = useCallback(async (stream) => {
         if (!stream) return null;
 
@@ -85,7 +80,6 @@ export const useCameraService = () => {
         };
     }, []);
 
-    // 에러 메시지 생성
     const generateErrorMessage = useCallback((error) => {
         const errorMessages = {
             'NotAllowedError': '카메라 사용 권한이 거부되었습니다.',
@@ -99,7 +93,6 @@ export const useCameraService = () => {
         return errorMessages[error.name] || '카메라 접근 중 오류가 발생했습니다.';
     }, []);
 
-    // 브라우저 호환성 확인
     const checkBrowserSupport = useCallback(() => {
         const hasGetUserMedia = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
         const hasEnumerateDevices = !!(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices);
@@ -112,11 +105,8 @@ export const useCameraService = () => {
     }, []);
 
     return {
-        // 상태
         availableDevices,
         supportedConstraints,
-
-        // 메서드
         getAvailableDevices,
         getSupportedConstraints,
         createOptimalConstraints,

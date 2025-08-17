@@ -7,18 +7,26 @@ export const VIDEO_CONFIG = {
     CANVAS_HEIGHT: 480,
     QUALITY: 0.8, // JPEG 품질
     MAX_FILE_SIZE: 50 * 1024, // 50KB
-    MAX_RETRIES: 3
+    MAX_RETRIES: 3,
+    KEYPOINT_BUFFER_SIZE: 10 // 10 frame buffer
 };
 
 export const API_CONFIG = {
     BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
-    ENDPOINTS: {
-        // 웹캠 -> 텍스트
-        ANALYZE_FRAME: '/api/signlanguage/analyze',
-        HEALTH_CHECK: '/api/signlanguage/health',
+    WEBSOCKET_URL: import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws',
 
-        // 텍스트 -> 수어 애니메이션
-        TEXT_TO_SIGN: '/api/translation/text-to-sign',
-        TRANSLATION_HEALTH: '/api/translation/health'
+    ENDPOINTS: {
+        VERIFY_TOKEN: '/api/auth/verify-token',
+        HEALTH_CHECK: '/api/auth/health'
     }
+};
+
+export const MEDIAPIPE_CONFIG = {
+    MAX_NUM_HANDS: 2,
+    MODEL_COMPLEXITY: 1,
+    MIN_DETECTION_CONFIDENCE: 0.7,
+    MIN_TRACKING_CONFIDENCE: 0.5,
+    KEYPOINT_DIMENSIONS: 194, // 손 키포인트 차원
+    SINGLE_HAND_LANDMARKS: 21,
+    COORDINATES_PER_LANDMARK: 3 // x, y, z
 };
