@@ -381,11 +381,11 @@ const TicketDetail = () => {
                 }`}
               >
                 <Calendar size={12} />
-                {ticket.modifiedDate &&
-                ticket.modifiedDate !== ticket.createdDate
-                  ? `수정됨 ${new Date(ticket.modifiedDate).toLocaleDateString(
-                      "ko-KR"
-                    )}`
+                {ticket.lastEditedDate &&
+                ticket.lastEditedDate !== ticket.createdDate
+                  ? `수정됨 ${new Date(
+                      ticket.lastEditedDate
+                    ).toLocaleDateString("ko-KR")}`
                   : ticket.createdDate
                   ? new Date(ticket.createdDate).toLocaleDateString("ko-KR")
                   : "날짜 없음"}
@@ -656,8 +656,10 @@ const TicketDetail = () => {
                       isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
-                    {ticket.createdDate
-                      ? new Date(ticket.createdDate).toLocaleDateString("ko-KR")
+                    {ticket.adminResponseDate
+                      ? new Date(ticket.adminResponseDate).toLocaleDateString(
+                          "ko-KR"
+                        )
                       : "날짜 없음"}
                   </span>
                 </div>
