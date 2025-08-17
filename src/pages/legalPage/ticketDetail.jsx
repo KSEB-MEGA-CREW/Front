@@ -129,8 +129,7 @@ const TicketDetail = () => {
 
     try {
       const replyData = {
-        content: replyContent.trim(),
-        adminName: user?.username || "admin",
+        reply: replyContent.trim(),
       };
 
       console.log(
