@@ -720,7 +720,7 @@ const InquiryBoard = () => {
                         className={`
                       px-2 py-1 rounded-full text-xs font-medium
                       ${
-                        ticket.status === "answered"
+                        ticket.status === "ANSWERED"
                           ? isDarkMode
                             ? "bg-green-500/20 text-green-400"
                             : "bg-green-100 text-green-600"
@@ -730,7 +730,7 @@ const InquiryBoard = () => {
                       }
                     `}
                       >
-                        {ticket.status === "answered"
+                        {ticket.status === "ANSWERED"
                           ? "답변 완료"
                           : "답변 대기"}
                       </span>
