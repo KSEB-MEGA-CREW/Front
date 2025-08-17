@@ -290,60 +290,57 @@ const InquiryBoard = () => {
       }`}
     >
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* 헤더 */}
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate("/customer-support")}
-            className={`
-              p-2 rounded-lg transition-colors
-              ${
+        {/* 헤더: justify-between 클래스를 추가하여 내부 요소를 양쪽으로 정렬 */}
+        <div className="flex items-center justify-between">
+          {/* 왼쪽 그룹: 뒤로가기 버튼 + 제목 */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/customer-support")}
+              className={`p-2 rounded-lg transition-colors ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                   : "hover:bg-white text-gray-600 hover:text-gray-900"
-              }
-            `}
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <div className="flex items-center gap-3">
-            <div
-              className={`
-              p-3 rounded-lg
-              ${
-                isDarkMode
-                  ? "bg-blue-500/20 text-blue-400"
-                  : "bg-blue-100 text-blue-600"
-              }
-            `}
-            >
-              <MessageSquare size={32} />
-            </div>
-            <h1
-              className={`text-4xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              문의 게시판
-            </h1>
-          </div>
-        </div>
-
-        {/* 뷰 모드 탭 */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          {isAdmin() && (
-            <button
-              onClick={() => handleViewModeChange("admin")}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                viewMode === "admin"
-                  ? "bg-red-600 text-white"
-                  : isDarkMode
-                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              ⚡ 관리자 뷰
+              <ArrowLeft size={24} />
             </button>
-          )}
+            <div className="flex items-center gap-3">
+              <div
+                className={`p-3 rounded-lg ${
+                  isDarkMode
+                    ? "bg-blue-500/20 text-blue-400"
+                    : "bg-blue-100 text-blue-600"
+                }`}
+              >
+                <MessageSquare size={32} />
+              </div>
+              <h1
+                className={`text-4xl font-bold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                문의 게시판
+              </h1>
+            </div>
+          </div>
+
+          {/* 오른쪽 그룹: 관리자 뷰 버튼 (이곳으로 이동) */}
+          <div>
+            {isAdmin() && (
+              <button
+                onClick={() => handleViewModeChange("admin")}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  viewMode === "admin"
+                    ? "bg-red-600 text-white"
+                    : isDarkMode
+                    ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                ⚡ 관리자 뷰
+              </button>
+            )}
+          </div>
         </div>
 
         {/* 내 문의 필터 상태 표시 */}
