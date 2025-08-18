@@ -459,7 +459,7 @@ function MainPage() {
                 : "bg-gradient-to-r from-[#f1f3f5] to-gray-50"
             }`}
           >
-            <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" />
+            {/* <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" /> */}
             <h2
               className={`text-3xl md:text-4xl font-bold mb-6 ${
                 isDarkMode ? "text-white" : "text-gray-900"
