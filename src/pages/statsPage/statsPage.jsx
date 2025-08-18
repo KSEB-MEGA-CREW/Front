@@ -53,8 +53,8 @@ const StatsPage = () => {
                 p-3 rounded-lg
                 ${
                   isDarkMode
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-blue-100 text-blue-600"
+                    ? "bg-green-500/20 text-green-400"
+                    : "bg-green-100 text-green-600"
                 }
               `}
               >
@@ -97,8 +97,8 @@ const StatsPage = () => {
                 p-3 rounded-lg
                 ${
                   isDarkMode
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-green-100 text-green-600"
+                    ? "bg-blue-500/20 text-blue-400"
+                    : "bg-blue-100 text-blue-600"
                 }
               `}
               >

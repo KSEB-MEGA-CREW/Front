@@ -130,6 +130,7 @@ function CalendarModel({ userId }) {
           return acc;
         }, {});
         setQuizHistory(historyMap);
+        console.log("퀴즈", activeDate, quizHistory);
       } catch (error) {
         console.error("퀴즈 기록 로딩 실패:", error);
         setQuizHistory({});
