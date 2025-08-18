@@ -1,6 +1,6 @@
 import LoginPage from "../pages/loginPage/loginPage"; // Outlet을 포함한 레이아웃 페이지
 import StartPage from "../components/auth/startPage"; // 새로운 시작 페이지
-import PublicRoute from "./PublicRoute";
+import PublicRoute from "../router/publicRoute";
 import Login from "../components/login/loginBox"; // 로그인 컴포넌트
 import Signup from "../components/login/signupBox"; // 회원가입 컴포넌트
 
