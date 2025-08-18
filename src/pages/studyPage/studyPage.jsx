@@ -121,7 +121,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
+            isDarkMode ? "bg-gray-900" : "bg-gray-50"
           }`}
         >
           <div className="flex justify-center items-center min-h-screen">
@@ -157,7 +157,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
+            isDarkMode ? "bg-gray-900" : "bg-gray-50"
           }`}
         >
           <div className="flex flex-col items-center justify-center min-h-screen px-4">
@@ -219,7 +219,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen px-4 py-8 ${
-            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
+            isDarkMode ? "bg-gray-900" : "bg-gray-50"
           }`}
         >
           <div className="max-w-4xl mx-auto">
@@ -510,7 +510,7 @@ function StudyWord() {
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                         selected === null
                           ? isDarkMode
-                            ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]0"
+                            ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]"
                             : "bg-gray-100 text-gray-700 group-hover:bg-gray-200"
                           : ""
                       } ${
