@@ -173,7 +173,7 @@ const CustomerSupport = () => {
                 href="mailto:dissolve1882@naver.com"
                 className={`hover:text-blue-500 transition-colors`}
               >
-                mailto:dissolve1882@naver.com
+                dissolve1882@naver.com
               </a>
             </p>
           </div>
