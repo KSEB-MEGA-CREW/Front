@@ -295,22 +295,20 @@ const StasticComponent = () => {
                           </span>
                         ) : (
                           <span
-                            className={`flex items-center gap-2 ${
-                              item.accuracy >= 80
-                                ? "text-green-300"
-                                : item.accuracy >= 60
-                                ? "text-yellow-300"
-                                : "text-red-300"
-                            }`}
+                            className={"flex items-center gap-2 text-gray-300"}
                           >
                             <span
-                              className={`text-2xl ${
+                              className={`text-2xl text-gray-800 ${
                                 item.accuracy >= 80
                                   ? "🎉"
                                   : item.accuracy >= 60
                                   ? "👍"
-                                  : item.accuracy > 0
+                                  : item.accuracy >= 40
+                                  ? "😊"
+                                  : item.accuracy >= 20
                                   ? "💪"
+                                  : item.accuracy > 0
+                                  ? "🧐"
                                   : "😔"
                               }`}
                             ></span>
