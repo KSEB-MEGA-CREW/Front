@@ -59,7 +59,7 @@ export default defineConfig({
 
       // ✅ WebSocket 프록시
       "/ws": {
-        target: "ws://165.246.241.10:8080",
+        target: "ws://localhost:8000",
         ws: true,
         changeOrigin: true,
       },

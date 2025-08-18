@@ -33,6 +33,7 @@ const InquiryBoard = () => {
     my: 1,
     admin: 1,
   });
+
   const [pageInfo, setPageInfo] = useState({
     public: { totalPages: 0, totalElements: 0, size: 5, number: 0 },
     my: { totalPages: 0, totalElements: 0, size: 5, number: 0 },
@@ -41,11 +42,11 @@ const InquiryBoard = () => {
 
   const categories = [
     { id: "all", label: "전체", icon: "📋" },
-    { id: "technical", label: "기술적 문제", icon: "⚙️" },
-    { id: "account", label: "계정 관련", icon: "👤" },
-    { id: "learning", label: "학습 문의", icon: "📚" },
-    { id: "feature", label: "기능 제안", icon: "💡" },
-    { id: "other", label: "기타", icon: "❓" },
+    { id: "TECHNICAL", label: "기술적 문제", icon: "⚙️" },
+    { id: "ACCOUNT", label: "계정 관련", icon: "👤" },
+    { id: "LEARNING", label: "학습 문의", icon: "📚" },
+    { id: "FEATURE", label: "기능 제안", icon: "💡" },
+    { id: "OTHER", label: "기타", icon: "❓" },
   ];
 
   const getCategoryLabel = (categoryId) => {
@@ -289,72 +290,57 @@ const InquiryBoard = () => {
       }`}
     >
       <div className="max-w-4xl mx-auto space-y-8">
-        {/* 헤더 */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate("/customer-support")}
-            className={`
-              p-2 rounded-lg transition-colors
-              ${
+        {/* 헤더: justify-between 클래스를 추가하여 내부 요소를 양쪽으로 정렬 */}
+        <div className="flex items-center justify-between">
+          {/* 왼쪽 그룹: 뒤로가기 버튼 + 제목 */}
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/customer-support")}
+              className={`p-2 rounded-lg transition-colors ${
                 isDarkMode
                   ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                   : "hover:bg-white text-gray-600 hover:text-gray-900"
-              }
-            `}
-          >
-            <ArrowLeft size={24} />
-          </button>
-          <div className="flex items-center gap-3">
-            <div
-              className={`
-              p-3 rounded-lg
-              ${
-                isDarkMode
-                  ? "bg-blue-500/20 text-blue-400"
-                  : "bg-blue-100 text-blue-600"
-              }
-            `}
-            >
-              <MessageSquare size={32} />
-            </div>
-            <h1
-              className={`text-4xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
-              문의 게시판
-            </h1>
-          </div>
-        </div>
-
-        {/* 뷰 모드 탭 */}
-        <div className="flex flex-wrap gap-2 mb-6">
-          <button
-            onClick={() => handleViewModeChange("public")}
-            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-              viewMode === "public"
-                ? "bg-blue-600 text-white"
-                : isDarkMode
-                ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
-          >
-            🌐 공개 문의
-          </button>
-          {isAdmin() && (
-            <button
-              onClick={() => handleViewModeChange("admin")}
-              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                viewMode === "admin"
-                  ? "bg-red-600 text-white"
-                  : isDarkMode
-                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              ⚡ 관리자 뷰
+              <ArrowLeft size={24} />
             </button>
-          )}
+            <div className="flex items-center gap-3">
+              <div
+                className={`p-3 rounded-lg ${
+                  isDarkMode
+                    ? "bg-blue-500/20 text-blue-400"
+                    : "bg-blue-100 text-blue-600"
+                }`}
+              >
+                <MessageSquare size={32} />
+              </div>
+              <h1
+                className={`text-4xl font-bold ${
+                  isDarkMode ? "text-white" : "text-gray-900"
+                }`}
+              >
+                문의 게시판
+              </h1>
+            </div>
+          </div>
+
+          {/* 오른쪽 그룹: 관리자 뷰 버튼 (이곳으로 이동) */}
+          <div>
+            {isAdmin() && (
+              <button
+                onClick={() => handleViewModeChange("admin")}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  viewMode === "admin"
+                    ? "bg-red-600 text-white"
+                    : isDarkMode
+                    ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                }`}
+              >
+                ⚡ 관리자 뷰
+              </button>
+            )}
+          </div>
         </div>
 
         {/* 내 문의 필터 상태 표시 */}
@@ -375,7 +361,7 @@ const InquiryBoard = () => {
                 className={isDarkMode ? "text-blue-400" : "text-blue-600"}
               />
               <span
-                className={`text-sm font-semibold ${
+                className={`text-sm font-medium ${
                   isDarkMode ? "text-blue-400" : "text-blue-600"
                 }`}
               >
@@ -434,10 +420,10 @@ const InquiryBoard = () => {
             <button
               onClick={toggleMyInquiryFilter}
               className={`
-                flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-colors whitespace-nowrap
+                flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors whitespace-nowrap
                 ${
                   isMyInquiryFilter
-                    ? "bg-blue-600 text-white"
+                    ? "bg-blue-500 text-white"
                     : isDarkMode
                     ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                     : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
@@ -552,7 +538,7 @@ const InquiryBoard = () => {
             </p>
             <button
               onClick={() => navigate("/customer-support")}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              className="px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
             >
               문의하기
             </button>
@@ -610,7 +596,7 @@ const InquiryBoard = () => {
                           ? "bg-gray-800 border-gray-700 opacity-75"
                           : "bg-gray-100 border-gray-200 opacity-75"
                         : isDarkMode
-                        ? "bg-gray-800 border-gray-700 hover:bg-gray-750"
+                        ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
                         : "bg-white border-gray-200 hover:bg-gray-50"
                     }
                   `}
@@ -622,11 +608,11 @@ const InquiryBoard = () => {
                       </span>
                       <span
                         className={`
-                      px-3 py-1 rounded-full text-xs font-semibold
+                      px-3 py-1 rounded-full text-xs font-medium
                       ${
                         isDarkMode
-                          ? "bg-blue-500/20 text-blue-400"
-                          : "bg-blue-100 text-blue-600"
+                          ? "border-1 border-gray-300 text-gray-200"
+                          : "border-1 border-gray-400 text-gray-800"
                       }
                     `}
                       >
@@ -636,26 +622,26 @@ const InquiryBoard = () => {
                       {/* 공개/비공개 상태 표시 */}
                       <span
                         className={`
-                      px-2 py-1 rounded-full text-xs font-semibold
+                      px-2 py-1 rounded-full text-xs font-medium
                       ${
                         ticket.isPublic
                           ? isDarkMode
-                            ? "bg-green-500/20 text-green-400"
-                            : "bg-green-100 text-green-600"
+                            ? ""
+                            : ""
                           : isDarkMode
                           ? "bg-orange-500/20 text-orange-400"
                           : "bg-orange-100 text-orange-600"
                       }
                     `}
                       >
-                        {ticket.isPublic ? "🌐 공개" : "🔒 비공개"}
+                        {ticket.isPublic ? "" : "🔒"}
                       </span>
 
                       {/* 관리자 뷰에서만 사용자명 표시 */}
                       {viewMode === "admin" && (
                         <span
                           className={`
-                        px-2 py-1 rounded-full text-xs font-semibold
+                        px-2 py-1 rounded-full text-xs font-medium
                         ${
                           isDarkMode
                             ? "bg-purple-500/20 text-purple-400"
@@ -732,9 +718,9 @@ const InquiryBoard = () => {
                     {ticket.status && (
                       <span
                         className={`
-                      px-2 py-1 rounded-full text-xs font-semibold
+                      px-2 py-1 rounded-full text-xs font-medium
                       ${
-                        ticket.status === "answered"
+                        ticket.status === "ANSWERED"
                           ? isDarkMode
                             ? "bg-green-500/20 text-green-400"
                             : "bg-green-100 text-green-600"
@@ -744,7 +730,7 @@ const InquiryBoard = () => {
                       }
                     `}
                       >
-                        {ticket.status === "answered"
+                        {ticket.status === "ANSWERED"
                           ? "답변 완료"
                           : "답변 대기"}
                       </span>
@@ -770,7 +756,7 @@ const InquiryBoard = () => {
         <div className="text-center">
           <button
             onClick={() => navigate("/customer-support")}
-            className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors inline-flex items-center gap-2"
+            className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors inline-flex items-center gap-2"
           >
             <MessageSquare size={18} />새 문의하기
           </button>

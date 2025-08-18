@@ -15,7 +15,7 @@ const PrivacyPolicy = () => {
     >
       <div className="max-w-4xl mx-auto space-y-8">
         {/* 헤더 */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate("/settings")}
             className={`

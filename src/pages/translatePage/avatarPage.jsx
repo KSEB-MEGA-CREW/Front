@@ -20,20 +20,8 @@ import {
   Clock,
 } from "lucide-react";
 
-//=========== 오류 해결을 위한 Mock 코드 ===========//
-
-// 1. ThemeContext Mock
-// "../../Context/themeContext" 파일이 없어 임시로 생성합니다.
-const ThemeContext = createContext();
-const ThemeProvider = ({ children }) => {
-  // 기본적으로 다크 모드를 사용하도록 설정합니다.
-  const [isDarkMode, setIsDarkMode] = useState(true);
-  const value = { isDarkMode, setIsDarkMode };
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
-};
-const useTheme = () => useContext(ThemeContext);
+// ThemeContext import
+import { useTheme } from "../../Context/themeContext";
 
 // 2. useUnityAvatar Hook Mock
 // "../../hooks/useUnityAvatar" 파일이 없어 임시로 생성합니다.
@@ -241,7 +229,7 @@ const AvatarPage = () => {
       <div className="relative w-full h-screen flex flex-col xl:flex-row">
         <div className="flex-1 relative p-4">
           <div
-            className={`w-full h-full rounded-3xl shadow-2xl overflow-hidden relative border ${
+            className={`w-full h-full rounded-3xl overflow-hidden relative border ${
               isDarkMode
                 ? "bg-gray-800 border-gray-700"
                 : "bg-white border-gray-200"
@@ -270,13 +258,13 @@ const AvatarPage = () => {
 
                 {isPlaying && currentTranslation && (
                   <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
                       isDarkMode
-                        ? "bg-purple-500/20 text-purple-300"
-                        : "bg-purple-100 text-purple-700"
+                        ? "bg-gray-700 text-[#ff4444]"
+                        : "bg-gray-100 text-[#ff4444]"
                     }`}
                   >
-                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse" />
+                    <div className="w-2 h-2 bg-[#ff4444] rounded-full animate-pulse font-medium" />
                     재생 중: {currentTranslation.text}
                   </div>
                 )}
@@ -330,7 +318,7 @@ const AvatarPage = () => {
                   </p>
                   <button
                     onClick={() => window.location.reload()}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
                   >
                     <RotateCcw size={18} />
                     페이지 새로고침
@@ -360,7 +348,7 @@ const AvatarPage = () => {
                     >
                       <Loader
                         size={24}
-                        className="animate-spin text-purple-600"
+                        className="animate-spin text-blue-500"
                       />
                       {isUnityLoading
                         ? "Unity 아바타 로딩 중..."
@@ -399,8 +387,12 @@ const AvatarPage = () => {
                       onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         isSpeechEnabled
-                          ? "bg-green-100 text-green-600"
-                          : "bg-gray-100 text-gray-400"
+                          ? isDarkMode
+                            ? "bg-blue-600 text-white"
+                            : "bg-blue-600 text-white"
+                          : isDarkMode
+                          ? "bg-gray-600 text-gray-300"
+                          : "bg-gray-300 text-gray-600"
                       }`}
                     >
                       {isSpeechEnabled ? (
@@ -419,15 +411,27 @@ const AvatarPage = () => {
                       <button
                         onClick={resetAvatar}
                         disabled={!isUnityLoaded}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-blue-100 hover:bg-blue-200 disabled:bg-gray-100 text-blue-700 disabled:text-gray-400 rounded-lg transition-all duration-200 text-sm"
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
+                          !isUnityLoaded
+                            ? isDarkMode
+                              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-blue-500 hover:bg-blue-600 text-white"
+                        }`}
                       >
                         <User size={16} />
-                        아바타 리셋
+                        리셋
                       </button>
                       <button
                         onClick={handleStopAnimation}
                         disabled={!isPlaying}
-                        className="flex-1 flex items-center justify-center gap-2 py-2 px-3 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 text-red-700 disabled:text-gray-400 rounded-lg transition-all duration-200 text-sm"
+                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
+                          !isPlaying
+                            ? isDarkMode
+                              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            : "bg-[#ff4444] hover:bg-red-600 text-white"
+                        }`}
                       >
                         <Square size={16} />
                         정지
@@ -466,7 +470,7 @@ const AvatarPage = () => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="수어로 변환할 텍스트를 입력하세요..."
-                className={`w-full h-32 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all duration-200 border ${
+                className={`w-full h-32 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 border ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
                     : "bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-500"
@@ -481,13 +485,17 @@ const AvatarPage = () => {
                     isConversionLoading ||
                     isPlaying
                   }
-                  className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:opacity-50 disabled:transform-none text-white font-semibold rounded-xl transition-all duration-300 transform hover:scale-[1.02] shadow-lg"
+                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 font-semibold rounded-xl transition-all duration-300 transform shadow-lg ${
+                    !inputText.trim() ||
+                    !isUnityLoaded ||
+                    isConversionLoading ||
+                    isPlaying
+                      ? isDarkMode
+                        ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      : "bg-blue-500 hover:bg-blue-600 text-white hover:scale-[1.02]"
+                  }`}
                 >
-                  {isConversionLoading ? (
-                    <Loader size={18} className="animate-spin" />
-                  ) : (
-                    <Sparkles size={18} />
-                  )}
                   수어 변환
                 </button>
                 <button
@@ -525,7 +533,7 @@ const AvatarPage = () => {
                   onClick={() => handlePredefinedSelect(phrase)}
                   className={`p-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     selectedPredefined === phrase
-                      ? "bg-purple-500 text-white shadow-lg"
+                      ? "bg-blue-500 text-white shadow-lg"
                       : isDarkMode
                       ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
                       : "bg-gray-100 hover:bg-gray-200 text-gray-700"
@@ -628,13 +636,4 @@ const AvatarPage = () => {
   );
 };
 
-// App 컴포넌트가 ThemeProvider를 사용하도록 설정
-const App = () => {
-  return (
-    <ThemeProvider>
-      <AvatarPage />
-    </ThemeProvider>
-  );
-};
-
-export default App;
+export default AvatarPage;
