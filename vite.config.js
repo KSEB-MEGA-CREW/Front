@@ -26,7 +26,7 @@ export default defineConfig({
     // ✅ 프록시 설정 개선
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "http://165.246.241.10:8080",
         changeOrigin: true,
         secure: false,
         timeout: 60000,
@@ -49,7 +49,7 @@ export default defineConfig({
 
       // OAuth2 관련 요청 프록시
       "/oauth2": {
-        target: "http://localhost:8080",
+        target: "http://165.246.241.10:8080",
         changeOrigin: true,
         secure: false,
         timeout: 60000,
@@ -59,7 +59,7 @@ export default defineConfig({
 
       // ✅ WebSocket 프록시
       "/ws": {
-        target: "ws://localhost:8080",
+        target: "ws://165.246.241.10:8080",
         ws: true,
         changeOrigin: true,
       },
@@ -69,7 +69,7 @@ export default defineConfig({
   // ✅ 환경변수 설정 개선
   define: {
     __API_URL__: JSON.stringify(
-      process.env.VITE_API_URL || "http://localhost:8080"
+      process.env.VITE_API_URL || "http://165.246.241.10:8080"
     ),
   },
 
