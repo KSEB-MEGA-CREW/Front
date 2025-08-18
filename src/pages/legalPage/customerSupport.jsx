@@ -169,7 +169,12 @@ const CustomerSupport = () => {
                 isDarkMode ? "text-blue-400" : "text-blue-600"
               }`}
             >
-              dissolve1882@naver.com
+              <a
+                href="mailto:dissolve1882@naver.com"
+                className={`hover:text-blue-500 transition-colors`}
+              >
+                dissolve1882@naver.com
+              </a>
             </p>
           </div>
 
