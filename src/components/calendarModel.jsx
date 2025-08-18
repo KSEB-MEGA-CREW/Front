@@ -188,7 +188,7 @@ function CalendarModel({ userId }) {
       tiles.push(
         <div
           key={day}
-          className={`w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold transition-all duration-200 text-white ${colorClass}`}
+          className={`w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold transition-all duration-200 text-gray-600 ${colorClass}`}
         >
           {day}
         </div>
