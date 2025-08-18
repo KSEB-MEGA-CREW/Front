@@ -620,7 +620,7 @@ const TicketDetail = () => {
             <User size={14} />
             <span
               className={`text-xs ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
+                isDarkMode ? "text-gray-400" : "text-gray-900"
               }`}
             >
               {ticket.userName || "익명"}
