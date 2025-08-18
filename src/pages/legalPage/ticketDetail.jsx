@@ -597,7 +597,7 @@ const TicketDetail = () => {
                 문의 내용 *
               </label>
               <div
-                className={`p-4 rounded-lg border mb-3 ${
+                className={`p-4 rounded-lg border mb-3 min-h-[155px] ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600"
                     : "bg-gray-50 border-gray-200"
