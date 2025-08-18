@@ -622,10 +622,12 @@ const VideoPage = () => {
               onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
               className={`p-3 lg:p-4 rounded-xl lg:rounded-2xl transition-all duration-200 ${
                 isSpeechEnabled
-                  ? "border-1 border-gray-400 text-white hover:bg-gray-500"
+                  ? isDarkMode
+                    ? " border-1 border-gray-400 text-gray-300 hover:bg-gray-500"
+                    : " border-1 border-gray-400 text-gray-600 hover:bg-gray-400"
                   : isDarkMode
-                  ? " text-gray-300 hover:bg-gray-500"
-                  : " text-gray-600 hover:bg-gray-400"
+                  ? " border-1 border-gray-400 text-gray-300 hover:bg-gray-500"
+                  : " border-1 border-gray-400 text-gray-600 hover:bg-gray-400"
               }`}
               title="음성 출력 토글"
             >
