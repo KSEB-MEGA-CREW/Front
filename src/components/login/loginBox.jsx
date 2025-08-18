@@ -9,6 +9,7 @@ import {
   KAKAO_AUTH_URL,
   NAVER_AUTH_URL,
 } from "../../api/authApi";
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginBox = () => {
   const { login } = useAuth();
@@ -213,9 +214,9 @@ const LoginBox = () => {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors"
           >
-            {showPassword ? "🙈" : "👁"}
+            {showPassword ? <Eye size={19} /> : <EyeOff size={19} />}
           </button>
         </div>
 
