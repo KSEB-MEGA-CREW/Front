@@ -444,7 +444,7 @@ const CustomerSupport = () => {
                     />
                     <div className="ml-3">
                       <div
-                        className={`text-sm font-semibold ${
+                        className={`text-sx font-semibold ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
@@ -469,7 +469,7 @@ const CustomerSupport = () => {
                     />
                     <div className="ml-3">
                       <div
-                        className={`text-sm font-semibold ${
+                        className={`text-sx font-semibold ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
