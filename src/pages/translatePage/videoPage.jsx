@@ -722,10 +722,10 @@ const VideoPage = () => {
               onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
               className={`p-3 lg:p-4 rounded-xl lg:rounded-2xl transition-all duration-200 ${
                 isSpeechEnabled
-                  ? "bg-blue-600 text-white"
+                  ? "border-1 border-gray-400 text-white hover:bg-gray-500"
                   : isDarkMode
-                  ? "bg-gray-600 text-gray-300 hover:bg-gray-700"
-                  : "bg-gray-300 text-gray-600 hover:bg-gray-400"
+                  ? " text-gray-300 hover:bg-gray-500"
+                  : " text-gray-600 hover:bg-gray-400"
               }`}
               title="음성 출력 토글"
             >
