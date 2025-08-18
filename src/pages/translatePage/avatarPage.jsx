@@ -1,9 +1,10 @@
+// AvatarPage.jsx 상단 import들 아래에 추가
+import GLBAvatarPlayer from "./GLBAvatarPlayer.jsx";
+
 import React, {
   useState,
   useEffect,
   useRef,
-  createContext,
-  useContext,
 } from "react";
 import {
   Square,
@@ -14,7 +15,6 @@ import {
   Loader,
   AlertCircle,
   CheckCircle,
-  Sparkles,
   User,
   MessageSquare,
   Clock,
@@ -33,11 +33,11 @@ const useUnityAvatar = () => {
   const sendAnimationData = () => {
     console.log("Mock: 애니메이션 데이터 전송 시도");
     setIsPlaying(true);
-    // 3초 후에 애니메이션이 끝나는 것을 시뮬레이션합니다.
-    setTimeout(() => {
-      setIsPlaying(false);
-      console.log("Mock: 애니메이션 종료");
-    }, 3000);
+  };
+
+  const stopAnimation = () => {
+    console.log("Mock: 애니메이션 정지");
+    setIsPlaying(false);
   };
 
   return {
@@ -48,10 +48,7 @@ const useUnityAvatar = () => {
     containerRef,
     initializeUnity: () => console.log("Mock: Unity 초기화"),
     sendAnimationData,
-    stopAnimation: () => {
-      console.log("Mock: 애니메이션 정지");
-      setIsPlaying(false);
-    },
+    stopAnimation,
     resetAvatar: () => console.log("Mock: 아바타 리셋"),
   };
 };
@@ -92,6 +89,7 @@ const AvatarPage = () => {
   const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
   const [selectedPredefined, setSelectedPredefined] = useState("");
   const [currentTranslation, setCurrentTranslation] = useState(null);
+  const [animationUrl, setAnimationUrl] = useState("/만나서_반갑습니다.glb"); // 기본 애니메이션
 
   // Unity 아바타 훅
   const {
@@ -99,7 +97,6 @@ const AvatarPage = () => {
     isLoading: isUnityLoading,
     error: unityError,
     isPlaying,
-    containerRef,
     initializeUnity,
     sendAnimationData,
     stopAnimation,
@@ -113,6 +110,8 @@ const AvatarPage = () => {
     convertTextToSignLanguage,
     clearError,
   } = useTextToSignAPI();
+
+  
 
   // 미리 정의된 수어 구문들
   const predefinedPhrases = [
@@ -137,21 +136,31 @@ const AvatarPage = () => {
   const handleConvertToSignLanguage = async (text) => {
     if (!text.trim() || isPlaying) return;
 
-    try {
-      clearError();
-      const result = await convertTextToSignLanguage(text);
+    // 입력된 텍스트의 띄어쓰기를 '_'로 변환
+    const processedText = text.replace(/ /g, '_');
+    const animationFileUrl = `/${processedText}.glb`;
 
-      if (result.success) {
-        console.log("✅ 번역 요청 전송 완료:", result.data);
-        sendAnimationData(); // 애니메이션 재생 시작
+    try {
+      // GET 요청으로 파일 존재 여부 및 Content-Type 확인
+      const response = await fetch(animationFileUrl);
+
+      // SPA의 404 fallback (index.html 반환)을 피하기 위해 Content-Type 확인
+      if (response.ok && response.headers.get("Content-Type") === "model/gltf-binary") {
+        // 파일이 존재하고 GLB 타입이 맞으면 애니메이션 재생
+        setAnimationUrl(animationFileUrl);
+        
+        stopAnimation();
+        setTimeout(() => {
+          sendAnimationData();
+        }, 10);
 
         const newTranslation = {
           id: Date.now(),
           text: text,
           timestamp: new Date(),
-          requestId: result.data.requestId,
-          status: result.data.status,
-          confidence: Math.random() * 0.2 + 0.8, // 80% ~ 100% 사이의 랜덤 신뢰도
+          requestId: `local-${Date.now()}`,
+          status: "COMPLETED",
+          confidence: 1.0,
           duration: 3,
         };
 
@@ -161,9 +170,12 @@ const AvatarPage = () => {
         if (isSpeechEnabled) {
           speakText(text);
         }
+      } else {
+        // 파일이 없거나 타입이 맞지 않으면 동작하지 않음
+        console.log(`애니메이션 파일을 찾을 수 없거나 타입이 올바르지 않습니다: ${animationFileUrl}`);
       }
     } catch (error) {
-      console.error("수어 변환 오류:", error);
+      console.error("애니메이션 파일 확인 중 오류 발생:", error);
     }
   };
 
@@ -328,14 +340,16 @@ const AvatarPage = () => {
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <div
-                  ref={containerRef}
-                  className="w-full max-w-4xl h-full max-h-[600px] bg-gray-900/10 rounded-2xl border border-white/10 flex items-center justify-center"
-                  style={{ minHeight: "400px" }}
-                >
-                  <p className={isDarkMode ? "text-gray-600" : "text-gray-400"}>
-                    (Unity 아바타가 여기에 표시됩니다)
-                  </p>
-                </div>
+  className="w-full max-w-4xl h-full max-h-[600px] bg-gray-900/10 rounded-2xl border border-white/10"
+  style={{ minHeight: "400px" }}
+>
+  <GLBAvatarPlayer
+    avatarUrl="/avatar.glb"
+    animationUrl={animationUrl} 
+    play={isPlaying}
+    dark={isDarkMode}
+  />
+</div>
 
                 {(isUnityLoading || isConversionLoading) && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
