@@ -95,137 +95,147 @@ const SignUpBox = () => {
   };
 
   return (
-    <div
-      className="bg-white/5 backdrop-blur-xl rounded-2xl p-8 w-full max-w-sm md:w-96 shadow-2xl border border-white/10 hover:shadow-3xl transition-all duration-300"
-      style={{ animation: "float 6s ease-in-out infinite" }}
-    >
-      <div className="flex justify-center mb-8">
-        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
-          <svg
-            className="w-8 h-8 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-            />
-          </svg>
-        </div>
-      </div>
-      <h2 className="text-2xl font-bold text-center text-white mb-6">
-        회원가입
-      </h2>
+    <div className="space-y-6">
       <form onSubmit={handleSignup} className="space-y-4">
-        <input
-          name="username"
-          type="text"
-          value={formData.username}
-          onChange={handleInputChange}
-          placeholder="사용자명 (2-20자)"
-          required
-          className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
-        />
-        {errors.username && (
-          <p className="text-sm text-red-400 mt-1">{errors.username}</p>
-        )}
-        <input
-          name="email"
-          type="email"
-          value={formData.email}
-          onChange={handleInputChange}
-          placeholder="이메일"
-          required
-          className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
-        />
-        {errors.email && (
-          <p className="text-sm text-red-400 mt-1">{errors.email}</p>
-        )}
-        <input
-          name="password"
-          type="password"
-          value={formData.password}
-          onChange={handleInputChange}
-          placeholder="비밀번호 (8자 이상, 영문/숫자/특수문자)"
-          required
-          className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
-        />
-        {errors.password && (
-          <p className="text-sm text-red-400 mt-1">{errors.password}</p>
-        )}
-        <input
-          name="confirmPassword"
-          type="password"
-          value={formData.confirmPassword}
-          onChange={handleInputChange}
-          placeholder="비밀번호 확인"
-          required
-          className="w-full px-4 py-3 rounded-xl border border-white/20 text-white placeholder-white/60 bg-white/5 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-purple-400/50"
-        />
-        {errors.confirmPassword && (
-          <p className="text-sm text-red-400 mt-1">{errors.confirmPassword}</p>
-        )}
-        <div className="border border-white/20 rounded-xl p-4">
-          <label className="text-center block text-white/70 mb-1 font-semibold">
-            청각상태
-          </label>
-          <p className="text-xs text-white/50 mb-3 text-center">
+        <div>
+          <input
+            name="username"
+            type="text"
+            value={formData.username}
+            onChange={handleInputChange}
+            placeholder="사용자명 (2-20자)"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-700 text-white placeholder-gray-400 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+          {errors.username && (
+            <p className="text-sm text-red-400 mt-1">{errors.username}</p>
+          )}
+        </div>
+
+        <div>
+          <input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleInputChange}
+            placeholder="이메일"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-700 text-white placeholder-gray-400 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+          {errors.email && (
+            <p className="text-sm text-red-400 mt-1">{errors.email}</p>
+          )}
+        </div>
+
+        <div>
+          <input
+            name="password"
+            type="password"
+            value={formData.password}
+            onChange={handleInputChange}
+            placeholder="비밀번호 (8자 이상, 영문/숫자/특수문자)"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-700 text-white placeholder-gray-400 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+          {errors.password && (
+            <p className="text-sm text-red-400 mt-1">{errors.password}</p>
+          )}
+        </div>
+
+        <div>
+          <input
+            name="confirmPassword"
+            type="password"
+            value={formData.confirmPassword}
+            onChange={handleInputChange}
+            placeholder="비밀번호 확인"
+            required
+            className="w-full px-4 py-3 rounded-lg border border-gray-700 text-white placeholder-gray-400 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+          />
+          {errors.confirmPassword && (
+            <p className="text-sm text-red-400 mt-1">
+              {errors.confirmPassword}
+            </p>
+          )}
+        </div>
+
+        {/* 청각상태 선택 */}
+        <div className="border border-gray-700 rounded-lg p-4 bg-gray-800">
+          <label className="block text-white font-semibold mb-2">청각상태</label>
+          <p className="text-xs text-gray-400 mb-4">
             맞춤형 수어 번역 서비스 제공을 위해 수집됩니다
           </p>
-          <div className="flex flex-col space-y-3">
-            {" "}
-            {/* 위아래 줄거리 3단위 */}
-            <label className="flex items-center space-x-2 text-white/80 pb-1">
-              {" "}
-              {/* 위쪽 청인 */}
+          <div className="space-y-3">
+            <label className="flex items-center space-x-3 text-white cursor-pointer">
               <input
                 type="radio"
                 name="hearing"
-                value="hardtohear"
-                checked={formData.hearing === "hardtohear"}
+                value="NORMAL"
+                checked={formData.hearing === "NORMAL"}
                 onChange={handleInputChange}
                 required
+                className="text-blue-600 focus:ring-blue-500"
               />
               <span>청인: 청력에 이상이 없음</span>
             </label>
-            <label className="flex items-center space-x-2 text-white/80 pt-1">
-              {" "}
-              {/* 아래쪽 농인 */}
+            <label className="flex items-center space-x-3 text-white cursor-pointer">
               <input
                 type="radio"
                 name="hearing"
                 value="deaf"
                 checked={formData.hearing === "deaf"}
                 onChange={handleInputChange}
+                className="text-blue-600 focus:ring-blue-500"
               />
               <span>농인: 청각에 이상이 있음</span>
             </label>
           </div>
+          {errors.hearing && (
+            <p className="text-sm text-red-400 mt-2">{errors.hearing}</p>
+          )}
         </div>
-        {errors.hearing && (
-          <p className="text-sm text-red-400">{errors.hearing}</p>
+
+        {errors.submit && (
+          <div className="p-3 rounded-lg bg-red-900/50 border border-red-700 text-red-300 text-sm">
+            {errors.submit}
+          </div>
         )}
+
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-white font-medium rounded-xl hover:from-purple-500/30 hover:to-pink-500/30 border border-white/20 backdrop-blur-md transform hover:scale-105 transition-all"
+          className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors duration-200"
         >
           {loading ? "가입 중..." : "회원가입"}
         </button>
-        {errors.submit && (
-          <p className="text-sm text-red-400 text-center mt-2">
-            {errors.submit}
-          </p>
-        )}
       </form>
-      <div className="text-sm text-center text-white/80 mt-6">
-        이미 계정이 있으신가요?{" "}
-        <Link to="/auth/login" className="underline hover:text-white">
-          로그인
+
+      {/* 약관 동의 텍스트 */}
+      <div className="text-xs text-center text-gray-400">
+        가입을 진행하시면
+        <Link
+          to="/about"
+          className="text-blue-400 hover:text-blue-300 underline ml-1"
+        >
+          서비스 이용약관
+        </Link>{" "}
+        및
+        <Link
+          to="/privacy"
+          className="text-blue-400 hover:text-blue-300 underline ml-1"
+        >
+          개인정보처리방침
         </Link>
+        에 동의하는 것으로 간주됩니다.
+      </div>
+
+      <div className="text-center">
+        <button
+          onClick={() => navigate("../login")}
+          className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+        >
+          이미 계정이 있으신가요? 로그인하기
+        </button>
       </div>
     </div>
   );

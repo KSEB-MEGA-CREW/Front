@@ -1,19 +1,11 @@
-// useNavigate 이용 (react-router-dom v6+)
 import { useNavigate } from "react-router-dom";
 import { Video } from 'lucide-react';
-
-// TranslatePage에 Outlet 추가해서 자식 컴포넌트가 렌더링되도록
 
 function VideoButton() {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    console.log('VideoButton 클릭됨'); // 디버깅용
-    try {
-      navigate("/translate/video"); // 라우터 설정에 맞는 올바른 경로
-    } catch (error) {
-      console.error('Navigation 오류:', error);
-    }
+    navigate("/translate/video");
   };
 
   return (

@@ -15,12 +15,9 @@ const apiRequest = async (url, options = {}) => {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        //"Cache-Control": "no-cache",
-        //Pragma: "no-cache",
         ...getAuthHeaders(),
         ...headers,
       },
-      //credentials: "include",
       cache: "no-cache",
       ...restOptions,
     });
@@ -32,7 +29,8 @@ const apiRequest = async (url, options = {}) => {
       // 현재 페이지가 로그인 페이지면 리다이렉트하지 않음 => 굳이 리다이렉트할 필요가 없으므로
       // 현재 페이지가 로그인 페이지가 아닐 때만 리다이렉트
       if (!window.location.pathname.includes("/auth")) {
-        window.location.href = "/auth";
+        // React Router를 사용하는 곳에서 처리하도록 이벤트 발생
+        window.dispatchEvent(new CustomEvent("auth-expired"));
       }
       throw new Error("인증이 만료되었습니다.");
     }
@@ -65,7 +63,6 @@ const apiRequest = async (url, options = {}) => {
     if (error.name === "TypeError" && error.message.includes("fetch")) {
       throw new Error("네트워크 연결을 확인해주세요.");
     }
-    // debug용 console.log
     console.error("API 요청 오류:", error);
     throw error;
   }
@@ -102,7 +99,7 @@ export const authApi = {
       }
       return response;
     } catch (error) {
-      console.log("로그인 오류:", error);
+      console.error("로그인 오류:", error);
       throw error;
     }
   },
@@ -114,6 +111,192 @@ export const authApi = {
       return response;
     } catch (error) {
       console.error("사용자 정보 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // updateUserProfile 사용자 정보 수정
+  updateUserProfile: async (updateData) => {
+    try {
+      const response = await apiRequest("/api/auth/update-profile", {
+        method: "PUT",
+        body: JSON.stringify(updateData),
+      });
+
+      // 수정 성공 시 localStorage의 사용자 정보도 업데이트
+      if (response.success && response.data) {
+        const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+        const updatedUser = { ...currentUser, ...response.data };
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+      }
+
+      return response;
+    } catch (error) {
+      console.error("프로필 수정 오류:", error);
+      throw error;
+    }
+  },
+
+  // deleteAccount 계정 삭제
+  deleteAccount: async () => {
+    try {
+      const response = await apiRequest("/api/auth/delete-account", {
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error("계정 삭제 오류:", error);
+      throw error;
+    }
+  },
+
+  // submitSupportTicket 고객 지원 문의 제출
+  submitSupportTicket: async (supportData) => {
+    try {
+      const response = await apiRequest("/api/support/ticket", {
+        method: "POST",
+        body: JSON.stringify(supportData),
+      });
+      return response;
+    } catch (error) {
+      console.error("지원 문의 제출 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTickets 문의 목록 조회 (개인) - 페이징 지원
+  getSupportTickets: async (page = 1, size = 5) => {
+    try {
+      const response = await apiRequest(
+        `/api/support/my-tickets?page=${page}&size=${size}`,
+        {
+          method: "GET",
+        }
+      );
+      console.log("📝 내 문의 목록 응답:", response);
+      return response;
+    } catch (error) {
+      console.error("내 문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getPublicSupportTickets 공개 문의 목록 조회 - 페이징 지원
+  getPublicSupportTickets: async (page = 1, size = 5) => {
+    try {
+      const response = await apiRequest(
+        `/api/support/public?page=${page}&size=${size}`,
+        {
+          method: "GET",
+        }
+      );
+
+      console.log("🎯 공개 문의 응답:", response); // 이 로그 추가
+      return response;
+    } catch (error) {
+      console.error("공개 문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getAllSupportTickets 전체 문의 목록 조회 (관리자용) - 페이징 지원
+  getAllSupportTickets: async (page = 1, size = 5) => {
+    try {
+      const response = await apiRequest(
+        `/api/support/admin/tickets?page=${page}&size=${size}`,
+        {
+          method: "GET",
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("전체 문의 목록 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTicketByAdminId 관리자 특정 문의 상세 조회
+  getSupportTicketByAdminId: async (ticketId) => {
+    try {
+      const response = await apiRequest(
+        `/api/support/admin/tickets/${ticketId}`,
+        {
+          method: "GET",
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("문의 상세 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // getSupportTicketById 특정 문의 상세 조회
+  getSupportTicketById: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "GET",
+      });
+      return response;
+    } catch (error) {
+      console.error("문의 상세 조회 오류:", error);
+      throw error;
+    }
+  },
+
+  // submitSupportReply 관리자 답변 작성
+  // 게시글 수정
+  updateSupportTicket: async (ticketId, ticketData) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "PUT",
+        body: JSON.stringify(ticketData),
+      });
+      return response;
+    } catch (error) {
+      console.error("게시글 수정 오류:", error);
+      throw error;
+    }
+  },
+
+  // 게시글 삭제 (일반 사용자)
+  deleteSupportTicket: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/tickets/${ticketId}`, {
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error("게시글 삭제 오류:", error);
+      throw error;
+    }
+  },
+
+  // 게시글 삭제 (관리자)
+  deleteSupportTicketByAdmin: async (ticketId) => {
+    try {
+      const response = await apiRequest(`/api/support/admin/tickets/${ticketId}`, {
+        method: "DELETE",
+      });
+      return response;
+    } catch (error) {
+      console.error("관리자 게시글 삭제 오류:", error);
+      throw error;
+    }
+  },
+
+  submitSupportReply: async (ticketId, replyData) => {
+    try {
+      const response = await apiRequest(
+        `/api/support/tickets/${ticketId}/reply`,
+        {
+          method: "POST",
+          body: JSON.stringify(replyData),
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("답변 작성 오류:", error);
       throw error;
     }
   },
@@ -130,9 +313,6 @@ export const quizApi = {
     try {
       const response = await apiRequest("/api/quiz", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
       });
       // ✅ 응답 객체 전체를 반환하도록 수정
       return response;
@@ -170,8 +350,7 @@ export const quizApi = {
         accuracy,
       }));
 
-      return calendarData; // 배열로 변환하여 반환
-      // 또는 객체 그대로 사용/ 여기서 data에 배열이 오길 기대함
+      return calendarData;
     } catch (error) {
       console.error("월 퀴즈 정보 조회:", error);
       throw error; // 에러가 발생하면 Promise.reject로 넘어감
@@ -199,7 +378,7 @@ export const validateToken = async () => {
   try {
     const response = await authApi.getCurrentUser(); // 수정: authApi 사용
     return response.success;
-  } catch (error) {
+  } catch {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     return false;

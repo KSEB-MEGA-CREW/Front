@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 .claude/
 CLAUDE.md
+mockoon-complete-api.json
+mockoon-customer-support.json

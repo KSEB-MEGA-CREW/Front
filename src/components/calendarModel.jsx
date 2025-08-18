@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { quizApi } from "../api/authApi";
 
 const formatDate = (date) => {
@@ -8,29 +8,112 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// ✅ 색상 및 범례 정보. range를 고유 식별자로 사용
-const ACCURACY_LEVELS = [
-  { range: "0", label: "0%", color: "bg-gray-700" },
-  { range: "1-20", label: "1-20%", color: "bg-green-300" },
-  { range: "21-40", label: "21-40%", color: "bg-green-400" },
-  { range: "41-60", label: "41-60%", color: "bg-green-500" },
-  { range: "61-80", label: "61-80%", color: "bg-green-600" },
-  { range: "81-99", label: "81-99%", color: "bg-green-700" },
-  { range: "100", label: "100%", color: "bg-green-800" },
-];
-// 모든 range 값들의 배열
-const allRanges = ACCURACY_LEVELS.map((l) => l.range);
+// ✅ 색상 테마 정의
+const COLOR_THEMES = {
+  green: {
+    name: "초록색",
+    colors: {
+      "no-quiz": "bg-gray-300",
+      0: "bg-gray-500",
+      "1-20": "bg-green-200",
+      "21-40": "bg-green-300",
+      "41-60": "bg-green-400",
+      "61-80": "bg-green-500",
+      "81-99": "bg-green-600",
+      100: "bg-green-700",
+    },
+  },
+  blue: {
+    name: "파란색",
+    colors: {
+      "no-quiz": "bg-gray-300",
+      0: "bg-gray-500",
+      "1-20": "bg-blue-200",
+      "21-40": "bg-blue-300",
+      "41-60": "bg-blue-400",
+      "61-80": "bg-blue-500",
+      "81-99": "bg-blue-600",
+      100: "bg-blue-700",
+    },
+  },
+  purple: {
+    name: "보라색",
+    colors: {
+      "no-quiz": "bg-gray-300",
+      0: "bg-gray-500",
+      "1-20": "bg-purple-200",
+      "21-40": "bg-purple-300",
+      "41-60": "bg-purple-400",
+      "61-80": "bg-purple-500",
+      "81-99": "bg-purple-600",
+      100: "bg-purple-700",
+    },
+  },
+};
 
+// ✅ 색상 및 범례 정보 생성 함수
+const createAccuracyLevels = (theme) => [
+  {
+    range: "no-quiz",
+    label: "안푼 날",
+    color: COLOR_THEMES[theme].colors["no-quiz"],
+  },
+  { range: "0", label: "0%", color: COLOR_THEMES[theme].colors["0"] },
+  { range: "1-20", label: "1-20%", color: COLOR_THEMES[theme].colors["1-20"] },
+  {
+    range: "21-40",
+    label: "21-40%",
+    color: COLOR_THEMES[theme].colors["21-40"],
+  },
+  {
+    range: "41-60",
+    label: "41-60%",
+    color: COLOR_THEMES[theme].colors["41-60"],
+  },
+  {
+    range: "61-80",
+    label: "61-80%",
+    color: COLOR_THEMES[theme].colors["61-80"],
+  },
+  {
+    range: "81-99",
+    label: "81-99%",
+    color: COLOR_THEMES[theme].colors["81-99"],
+  },
+  { range: "100", label: "100%", color: COLOR_THEMES[theme].colors["100"] },
+];
 function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
   const [activeDate, setActiveDate] = useState(new Date());
   const [quizHistory, setQuizHistory] = useState({});
   const [loading, setLoading] = useState(true);
-  // ✅ 필터링 상태를 Set으로 관리하여 여러 범위를 동시에 선택/해제
-  const [activeRanges, setActiveRanges] = useState(new Set(allRanges));
+  const [colorTheme, setColorTheme] = useState("green");
 
+  // 현재 테마에 따른 ACCURACY_LEVELS 생성 (메모화)
+  const ACCURACY_LEVELS = useMemo(
+    () => createAccuracyLevels(colorTheme),
+    [colorTheme]
+  );
+  const allRanges = useMemo(
+    () => ACCURACY_LEVELS.map((l) => l.range),
+    [ACCURACY_LEVELS]
+  );
+
+  // ✅ 필터링 상태를 Set으로 관리하여 여러 범위를 동시에 선택/해제
+  const [activeRanges, setActiveRanges] = useState(new Set());
+
+  // 테마 변경 시 activeRanges 업데이트
   useEffect(() => {
-    // 컴포넌트가 마운트될 때마다 모든 필터를 활성화 상태로 초기화
     setActiveRanges(new Set(allRanges));
+  }, [allRanges]);
+
+  // 월별 데이터 fetching - activeRanges와 분리
+  useEffect(() => {
+    // userId가 없으면 데이터를 가져오지 않음
+    if (!userId) {
+      setQuizHistory({});
+      setLoading(false);
+      return;
+    }
 
     const fetchMonthlyData = async () => {
       setLoading(true);
@@ -47,7 +130,6 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
           if (record.date) acc[record.date] = { accuracy: record.accuracy };
           return acc;
         }, {});
-        console.log("퀴즈 기록 로딩 완료:", historyMap);
         setQuizHistory(historyMap);
       } catch (error) {
         console.error("퀴즈 기록 로딩 실패:", error);
@@ -65,14 +147,15 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const getAccuracyRange = (accuracy) => {
-    if (accuracy <= 0) return "0"; // -1과 0을 함께 처리
+    if (accuracy === -1) return "no-quiz"; // 안푼 날
+    if (accuracy === 0) return "0"; // 0점
     if (accuracy > 0 && accuracy <= 20) return "1-20";
     if (accuracy > 20 && accuracy <= 40) return "21-40";
     if (accuracy > 40 && accuracy <= 60) return "41-60";
     if (accuracy > 60 && accuracy <= 80) return "61-80";
     if (accuracy > 80 && accuracy < 100) return "81-99";
     if (accuracy === 100) return "100";
-    return null;
+    return "no-quiz"; // 기본값은 안푼 날
   };
 
   // ✅ 범례 클릭 시 해당 범위를 Set에서 추가하거나 제거하는 토글 핸들러
@@ -258,8 +341,13 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
       />
 
       {/* 가이드 문구 */}
-      <div className={`text-center text-xs mb-3 ${isModal ? "text-gray-400" : "text-gray-500"}`}>
-        💡 아래 정답률 박스를 클릭하면 해당하는 날짜만 달력에서 확인할 수 있어요!
+      <div
+        className={`text-center text-xs mb-3 ${
+          isModal ? "text-gray-400" : "text-gray-500"
+        }`}
+      >
+        💡 아래 정답률 박스를 클릭하면 해당하는 날짜만 달력에서 확인할 수
+        있어요!
       </div>
 
       {/* ✅ 토글 기능이 적용된 범례 */}
@@ -307,6 +395,32 @@ function CalendarModel({ userId, isModal = false, isOpen = true, onClose }) {
         >
           전체 해제
         </button>
+      </div>
+
+      {/* 색상 테마 선택기 */}
+      <div className="flex justify-center items-center gap-2 mb-4">
+        <span
+          className={`text-xs ${isModal ? "text-gray-400" : "text-gray-500"}`}
+        >
+          색상 테마:
+        </span>
+        {Object.entries(COLOR_THEMES).map(([themeKey, theme]) => (
+          <button
+            key={themeKey}
+            onClick={() => setColorTheme(themeKey)}
+            className={`text-xs px-2 py-1 rounded-md transition-all ${
+              colorTheme === themeKey
+                ? isModal
+                  ? "bg-gray-700 text-white"
+                  : "bg-blue-100 text-blue-700"
+                : isModal
+                ? "text-gray-400 hover:bg-gray-700 hover:text-white"
+                : "text-gray-600 hover:bg-gray-100"
+            }`}
+          >
+            {theme.name}
+          </button>
+        ))}
       </div>
 
       {/* 모달일 때만 닫기 버튼 표시 */}
