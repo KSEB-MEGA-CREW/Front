@@ -254,14 +254,20 @@ const CustomerSupport = () => {
                 isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
             >
-              즉시 응답
+              평일 09:00~18:00
             </p>
             <p
               className={`font-medium ${
                 isDarkMode ? "text-purple-400" : "text-purple-600"
               }`}
             >
-              평일 09:00~18:00
+              <a
+                href="https://open.kakao.com/o/sKrWTeNh"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                오픈채팅 바로가기
+              </a>
             </p>
           </div>
         </div>
