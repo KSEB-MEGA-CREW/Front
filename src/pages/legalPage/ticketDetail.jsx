@@ -408,7 +408,8 @@ const TicketDetail = () => {
             {/* 수정/삭제 버튼 */}
             {(canEdit() || canDelete()) && !isEditing && (
               <div className="flex gap-2">
-                {canEdit() && (
+                {/* 👇 이 부분에 조건을 추가합니다. */}
+                {canEdit() && ticket.status === "PENDING" && (
                   <button
                     onClick={handleEditStart}
                     className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
@@ -420,6 +421,7 @@ const TicketDetail = () => {
                     <Pencil size={14} />
                   </button>
                 )}
+
                 {canDelete() && (
                   <button
                     onClick={() => setShowDeleteModal(true)}
@@ -597,7 +599,7 @@ const TicketDetail = () => {
                 문의 내용 *
               </label>
               <div
-                className={`p-4 rounded-lg border mb-3 ${
+                className={`p-4 rounded-lg border mb-3 min-h-[155px] ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600"
                     : "bg-gray-50 border-gray-200"
@@ -636,7 +638,7 @@ const TicketDetail = () => {
                 관리자 답변
               </h3>
               <div
-                className={`p-4 rounded-lg border border-l-4 border-l-blue-500 ${
+                className={`p-4 rounded-lg min-h-[130px] ${
                   isDarkMode
                     ? "bg-blue-900/20 border-blue-700/30"
                     : "bg-blue-50 border-blue-200"
@@ -664,7 +666,7 @@ const TicketDetail = () => {
                   </span>
                 </div>
                 <p
-                  className={`text-sm whitespace-pre-wrap ${
+                  className={`text-sx whitespace-pre-wrap ${
                     isDarkMode ? "text-blue-200" : "text-blue-700"
                   }`}
                 >

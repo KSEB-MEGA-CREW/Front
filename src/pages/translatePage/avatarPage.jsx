@@ -388,11 +388,11 @@ const AvatarPage = () => {
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         isSpeechEnabled
                           ? isDarkMode
-                            ? "bg-blue-600 text-white"
-                            : "bg-blue-600 text-white"
+                            ? "border-1 border-gray-400 hover:bg-gray-500 text-white"
+                            : "border-1 border-gray-400 hover:bg-gray-500 text-gray-800"
                           : isDarkMode
-                          ? "bg-gray-600 text-gray-300"
-                          : "bg-gray-300 text-gray-600"
+                          ? "border-1 border-gray-400 hover:bg-gray-500 text-gray-300"
+                          : "border-1 border-gray-400 hover:bg-gray-500 text-gray-600"
                       }`}
                     >
                       {isSpeechEnabled ? (

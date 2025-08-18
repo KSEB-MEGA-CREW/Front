@@ -30,7 +30,7 @@ const StatsPage = () => {
               isDarkMode ? "text-gray-300" : "text-gray-600"
             }`}
           >
-            당신의 수어 학습 진행 상황을 확인하세요
+            일일 학습 평균 정답률 현황을 확인하세요
           </p>
         </div>
 
