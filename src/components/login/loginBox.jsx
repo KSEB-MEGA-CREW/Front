@@ -216,7 +216,7 @@ const LoginBox = () => {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 transition-colors"
           >
-            {showPassword ? <Eye size={19} /> : <EyeOff size={19} />}
+            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
           </button>
         </div>
 
