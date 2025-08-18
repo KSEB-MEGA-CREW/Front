@@ -636,7 +636,7 @@ const TicketDetail = () => {
                 관리자 답변
               </h3>
               <div
-                className={`p-4 rounded-lg border border-l-4 border-l-blue-500 ${
+                className={`p-4 rounded-lg min-h-[130px] ${
                   isDarkMode
                     ? "bg-blue-900/20 border-blue-700/30"
                     : "bg-blue-50 border-blue-200"
@@ -664,7 +664,7 @@ const TicketDetail = () => {
                   </span>
                 </div>
                 <p
-                  className={`text-sm whitespace-pre-wrap ${
+                  className={`text-sx whitespace-pre-wrap ${
                     isDarkMode ? "text-blue-200" : "text-blue-700"
                   }`}
                 >
