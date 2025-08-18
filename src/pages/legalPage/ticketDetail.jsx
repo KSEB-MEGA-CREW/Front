@@ -408,7 +408,8 @@ const TicketDetail = () => {
             {/* 수정/삭제 버튼 */}
             {(canEdit() || canDelete()) && !isEditing && (
               <div className="flex gap-2">
-                {canEdit() && (
+                {/* 👇 이 부분에 조건을 추가합니다. */}
+                {canEdit() && ticket.status === "PENDING" && (
                   <button
                     onClick={handleEditStart}
                     className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
@@ -420,6 +421,7 @@ const TicketDetail = () => {
                     <Pencil size={14} />
                   </button>
                 )}
+
                 {canDelete() && (
                   <button
                     onClick={() => setShowDeleteModal(true)}
