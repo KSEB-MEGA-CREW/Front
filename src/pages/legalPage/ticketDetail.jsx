@@ -616,11 +616,15 @@ const TicketDetail = () => {
             </>
           )}
 
-          <div className="flex items-center gap-2 ">
+          <div
+            className={`flex gap-2 ${
+              isDarkMode ? "text-gray-300" : "text-gray-900"
+            } `}
+          >
             <User size={14} />
             <span
               className={`text-xs ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
+                isDarkMode ? "text-gray-300" : "text-gray-900"
               }`}
             >
               {ticket.userName || "익명"}
