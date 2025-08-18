@@ -407,15 +407,10 @@ function StudyWord() {
           {/* 비디오 영역과 문제 번호 */}
           <div className="flex items-start justify-center mb-8 relative">
             <div
-              className={`
-              w-full max-w-2xl h-[320px] rounded-2xl 
-              flex items-center justify-center overflow-hidden border
-              ${
-                isDarkMode
-                  ? "bg-gray-700/50 border-gray-600"
-                  : "bg-white border-gray-300 shadow-md"
-              }
-            `}
+              className="
+      w-full max-w-3xl h-[320px] rounded-2xl 
+      flex items-center justify-center overflow-hidden
+    "
             >
               {/* 문제 번호 - 비디오 오른쪽 끝 */}
               <div className="absolute top-0 right-0 -mr-20">
