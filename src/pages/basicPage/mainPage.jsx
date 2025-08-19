@@ -15,11 +15,11 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useTheme } from "../../Context/themeContext";
-import { useNavigate } from "react-router-dom"; // 1. useNavigate import
+import { useNavigate } from "react-router-dom";
 
 function MainPage() {
   const { isDarkMode } = useTheme();
-  const navigate = useNavigate(); // 2. useNavigate 훅 사용
+  const navigate = useNavigate();
   const [translationDemo, setTranslationDemo] = useState(false);
   const [todayUsers] = useState(2847 + Math.floor(Math.random() * 153));
 

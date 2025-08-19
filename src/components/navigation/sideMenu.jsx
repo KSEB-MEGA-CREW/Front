@@ -1,5 +1,4 @@
 import React from "react";
-// react-router-dom에서 useLocation 훅을 가져옵니다.
 import { useLocation } from "react-router-dom";
 import {
   Menu,
@@ -31,10 +30,8 @@ const SideMenu = ({
 }) => {
   const { user, isAdmin } = useAuth();
   const { isDarkMode } = useTheme();
-  // 현재 경로 정보를 가져옵니다.
   const location = useLocation();
 
-  // 기본 메뉴 항목 정의
   const menuItems = [
     {
       icon: <Home size={20} />,

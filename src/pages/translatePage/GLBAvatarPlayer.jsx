@@ -1,4 +1,3 @@
-// GLBAvatarPlayer.jsx
 import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -10,14 +9,11 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd }) {
   const mixerRef = useRef();
   const actionRef = useRef();
 
-  // GLB 로드
   const { scene: avatarSceneRaw } = useGLTF(avatarUrl);
   const animGltf = useGLTF(animationUrl);
 
-  // 아바타는 안전하게 clone (공유 재질/스켈레톤 문제 방지)
   const avatarScene = useMemo(() => SkeletonUtils.clone(avatarSceneRaw), [avatarSceneRaw]);
 
-  // 그림자 설정
   useEffect(() => {
     avatarScene.traverse((obj) => {
       if (obj.isMesh) {
@@ -27,15 +23,13 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd }) {
     });
   }, [avatarScene]);
 
-  // 애니메이션 Mixer 준비 & 클립 리타게팅(필요 시)
   useEffect(() => {
     const mixer = new THREE.AnimationMixer(avatarScene);
     mixerRef.current = mixer;
 
-    // 애니메이션 종료 이벤트 핸들러
     const onFinished = (e) => {
       if (e.action === actionRef.current) {
-        onEnd?.(); // onEnd prop이 있으면 호출
+        onEnd?.();
       }
     };
     mixer.addEventListener('finished', onFinished);

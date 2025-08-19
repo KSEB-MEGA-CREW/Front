@@ -28,7 +28,6 @@ function AvatarButton() {
         </div>
       </div>
       
-      {/* 호버 효과 배경 */}
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600 opacity-0 group-hover:opacity-5 transition-opacity duration-300 rounded-2xl"></div>
     </button>
   );

@@ -5,7 +5,6 @@ import TranslateRouter from "./translateRouter";
 import LoginRouter from "./loginRouter";
 import BasicLayout from "../layouts/basicLayout";
 
-// 직접 import
 import Main from "../pages/basicPage/mainPage";
 import OAuth2RedirectHandler from "../pages/loginPage/OAuth2RedirectHandler";
 import AuthCallback from "../components/authCallback";
@@ -23,7 +22,6 @@ import TicketDetail from "../pages/legalPage/ticketDetail";
 
 const router = createBrowserRouter([
   LoginRouter(),
-  // 기존 OAuth2 리다이렉트 핸들러 (호환성 유지)
   {
     path: "/oauth2/redirect",
     element: <OAuth2RedirectHandler />,

@@ -15,11 +15,9 @@ function BasicLayout({ children }) {
   const isHomePage = location.pathname === "/" || location.pathname === "/main";
   const isPublicPage = ["/about", "/privacy"].includes(location.pathname);
 
-  // auth-expired 이벤트 리스너 추가
   useEffect(() => {
     const handleAuthExpired = () => {
       logout();
-      // 현재 페이지가 로그인 페이지가 아닌 경우에만 리다이렉트
       if (!location.pathname.includes("/auth")) {
         navigate("/auth", { replace: true });
       }
@@ -36,7 +34,6 @@ function BasicLayout({ children }) {
     setShowMyPageModal(true);
   };
 
-  // 로딩 중일 때는 간단한 로딩 화면
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${

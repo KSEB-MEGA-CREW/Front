@@ -2,14 +2,12 @@ import React, { useState, useEffect } from "react";
 import { quizApi } from "../api/authApi";
 import { useTheme } from "../Context/themeContext";
 
-// 요일 이름을 반환하는 헬퍼 함수
 const getDayOfWeek = (dateString) => {
   const date = new Date(dateString);
   const days = ["일", "월", "화", "수", "목", "금", "토"];
   return days[date.getDay()];
 };
 
-// 최근 7일 날짜 배열 생성
 const getRecentSevenDays = () => {
   const days = [];
   const today = new Date();
@@ -35,7 +33,6 @@ const StasticComponent = () => {
         setLoading(true);
         setError(null);
 
-        // localStorage에서 사용자 정보 가져오기
         const userInfo = JSON.parse(localStorage.getItem("user"));
         if (!userInfo || !userInfo.id) {
           throw new Error("사용자 정보를 찾을 수 없습니다.");
@@ -43,9 +40,8 @@ const StasticComponent = () => {
 
         const currentDate = new Date();
         const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+        const month = currentDate.getMonth() + 1;
 
-        // API 호출로 월별 데이터 가져오기
         const monthlyData = await quizApi.getUserQuizHistory(
           year,
           month,

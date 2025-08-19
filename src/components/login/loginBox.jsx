@@ -1,5 +1,3 @@
-// src/components/LoginBox.jsx
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "../../Context/authContext";
@@ -35,76 +33,39 @@ const LoginBox = () => {
     setLoading(true);
 
     try {
-      console.log("🔄 로그인 시도:", { email: formData.email });
       const response = await authApi.login(formData);
 
-      // 서버 응답 전체 구조 로그
-      console.log("📥 서버 응답:", response);
-      console.log("📥 응답 데이터:", response.data);
-
       if (response.success && response.data) {
-        // 서버에서 { token, userInfo } 구조로 응답
         const token = response.data.token;
         const userInfo = response.data.userInfo;
 
-        console.log("🔑 추출된 토큰:", token ? "존재" : "없음");
-        console.log("👤 추출된 사용자 정보:", userInfo);
-
         if (token && userInfo) {
-          // AuthContext login 호출 전 로그
-          console.log("📤 AuthContext에 전달할 데이터:", {
-            token: "[존재]",
-            user: userInfo,
-          });
-
           try {
             const loginResult = login({
               token: token,
               user: userInfo,
             });
-
-            // login 함수 결과 확인
-            console.log("✅ AuthContext login 호출 완료", loginResult);
           } catch (loginError) {
-            console.error("❌ AuthContext login 실패:", loginError);
+            console.error("AuthContext login 실패:", loginError);
             setError(`로그인 처리 중 오류: ${loginError.message}`);
-            return; // 리다이렉트하지 않고 에러 표시
+            return;
           }
 
-          // localStorage 저장 상태 확인
           const storedToken = localStorage.getItem("token");
           const storedUser = localStorage.getItem("user");
-          console.log("💾 저장된 토큰:", storedToken ? "존재" : "없음");
-          console.log(
-            "💾 저장된 사용자:",
-            storedUser ? JSON.parse(storedUser) : "없음"
-          );
 
-          // 관리자 권한 확인
           if (userInfo) {
             const isAdminByRole = userInfo.role === "ADMIN";
             const isAdminByUsername = userInfo.username === "ADMIN";
             const finalIsAdmin = isAdminByRole || isAdminByUsername;
 
-            console.log("👑 관리자 권한 확인:", {
-              role: userInfo.role,
-              username: userInfo.username,
-              isAdminByRole,
-              isAdminByUsername,
-              finalIsAdmin,
-            });
-
-            // 관리자 로그인 성공 메시지 표시
             if (finalIsAdmin) {
-              setError(""); // 기존 에러 메시지 제거
+              setError("");
 
-              // 임시 성공 메시지 표시 (2초 후 리다이렉트)
               const adminSuccessMsg = `🔑 관리자 로그인 성공! (${
                 userInfo.username || userInfo.email
               })`;
-              console.log("🎯", adminSuccessMsg);
 
-              // UI에 성공 메시지 잠깐 표시
               const tempDiv = document.createElement("div");
               tempDiv.className =
                 "fixed top-4 right-4 z-50 p-3 rounded-lg bg-green-900/90 border border-green-700 text-green-300 font-semibold shadow-lg animate-pulse";
@@ -115,34 +76,31 @@ const LoginBox = () => {
               `;
               document.body.appendChild(tempDiv);
 
-              // 2초 후 메시지 제거하고 리다이렉트
               setTimeout(() => {
                 document.body.removeChild(tempDiv);
                 const redirectTo = searchParams.get("redirect") || "/";
-                console.log("🔄 관리자 리다이렉트:", redirectTo);
                 navigate(redirectTo, { replace: true });
               }, 2000);
 
-              return; // 즉시 리다이렉트 방지
+              return;
             }
           }
 
           const redirectTo = searchParams.get("redirect") || "/";
-          console.log("🔄 일반 사용자 리다이렉트:", redirectTo);
           navigate(redirectTo, { replace: true });
         } else {
-          console.error("❌ 토큰 또는 사용자 정보가 없습니다:", {
+          console.error("토큰 또는 사용자 정보가 없습니다:", {
             token,
             userInfo,
           });
           setError("로그인 응답에서 필요한 정보를 찾을 수 없습니다.");
         }
       } else {
-        console.error("❌ 로그인 실패:", response);
+        console.error("로그인 실패:", response);
         setError(response.message || "로그인에 실패했습니다.");
       }
     } catch (error) {
-      console.error("❌ 로그인 오류:", error);
+      console.error("로그인 오류:", error);
       setError(error.message || "로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
@@ -171,7 +129,6 @@ const LoginBox = () => {
     }
     const currentUrl = location.pathname + location.search;
     sessionStorage.setItem("loginRedirect", currentUrl);
-    // OAuth 리다이렉트는 외부 도메인으로 이동하므로 window.location.href 사용이 적절함
     window.location.href = authUrl;
   };
 
@@ -235,14 +192,11 @@ const LoginBox = () => {
         </button>
       </form>
 
-      {/* 구분선 */}
       <div className="flex items-center gap-4">
         <div className="flex-1 h-px bg-gray-700"></div>
         <span className="text-gray-500 text-sm">또는</span>
         <div className="flex-1 h-px bg-gray-700"></div>
       </div>
-
-      {/* 소셜 로그인 */}
       <div className="space-y-3">
         <button
           onClick={() => handleSocialLogin("google")}
@@ -267,7 +221,6 @@ const LoginBox = () => {
         </button>
       </div>
 
-      {/* 하단 링크 */}
       <div className="text-center">
         <a
           href="#"

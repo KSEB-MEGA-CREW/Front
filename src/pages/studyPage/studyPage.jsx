@@ -260,10 +260,10 @@ function StudyWord() {
               >
                 {totalCount}문제 중 {correctCount}개 맞혔어요!
                 {percentage >= 80
-                  ? " 🎉 훌륭해요!"
+                  ? " 훌륭해요!"
                   : percentage >= 60
-                  ? " 👏 잘했어요!"
-                  : " 💪 다시 도전해보세요!"}
+                  ? " 잘했어요!"
+                  : " 다시 도전해보세요!"}
               </p>
             </div>
 

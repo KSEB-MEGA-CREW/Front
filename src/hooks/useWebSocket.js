@@ -42,13 +42,11 @@ export const useWebSocket = () => {
 
         try {
             setError(null);
-            console.log(`🔐 Connecting with token: ${token.substring(0, 10)}... and userId: ${userId}`);
 
             await wsService.current.connect(token);
 
             // 메시지 핸들러 등록
             wsService.current.onMessage('connection_established', (data) => {
-                console.log('📡 Connection established:', data);
                 setError(null);
             });
 
@@ -67,7 +65,6 @@ export const useWebSocket = () => {
                 console.error('WebSocket server error:', errorMsg);
             });
 
-            console.log('✅ WebSocket 연결 및 핸들러 등록 완료');
 
         } catch (err) {
             const errorMsg = err.message || 'WebSocket 연결 실패';
