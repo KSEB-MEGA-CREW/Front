@@ -82,6 +82,5 @@ export const useTextToSignAPI = () => {
     convertTextToSignLanguage,
     clearError,
     abortRequests,
-    startNewSession
   };
 };

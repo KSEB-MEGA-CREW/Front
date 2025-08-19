@@ -618,13 +618,13 @@ const TicketDetail = () => {
 
           <div
             className={`flex gap-2 ${
-              isDarkMode ? "text-gray-300" : "text-gray-900"
-            } `}
+              isDarkMode ? "text-gray-300" : "text-gray-800"
+            }`}
           >
             <User size={14} />
             <span
               className={`text-xs ${
-                isDarkMode ? "text-gray-300" : "text-gray-900"
+                isDarkMode ? "text-gray-300" : "text-gray-800"
               }`}
             >
               {ticket.userName || "익명"}
@@ -671,7 +671,7 @@ const TicketDetail = () => {
                 </div>
                 <p
                   className={`text-sx whitespace-pre-wrap ${
-                    isDarkMode ? "text-blue-200" : "text-blue-700"
+                    isDarkMode ? "text-gray-200" : "text-gray-700"
                   }`}
                 >
                   {ticket.adminResponse}

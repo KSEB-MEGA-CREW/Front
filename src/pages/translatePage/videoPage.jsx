@@ -281,7 +281,7 @@ const VideoPage = () => {
         <div className="flex-1 relative p-4">
           <div
             className={`
-              w-full h-full rounded-3xl shadow-2xl overflow-hidden relative border
+              w-full h-full rounded-3xl overflow-hidden relative border
               ${
                 isDarkMode
                   ? "bg-gray-800 border-gray-700"
@@ -401,7 +401,7 @@ const VideoPage = () => {
                   </p>
                   <button
                     onClick={restartCamera}
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105"
                   >
                     <RotateCcw size={18} />
                     카메라 재시작

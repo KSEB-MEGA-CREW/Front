@@ -102,7 +102,7 @@ const SideMenu = ({
       `}
       >
         {/* 헤더 영역 */}
-        <div className="relative flex items-center p-4 h-[65px] border-b border-gray-200 dark:border-gray-700">
+        <div className="relative flex items-center p-4 h-[65px] border-b border-gray-400 dark:border-gray-700">
           <div
             className={`flex items-center gap-3 transition-opacity duration-300 ${
               isOpen ? "opacity-100" : "opacity-0"
@@ -223,7 +223,7 @@ const SideMenu = ({
         </div>
 
         {/* 하단 사용자 영역 */}
-        <div className="border-t border-gray-200 dark:border-gray-700 p-3 space-y-2">
+        <div className="border-t border-gray-400 dark:border-gray-700 p-3 space-y-2">
           {/* 계정 버튼 */}
           <button
             onClick={onShowMyPage}
@@ -256,7 +256,7 @@ const SideMenu = ({
                       ${
                         isDarkMode
                           ? " text-yellow-300 border-yellow-700"
-                          : " text-yellow-800 border-yellow-300"
+                          : " text-yellow-600 border-yellow-600"
                       }
                     `}
                   >
