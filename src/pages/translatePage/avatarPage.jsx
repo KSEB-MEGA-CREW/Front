@@ -1,9 +1,9 @@
+import GLBAvatarPlayer from "./GLBAvatarPlayer.jsx";
+
 import React, {
   useState,
   useEffect,
   useRef,
-  createContext,
-  useContext,
 } from "react";
 import {
   Square,
@@ -14,30 +14,24 @@ import {
   Loader,
   AlertCircle,
   CheckCircle,
-  Sparkles,
   User,
   MessageSquare,
   Clock,
 } from "lucide-react";
 
-// ThemeContext import
 import { useTheme } from "../../Context/themeContext";
 
-// 2. useUnityAvatar Hook Mock
-// "../../hooks/useUnityAvatar" 파일이 없어 임시로 생성합니다.
 const useUnityAvatar = () => {
   const containerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   // 애니메이션 재생을 시뮬레이션하는 함수
   const sendAnimationData = () => {
-    console.log("Mock: 애니메이션 데이터 전송 시도");
     setIsPlaying(true);
-    // 3초 후에 애니메이션이 끝나는 것을 시뮬레이션합니다.
-    setTimeout(() => {
-      setIsPlaying(false);
-      console.log("Mock: 애니메이션 종료");
-    }, 3000);
+  };
+
+  const stopAnimation = () => {
+    setIsPlaying(false);
   };
 
   return {
@@ -46,13 +40,10 @@ const useUnityAvatar = () => {
     error: null, // 에러가 없는 상태로 가정
     isPlaying, // 현재 재생 상태
     containerRef,
-    initializeUnity: () => console.log("Mock: Unity 초기화"),
+    initializeUnity: () => {},
     sendAnimationData,
-    stopAnimation: () => {
-      console.log("Mock: 애니메이션 정지");
-      setIsPlaying(false);
-    },
-    resetAvatar: () => console.log("Mock: 아바타 리셋"),
+    stopAnimation,
+    resetAvatar: () => {},
   };
 };
 
@@ -63,11 +54,9 @@ const useTextToSignAPI = () => {
 
   const convertTextToSignLanguage = async (text) => {
     setIsLoading(true);
-    console.log(`Mock API: "${text}" 변환 중...`);
     // 1.5초 동안 API 호출을 시뮬레이션합니다.
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsLoading(false);
-    console.log("Mock API: 변환 완료");
     return {
       success: true,
       data: { requestId: `mock-${Date.now()}`, status: "SUBMITTED" },
@@ -92,6 +81,7 @@ const AvatarPage = () => {
   const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
   const [selectedPredefined, setSelectedPredefined] = useState("");
   const [currentTranslation, setCurrentTranslation] = useState(null);
+  const [animationUrl, setAnimationUrl] = useState("/만나서_반갑습니다.glb"); // 기본 애니메이션
 
   // Unity 아바타 훅
   const {
@@ -99,7 +89,6 @@ const AvatarPage = () => {
     isLoading: isUnityLoading,
     error: unityError,
     isPlaying,
-    containerRef,
     initializeUnity,
     sendAnimationData,
     stopAnimation,
@@ -113,6 +102,8 @@ const AvatarPage = () => {
     convertTextToSignLanguage,
     clearError,
   } = useTextToSignAPI();
+
+  
 
   // 미리 정의된 수어 구문들
   const predefinedPhrases = [
@@ -137,21 +128,31 @@ const AvatarPage = () => {
   const handleConvertToSignLanguage = async (text) => {
     if (!text.trim() || isPlaying) return;
 
-    try {
-      clearError();
-      const result = await convertTextToSignLanguage(text);
+    // 입력된 텍스트의 띄어쓰기를 '_'로 변환
+    const processedText = text.replace(/ /g, '_');
+    const animationFileUrl = `/${processedText}.glb`;
 
-      if (result.success) {
-        console.log("✅ 번역 요청 전송 완료:", result.data);
-        sendAnimationData(); // 애니메이션 재생 시작
+    try {
+      // GET 요청으로 파일 존재 여부 및 Content-Type 확인
+      const response = await fetch(animationFileUrl);
+
+      // SPA의 404 fallback (index.html 반환)을 피하기 위해 Content-Type 확인
+      if (response.ok && response.headers.get("Content-Type") === "model/gltf-binary") {
+        // 파일이 존재하고 GLB 타입이 맞으면 애니메이션 재생
+        setAnimationUrl(animationFileUrl);
+        
+        stopAnimation();
+        setTimeout(() => {
+          sendAnimationData();
+        }, 10);
 
         const newTranslation = {
           id: Date.now(),
           text: text,
           timestamp: new Date(),
-          requestId: result.data.requestId,
-          status: result.data.status,
-          confidence: Math.random() * 0.2 + 0.8, // 80% ~ 100% 사이의 랜덤 신뢰도
+          requestId: `local-${Date.now()}`,
+          status: "COMPLETED",
+          confidence: 1.0,
           duration: 3,
         };
 
@@ -161,9 +162,11 @@ const AvatarPage = () => {
         if (isSpeechEnabled) {
           speakText(text);
         }
+      } else {
+        // 파일이 없거나 타입이 맞지 않으면 동작하지 않음
       }
     } catch (error) {
-      console.error("수어 변환 오류:", error);
+      console.error("애니메이션 파일 확인 중 오류 발생:", error);
     }
   };
 
@@ -328,14 +331,17 @@ const AvatarPage = () => {
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <div
-                  ref={containerRef}
-                  className="w-full max-w-4xl h-full max-h-[600px] bg-gray-900/10 rounded-2xl border border-white/10 flex items-center justify-center"
-                  style={{ minHeight: "400px" }}
-                >
-                  <p className={isDarkMode ? "text-gray-600" : "text-gray-400"}>
-                    (Unity 아바타가 여기에 표시됩니다)
-                  </p>
-                </div>
+  className="w-full max-w-4xl h-full max-h-[600px] bg-gray-900/10 rounded-2xl border border-white/10"
+  style={{ minHeight: "400px" }}
+>
+  <GLBAvatarPlayer
+    avatarUrl="/avatar.glb"
+    animationUrl={animationUrl} 
+    play={isPlaying}
+    dark={isDarkMode}
+    onEnd={stopAnimation}
+  />
+</div>
 
                 {(isUnityLoading || isConversionLoading) && (
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
@@ -388,11 +394,11 @@ const AvatarPage = () => {
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         isSpeechEnabled
                           ? isDarkMode
-                            ? "bg-blue-600 text-white"
-                            : "bg-blue-600 text-white"
+                            ? "border-1 border-gray-400 hover:bg-gray-500 text-white"
+                            : "border-1 border-gray-400 hover:bg-gray-500 text-gray-800"
                           : isDarkMode
-                          ? "bg-gray-600 text-gray-300"
-                          : "bg-gray-300 text-gray-600"
+                          ? "border-1 border-gray-400 hover:bg-gray-500 text-gray-300"
+                          : "border-1 border-gray-400 hover:bg-gray-500 text-gray-600"
                       }`}
                     >
                       {isSpeechEnabled ? (

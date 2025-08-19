@@ -15,11 +15,11 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useTheme } from "../../Context/themeContext";
-import { useNavigate } from "react-router-dom"; // 1. useNavigate import
+import { useNavigate } from "react-router-dom";
 
 function MainPage() {
   const { isDarkMode } = useTheme();
-  const navigate = useNavigate(); // 2. useNavigate 훅 사용
+  const navigate = useNavigate();
   const [translationDemo, setTranslationDemo] = useState(false);
   const [todayUsers] = useState(2847 + Math.floor(Math.random() * 153));
 
@@ -459,7 +459,7 @@ function MainPage() {
                 : "bg-gradient-to-r from-[#f1f3f5] to-gray-50"
             }`}
           >
-            <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" />
+            {/* <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" /> */}
             <h2
               className={`text-3xl md:text-4xl font-bold mb-6 ${
                 isDarkMode ? "text-white" : "text-gray-900"

@@ -121,7 +121,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
+            isDarkMode ? "bg-gray-900" : "bg-gray-50"
           }`}
         >
           <div className="flex justify-center items-center min-h-screen">
@@ -157,7 +157,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
+            isDarkMode ? "bg-gray-900" : "bg-gray-50"
           }`}
         >
           <div className="flex flex-col items-center justify-center min-h-screen px-4">
@@ -219,7 +219,7 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen px-4 py-8 ${
-            isDarkMode ? "bg-gray-900" : "bg-[#f6f6f6]"
+            isDarkMode ? "bg-gray-900" : "bg-gray-50"
           }`}
         >
           <div className="max-w-4xl mx-auto">
@@ -260,10 +260,10 @@ function StudyWord() {
               >
                 {totalCount}문제 중 {correctCount}개 맞혔어요!
                 {percentage >= 80
-                  ? " 🎉 훌륭해요!"
+                  ? " 훌륭해요!"
                   : percentage >= 60
-                  ? " 👏 잘했어요!"
-                  : " 💪 다시 도전해보세요!"}
+                  ? " 잘했어요!"
+                  : " 다시 도전해보세요!"}
               </p>
             </div>
 
@@ -407,15 +407,10 @@ function StudyWord() {
           {/* 비디오 영역과 문제 번호 */}
           <div className="flex items-start justify-center mb-8 relative">
             <div
-              className={`
-              w-full max-w-2xl h-[320px] rounded-2xl 
-              flex items-center justify-center overflow-hidden border
-              ${
-                isDarkMode
-                  ? "bg-gray-700/50 border-gray-600"
-                  : "bg-white border-gray-300 shadow-md"
-              }
-            `}
+              className="
+      w-full max-w-3xl h-[320px] rounded-2xl 
+      flex items-center justify-center overflow-hidden
+    "
             >
               {/* 문제 번호 - 비디오 오른쪽 끝 */}
               <div className="absolute top-0 right-0 -mr-20">
@@ -515,7 +510,7 @@ function StudyWord() {
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                         selected === null
                           ? isDarkMode
-                            ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]0"
+                            ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]"
                             : "bg-gray-100 text-gray-700 group-hover:bg-gray-200"
                           : ""
                       } ${

@@ -20,27 +20,24 @@ export class FrameProcessor {
         console.log('✅ FrameProcessor 생성 완료');
     }
 
-    async initialize() {
-        console.log('🔄 FrameProcessor 초기화 시작...');
-
-        if (this.initPromise) {
-            console.log('⏳ 이미 초기화 중...');
-            return this.initPromise;
-        }
-
-        this.initPromise = this._initialize();
-        return this.initPromise;
+  async initialize() {
+    if (this.initPromise) {
+      return this.initPromise;
     }
 
-    async _initialize() {
-        try {
-            // 1. 브라우저 환경 확인
-            if (typeof window === 'undefined') {
-                throw new Error('❌ 브라우저 환경이 아닙니다');
-            }
+    this.initPromise = this._initialize();
+    return this.initPromise;
+  }
 
-            // 2. MediaPipe 라이브러리 대기 (최대 5초)
-            await this.waitForMediaPipe();
+  async _initialize() {
+    try {
+      // 1. 브라우저 환경 확인
+      if (typeof window === "undefined") {
+        throw new Error(" 브라우저 환경이 아닙니다");
+      }
+
+      // 2. MediaPipe 라이브러리 대기 (최대 5초)
+      await this.waitForMediaPipe();
 
             // 3. Hands 인스턴스 생성
             console.log('🤲 MediaPipe Hands 인스턴스 생성 중...');
@@ -119,13 +116,12 @@ export class FrameProcessor {
                     return;
                 }
 
-                console.log(`⏳ MediaPipe 로드 대기 중... (${waitTime}ms)`);
-                setTimeout(checkMediaPipe, checkInterval);
-            };
+        setTimeout(checkMediaPipe, checkInterval);
+      };
 
-            checkMediaPipe();
-        });
-    }
+      checkMediaPipe();
+    });
+  }
 
     async extractKeypoints(videoElement, sessionId) {
         console.log('📊 키포인트 추출 시작');
@@ -134,18 +130,17 @@ export class FrameProcessor {
             throw new Error('❌ FrameProcessor가 초기화되지 않았습니다');
         }
 
-        if (!videoElement || videoElement.videoWidth === 0) {
-            throw new Error('❌ 비디오 요소가 준비되지 않았습니다');
-        }
+    if (!videoElement || videoElement.videoWidth === 0) {
+      throw new Error(" 비디오 요소가 준비되지 않았습니다");
+    }
 
-        if (this.isProcessing) {
-            console.log('⏭️ 이전 프레임 처리 중... 스킵');
-            return null;
-        }
+    if (this.isProcessing) {
+      return null;
+    }
 
-        try {
-            this.isProcessing = true;
-            performanceLogger.startTimer('keypointExtraction');
+    try {
+      this.isProcessing = true;
+      performanceLogger.startTimer("keypointExtraction");
 
             let keypoints;
 
@@ -170,25 +165,25 @@ export class FrameProcessor {
                 keypoints = new Array(194).fill(0.0);
             }
 
-            // 프레임 버퍼에 추가
-            this.frameBuffer.push(keypoints);
-            this.frameIndex++;
+      // 프레임 버퍼에 추가
+      this.frameBuffer.push(keypoints);
+      this.frameIndex++;
 
             const extractionTime = performanceLogger.endTimer('keypointExtraction');
 
             console.log(`📊 버퍼 상태: ${this.frameBuffer.length}/10 프레임`);
 
-            // 10프레임 배치 완성 시 반환
-            if (this.frameBuffer.length >= 10) {
-                const batchData = {
-                    keypoints: [...this.frameBuffer],
-                    frameIndex: this.frameIndex,
-                    batchSize: this.frameBuffer.length,
-                    sessionId
-                };
+      // 10프레임 배치 완성 시 반환
+      if (this.frameBuffer.length >= 10) {
+        const batchData = {
+          keypoints: [...this.frameBuffer],
+          frameIndex: this.frameIndex,
+          batchSize: this.frameBuffer.length,
+          sessionId,
+        };
 
-                this.frameBuffer = [];
-                performanceLogger.addMetric('keypointExtraction', extractionTime);
+        this.frameBuffer = [];
+        performanceLogger.addMetric("keypointExtraction", extractionTime);
 
                 console.log(`📦 배치 완성: ${batchData.batchSize}프레임`);
 
@@ -261,29 +256,26 @@ export class FrameProcessor {
         return readyState;
     }
 
-    resetFrameIndex() {
-        this.frameIndex = 0;
-        this.frameBuffer = [];
-        console.log('🔄 프레임 인덱스 리셋');
-    }
+  resetFrameIndex() {
+    this.frameIndex = 0;
+    this.frameBuffer = [];
+  }
 
-    getCurrentBufferSize() {
-        return this.frameBuffer.length;
-    }
+  getCurrentBufferSize() {
+    return this.frameBuffer.length;
+  }
 
-    cleanup() {
-        try {
-            console.log('🧹 FrameProcessor 정리 시작...');
+  cleanup() {
+    try {
+      if (this.loadingTimeout) {
+        clearTimeout(this.loadingTimeout);
+        this.loadingTimeout = null;
+      }
 
-            if (this.loadingTimeout) {
-                clearTimeout(this.loadingTimeout);
-                this.loadingTimeout = null;
-            }
-
-            if (this.hands) {
-                this.hands.close();
-                this.hands = null;
-            }
+      if (this.hands) {
+        this.hands.close();
+        this.hands = null;
+      }
 
             this.ready = false;
             this.isProcessing = false;

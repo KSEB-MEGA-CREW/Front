@@ -2,14 +2,12 @@ import React, { useState, useEffect } from "react";
 import { quizApi } from "../api/authApi";
 import { useTheme } from "../Context/themeContext";
 
-// 요일 이름을 반환하는 헬퍼 함수
 const getDayOfWeek = (dateString) => {
   const date = new Date(dateString);
   const days = ["일", "월", "화", "수", "목", "금", "토"];
   return days[date.getDay()];
 };
 
-// 최근 7일 날짜 배열 생성
 const getRecentSevenDays = () => {
   const days = [];
   const today = new Date();
@@ -35,7 +33,6 @@ const StasticComponent = () => {
         setLoading(true);
         setError(null);
 
-        // localStorage에서 사용자 정보 가져오기
         const userInfo = JSON.parse(localStorage.getItem("user"));
         if (!userInfo || !userInfo.id) {
           throw new Error("사용자 정보를 찾을 수 없습니다.");
@@ -43,9 +40,8 @@ const StasticComponent = () => {
 
         const currentDate = new Date();
         const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1; // getMonth()는 0부터 시작하므로 +1
+        const month = currentDate.getMonth() + 1;
 
-        // API 호출로 월별 데이터 가져오기
         const monthlyData = await quizApi.getUserQuizHistory(
           year,
           month,
@@ -90,32 +86,32 @@ const StasticComponent = () => {
         text: "text-gray-600",
         shadow: "shadow-lg",
       }; // 기록이 없는 날
-    if (accuracy >= 90)
+    if (accuracy >= 80)
       return {
-        bg: "bg-emerald-500",
+        bg: "bg-[#004D40]",
         text: "text-white",
         shadow: "shadow-emerald-200",
       };
-    if (accuracy >= 80)
+    if (accuracy >= 60)
       return {
-        bg: "bg-blue-500",
+        bg: "bg-[#00838F]",
         text: "text-white",
         shadow: "shadow-blue-200",
       };
-    if (accuracy >= 70)
+    if (accuracy >= 40)
       return {
-        bg: "bg-amber-500",
+        bg: "bg-[#00acc1]",
         text: "text-white",
         shadow: "shadow-amber-200",
       };
-    if (accuracy >= 60)
+    if (accuracy >= 20)
       return {
-        bg: "bg-orange-500",
+        bg: "bg-[#26C6DA]",
         text: "text-white",
         shadow: "shadow-orange-200",
       };
     return {
-      bg: "bg-red-500",
+      bg: "bg-[#80DEEA]",
       text: "text-white",
       shadow: "shadow-red-200",
     }; // 0%~59% (0% 포함)
@@ -130,12 +126,11 @@ const StasticComponent = () => {
     const maxSize = 60; // 최대 크기를 줄여서 오버플로우 방지
 
     // 정답률에 따른 단계별 크기 조정
-    if (accuracy >= 90) return maxSize;
-    if (accuracy >= 80) return maxSize - 8;
-    if (accuracy >= 70) return maxSize - 12;
-    if (accuracy >= 60) return maxSize - 16;
-    if (accuracy >= 40) return maxSize - 20;
-    if (accuracy >= 20) return maxSize - 22;
+    if (accuracy >= 80) return maxSize;
+    if (accuracy >= 60) return maxSize - 8;
+    if (accuracy >= 40) return maxSize - 12;
+    if (accuracy >= 20) return maxSize - 16;
+    if (accuracy >= 0) return maxSize - 20;
     return minSize; // 0-19%
   };
 
@@ -218,11 +213,11 @@ const StasticComponent = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h2
-            className={`text-xl font-bold flex items-center gap-2 ${
+            className={`text-lg font-bold flex items-center gap-2 ${
               isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
-            📊 주간 학습 성취도
+            주간 학습 성취도
           </h2>
           <p
             className={`text-sm mt-1 ${
@@ -296,22 +291,20 @@ const StasticComponent = () => {
                           </span>
                         ) : (
                           <span
-                            className={`flex items-center gap-2 ${
-                              item.accuracy >= 80
-                                ? "text-green-300"
-                                : item.accuracy >= 60
-                                ? "text-yellow-300"
-                                : "text-red-300"
-                            }`}
+                            className={"flex items-center gap-2 text-gray-300"}
                           >
                             <span
-                              className={`text-2xl ${
+                              className={`text-2xl text-gray-800 ${
                                 item.accuracy >= 80
                                   ? "🎉"
                                   : item.accuracy >= 60
                                   ? "👍"
-                                  : item.accuracy > 0
+                                  : item.accuracy >= 40
+                                  ? "😊"
+                                  : item.accuracy >= 20
                                   ? "💪"
+                                  : item.accuracy > 0
+                                  ? "🧐"
                                   : "😔"
                               }`}
                             ></span>
@@ -396,13 +389,13 @@ const StasticComponent = () => {
               isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
-            <div className="w-4 h-4 bg-emerald-500 rounded-full shadow-sm"></div>
+            <div className="w-4 h-4 bg-[#004D40] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              90% 이상
+              80% 이상
             </span>
           </div>
           <div
@@ -410,13 +403,13 @@ const StasticComponent = () => {
               isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
-            <div className="w-4 h-4 bg-blue-500 rounded-full shadow-sm"></div>
+            <div className="w-4 h-4 bg-[#00838F] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              80-89%
+              60-79%
             </span>
           </div>
           <div
@@ -424,13 +417,13 @@ const StasticComponent = () => {
               isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
-            <div className="w-4 h-4 bg-amber-500 rounded-full shadow-sm"></div>
+            <div className="w-4 h-4 bg-[#00ACC1] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              70-79%
+              40-59%
             </span>
           </div>
           <div
@@ -438,13 +431,13 @@ const StasticComponent = () => {
               isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
-            <div className="w-4 h-4 bg-orange-500 rounded-full shadow-sm"></div>
+            <div className="w-4 h-4 bg-[#26C6DA] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              60-69%
+              20-39%
             </span>
           </div>
           <div
@@ -452,13 +445,13 @@ const StasticComponent = () => {
               isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
-            <div className="w-4 h-4 bg-red-500 rounded-full shadow-sm"></div>
+            <div className="w-4 h-4 bg-[#80DEEA] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
                 isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
-              60% 미만
+              20% 미만
             </span>
           </div>
           <div

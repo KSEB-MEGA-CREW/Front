@@ -28,7 +28,6 @@ export class WebSocketService {
         return new Promise((resolve, reject) => {
             try {
                 const wsUrl = `${API_CONFIG.WEBSOCKET_URL}?token=${encodeURIComponent(token)}`;
-                console.log('🔌 WebSocket connecting to:', wsUrl);
 
                 this.ws = new WebSocket(wsUrl);
 
@@ -46,7 +45,6 @@ export class WebSocketService {
                     this.reconnectAttempts = 0;
                     this.connectionPromise = null;
 
-                    console.log('✅ WebSocket connected successfully');
 
                     // Ping 간격 설정 (30초마다)
                     this.startPing();
@@ -69,7 +67,6 @@ export class WebSocketService {
                     this.connectionPromise = null;
                     this.stopPing();
 
-                    console.log(`🔌 WebSocket disconnected: ${event.code} - ${event.reason}`);
 
                     // 정상 종료가 아닌 경우 재연결 시도
                     if (event.code !== 1000 && event.code !== 1001) {
@@ -79,7 +76,7 @@ export class WebSocketService {
 
                 this.ws.onerror = (error) => {
                     clearTimeout(connectTimeout);
-                    console.error('❌ WebSocket error:', error);
+                    console.error('WebSocket error:', error);
 
                     if (this.ws && this.ws.readyState === WebSocket.CONNECTING) {
                         reject(new Error('WebSocket connection failed'));
@@ -219,7 +216,7 @@ export class WebSocketService {
 
     attemptReconnect(token) {
         if (this.reconnectAttempts >= API_CONFIG.MAX_RECONNECT_ATTEMPTS) {
-            console.error('❌ Max reconnection attempts reached');
+            console.error('Max reconnection attempts reached');
             return;
         }
 
@@ -230,7 +227,6 @@ export class WebSocketService {
         this.reconnectAttempts++;
         const delay = API_CONFIG.RECONNECT_INTERVAL * this.reconnectAttempts;
 
-        console.log(`🔄 Reconnecting in ${delay}ms... (${this.reconnectAttempts}/${API_CONFIG.MAX_RECONNECT_ATTEMPTS})`);
 
         this.reconnectTimer = setTimeout(() => {
             this.reconnectTimer = null;
@@ -264,7 +260,6 @@ export class WebSocketService {
         this.reconnectAttempts = 0;
         this.currentSessionId = null;
 
-        console.log('🔌 WebSocket disconnected manually');
     }
 
     getConnectionState() {

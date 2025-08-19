@@ -50,11 +50,10 @@ export class MediaPipeService {
             const initTime = performanceLogger.endTimer('mediapipe_init');
             performanceLogger.addMetric('mediapipeInit', initTime);
 
-            console.log('✅ MediaPipe Hands initialized successfully');
             return true;
 
         } catch (error) {
-            console.error('❌ MediaPipe initialization failed:', error);
+            console.error('MediaPipe initialization failed:', error);
             this.isInitialized = false;
             throw error;
         }
@@ -122,7 +121,6 @@ export class MediaPipeService {
             this.isProcessing = false;
             this.initPromise = null;
 
-            console.log('MediaPipe cleaned up');
         } catch (error) {
             console.error('MediaPipe cleanup error:', error);
         }

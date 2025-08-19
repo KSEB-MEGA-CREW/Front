@@ -63,29 +63,16 @@ export class PerformanceLogger {
 
     logPerformance(label, duration, metadata = {}) {
         const timestamp = new Date().toISOString().split('T')[1].slice(0, -1);
-        console.log(
-            `🕐 [${timestamp}] ${label}: ${Math.round(duration * 100) / 100}ms`,
-            metadata.frameIndex !== undefined ? `(Frame #${metadata.frameIndex})` : '',
-            metadata.batchSize ? `(Batch: ${metadata.batchSize})` : ''
-        );
     }
 
     printReport() {
-        console.log('\n📊 === WebSocket 성능 측정 리포트 ===');
 
         Object.keys(this.metrics).forEach(type => {
             const stats = this.getStats(type);
             if (stats) {
-                console.log(`\n📈 ${type.toUpperCase()}:`);
-                console.log(`   총 처리 횟수: ${stats.count}회`);
-                console.log(`   평균 시간: ${stats.average}ms`);
-                console.log(`   최소 시간: ${stats.min}ms`);
-                console.log(`   최대 시간: ${stats.max}ms`);
-                console.log(`   총 소요 시간: ${stats.total}ms`);
             }
         });
 
-        console.log('\n=========================\n');
     }
 
     clearMetrics() {
@@ -115,7 +102,6 @@ export class FPSCalculator {
             this.frameCount = 0;
             this.lastTime = currentTime;
 
-            console.log(`📹 현재 FPS: ${this.fps}`);
         }
 
         return this.fps;

@@ -22,11 +22,7 @@ const SettingsPage = () => {
             <div
               className={`
               p-3 rounded-lg
-              ${
-                isDarkMode
-                  ? "bg-gray-800 text-gray-300"
-                  : "bg-white text-gray-600"
-              }
+              ${isDarkMode ? "bg-gray-800 text-gray-300" : "text-gray-600"}
             `}
             >
               <Settings size={32} />
