@@ -671,7 +671,7 @@ const TicketDetail = () => {
                 </div>
                 <p
                   className={`text-sx whitespace-pre-wrap ${
-                    isDarkMode ? "text-blue-200" : "text-blue-700"
+                    isDarkMode ? "text-gray-200" : "text-gray-700"
                   }`}
                 >
                   {ticket.adminResponse}
