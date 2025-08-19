@@ -75,7 +75,7 @@ export class WebSocketService {
 
                 this.ws.onerror = (error) => {
                     clearTimeout(connectTimeout);
-                    console.error('❌ WebSocket error:', error);
+                    console.error('WebSocket error:', error);
 
                     if (this.ws && this.ws.readyState === WebSocket.CONNECTING) {
                         reject(new Error('WebSocket connection failed'));
@@ -162,7 +162,7 @@ export class WebSocketService {
 
     attemptReconnect(token) {
         if (this.reconnectAttempts >= API_CONFIG.MAX_RECONNECT_ATTEMPTS) {
-            console.error('❌ Max reconnection attempts reached');
+            console.error('Max reconnection attempts reached');
             return;
         }
 

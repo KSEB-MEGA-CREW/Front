@@ -48,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
     if (!token || !user) {
       const errorMsg = "Login failed: Invalid auth data";
-      console.error("❌", errorMsg, { token, user });
+      console.error(errorMsg, { token, user });
 
       // 에러를 상위 컴포넌트로 전파하기 위해 throw
       throw new Error(!token ? "토큰이 없습니다" : "사용자 정보가 없습니다");
@@ -69,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
       return { success: true };
     } catch (error) {
-      console.error("❌ localStorage 저장 실패:", error);
+      console.error("localStorage 저장 실패:", error);
 
       // 실패 시 상태 롤백
       setToken(null);

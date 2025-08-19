@@ -46,7 +46,7 @@ const LoginBox = () => {
               user: userInfo,
             });
           } catch (loginError) {
-            console.error("❌ AuthContext login 실패:", loginError);
+            console.error("AuthContext login 실패:", loginError);
             setError(`로그인 처리 중 오류: ${loginError.message}`);
             return;
           }
@@ -89,18 +89,18 @@ const LoginBox = () => {
           const redirectTo = searchParams.get("redirect") || "/";
           navigate(redirectTo, { replace: true });
         } else {
-          console.error("❌ 토큰 또는 사용자 정보가 없습니다:", {
+          console.error("토큰 또는 사용자 정보가 없습니다:", {
             token,
             userInfo,
           });
           setError("로그인 응답에서 필요한 정보를 찾을 수 없습니다.");
         }
       } else {
-        console.error("❌ 로그인 실패:", response);
+        console.error("로그인 실패:", response);
         setError(response.message || "로그인에 실패했습니다.");
       }
     } catch (error) {
-      console.error("❌ 로그인 오류:", error);
+      console.error("로그인 오류:", error);
       setError(error.message || "로그인 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);

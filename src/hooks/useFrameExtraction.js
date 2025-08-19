@@ -37,12 +37,12 @@ class FrameProcessor {
         this.ready = true;
         return true;
       } else {
-        console.warn('⚠️ MediaPipe 없음, 테스트 모드로 동작');
+        console.warn('MediaPipe 없음, 테스트 모드로 동작');
         this.ready = true; // 테스트용
         return true;
       }
     } catch (error) {
-      console.error('❌ FrameProcessor 초기화 실패:', error);
+      console.error('FrameProcessor 초기화 실패:', error);
       this.ready = false;
       throw error;
     }
@@ -88,7 +88,7 @@ class FrameProcessor {
       return null;
 
     } catch (error) {
-      console.error('❌ 키포인트 추출 실패:', error);
+      console.error('키포인트 추출 실패:', error);
       throw error;
     }
   }
@@ -115,7 +115,7 @@ class FrameProcessor {
       this.frameIndex = 0;
 
     } catch (error) {
-      console.error('❌ FrameProcessor 정리 오류:', error);
+      console.error('FrameProcessor 정리 오류:', error);
     }
   }
 }
@@ -216,7 +216,7 @@ export const useFrameExtraction = () => {
 
       return { token, user };
     } catch (error) {
-      console.error("❌ validateUser 실패:", error);
+      console.error("validateUser 실패:", error);
       throw new Error(`인증 오류: ${error.message}`);
     }
   }, [user?.id, getValidToken]);
@@ -232,7 +232,7 @@ export const useFrameExtraction = () => {
 
         return true;
       } catch (error) {
-        console.error("❌ FrameProcessor 생성 실패:", error);
+        console.error("FrameProcessor 생성 실패:", error);
         frameProcessor.current = null;
         throw error;
       }
@@ -257,7 +257,7 @@ export const useFrameExtraction = () => {
       }
 
       if (typeof frameProcessor.current.isReady !== 'function') {
-        console.error("❌ isReady 메서드가 함수가 아님:", typeof frameProcessor.current.isReady);
+        console.error("isReady 메서드가 함수가 아님:", typeof frameProcessor.current.isReady);
         console.error("FrameProcessor 인스턴스:", frameProcessor.current);
         throw new Error('FrameProcessor의 isReady 메서드가 함수가 아닙니다');
       }
@@ -273,13 +273,13 @@ export const useFrameExtraction = () => {
         } else {
         }
       } catch (wsError) {
-        console.warn("⚠️ WebSocket 연결 실패 (계속 진행):", wsError.message);
+        console.warn("WebSocket 연결 실패 (계속 진행):", wsError.message);
       }
 
       return true;
 
     } catch (err) {
-      console.error("❌ 초기화 실패:", err);
+      console.error("초기화 실패:", err);
       console.error("Error stack:", err.stack);
 
       const errorMsg = err.message || 'Initialization failed';
@@ -319,7 +319,7 @@ export const useFrameExtraction = () => {
           frameCount.current++;
 
           if (!frameProcessor.current) {
-            console.error('❌ frameProcessor가 null이 되었습니다');
+            console.error('frameProcessor가 null이 되었습니다');
             stopFrameExtraction();
             return;
           }
@@ -349,7 +349,7 @@ export const useFrameExtraction = () => {
 
 
     } catch (err) {
-      console.error('❌ Frame extraction start failed:', err);
+      console.error('Frame extraction start failed:', err);
       setError(err.message);
       setIsProcessing(false);
       setStatus('error');

@@ -53,7 +53,7 @@ export class MediaPipeService {
             return true;
 
         } catch (error) {
-            console.error('❌ MediaPipe initialization failed:', error);
+            console.error('MediaPipe initialization failed:', error);
             this.isInitialized = false;
             throw error;
         }

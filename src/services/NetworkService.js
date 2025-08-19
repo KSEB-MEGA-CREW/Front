@@ -27,7 +27,7 @@ export class NetworkService {
             }
             
             if (!response.ok) {
-                console.warn('🔍 Token verification failed with status:', response.status);
+                console.warn('Token verification failed with status:', response.status);
                 return false;
             }
 
