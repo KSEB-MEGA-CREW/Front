@@ -8,7 +8,7 @@ export const useWebSocket = () => {
     const [error, setError] = useState(null);
     const [lastResult, setLastResult] = useState(null);
     const [sessionStats, setSessionStats] = useState(null);
-    const [translationState, setTranslationState] = useState('idle');
+    const [translationState, setTranslationState] = useState('idle'); // 🔄 추가: 번역 상태
 
     const wsService = useRef(new WebSocketService());
     const stateCheckInterval = useRef(null);
@@ -71,62 +71,24 @@ export const useWebSocket = () => {
                 console.log(`🎯 연결 완료 후 상태 확인: isConnected=${connected}`);
             }, 100);
 
-            // 🔄 수정: PREDICTION_RESULT 메시지 처리
+            // 🔄 수정: 메시지 타입별 핸들러 등록
             wsService.current.onMessage(MESSAGE_TYPES.PREDICTION_RESULT, (data) => {
-                console.log('🎯 개별 예측 수신:', data);
-
-                // 개별 예측 결과로 임시 업데이트 (문장보다 우선순위 낮음)
-                setLastResult(prev => {
-                    // 이미 완성된 문장이 있으면 개별 예측 무시 (3초 이내)
-                    if (prev && prev.type === 'sentence' &&
-                        Date.now() - new Date(prev.timestamp).getTime() < 3000) {
-                        return prev;
-                    }
-
-                    return {
-                        label: data.label,
-                        confidence: data.confidence,
-                        type: 'prediction',  // 예측 타입 명시
-                        timestamp: data.timestamp,
-                        sessionId: data.session_id
-                    };
-                });
-
+                console.log('📡 Prediction result:', data);
+                if (data.result) {
+                    setLastResult(data.result);
+                }
                 if (data.session_stats) {
                     setSessionStats(data.session_stats);
                 }
             });
 
-            // 🔄 수정: SENTENCE_GENERATED 메시지 처리 강화
             wsService.current.onMessage(MESSAGE_TYPES.SENTENCE_GENERATED, (data) => {
-                console.log('📝 완성된 문장 수신:', data);
-
-                // 완성된 문장으로 결과 업데이트
+                console.log('📝 Sentence generated:', data);
                 setLastResult({
                     label: data.sentence,
                     confidence: 1.0,
-                    type: 'sentence',  // 문장 타입 명시
-                    glosses: data.glosses || [],
-                    timestamp: data.timestamp,
-                    sessionId: data.session_id
+                    type: 'sentence'
                 });
-
-                // 🔄 추가: 문장 완성 이벤트 발생
-                setTranslationState('sentence_completed');
-
-                // 🔄 추가: 완성 알림 (선택적)
-                if (window.speechSynthesis && data.sentence) {
-                    try {
-                        window.speechSynthesis.cancel(); // 이전 음성 중단
-                        const utterance = new SpeechSynthesisUtterance(data.sentence);
-                        utterance.lang = 'ko-KR';
-                        utterance.rate = 0.9;
-                        utterance.volume = 0.8;
-                        window.speechSynthesis.speak(utterance);
-                    } catch (ttsError) {
-                        console.warn('⚠️ TTS 실패:', ttsError);
-                    }
-                }
             });
 
             wsService.current.onMessage(MESSAGE_TYPES.STATUS, (data) => {
