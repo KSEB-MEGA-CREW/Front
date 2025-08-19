@@ -1,12 +1,10 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-// 토큰 관리
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-// 공통 API 요청 함수
 const apiRequest = async (url, options = {}) => {
   const { headers = {}, ...restOptions } = options;
 
@@ -22,30 +20,23 @@ const apiRequest = async (url, options = {}) => {
       ...restOptions,
     });
 
-    // 401 처리 (인증 만료))
     if (response.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      // 현재 페이지가 로그인 페이지면 리다이렉트하지 않음 => 굳이 리다이렉트할 필요가 없으므로
-      // 현재 페이지가 로그인 페이지가 아닐 때만 리다이렉트
       if (!window.location.pathname.includes("/auth")) {
-        // React Router를 사용하는 곳에서 처리하도록 이벤트 발생
         window.dispatchEvent(new CustomEvent("auth-expired"));
       }
       throw new Error("인증이 만료되었습니다.");
     }
 
-    // 403 처리l
     if (response.status === 403) {
       throw new Error("접근 권한이 없습니다.");
     }
 
-    // 404 처리
     if (response.status === 404) {
       throw new Error("요청한 리소스를 찾을 수 없습니다.");
     }
 
-    // 500 처리
     if (response.status >= 500) {
       throw new Error("서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
     }
@@ -173,7 +164,6 @@ export const authApi = {
           method: "GET",
         }
       );
-      console.log("📝 내 문의 목록 응답:", response);
       return response;
     } catch (error) {
       console.error("내 문의 목록 조회 오류:", error);
@@ -191,7 +181,6 @@ export const authApi = {
         }
       );
 
-      console.log("🎯 공개 문의 응답:", response); // 이 로그 추가
       return response;
     } catch (error) {
       console.error("공개 문의 목록 조회 오류:", error);

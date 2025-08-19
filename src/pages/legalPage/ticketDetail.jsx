@@ -65,25 +65,12 @@ const TicketDetail = () => {
       // 분기 처리: 관리자인 경우와 일반 사용자인 경우 다른 API를 호출합니다.
       if (isAdmin()) {
         // 관리자용 API 호출
-        console.log(
-          `%c[API 요청] 관리자용 문의 상세 조회 (ID: ${ticketId})`,
-          "color: #71a4d4; font-weight: bold;"
-        );
         response = await authApi.getSupportTicketByAdminId(ticketId);
       } else {
         // 일반 사용자용 API 호출
-        console.log(
-          `%c[API 요청] 사용자용 문의 상세 조회 (ID: ${ticketId})`,
-          "color: #71a4d4; font-weight: bold;"
-        );
         response = await authApi.getSupportTicketById(ticketId);
       }
 
-      console.log(
-        "%c[API 응답] 문의 상세 정보:",
-        "color: #5a9b5a; font-weight: bold;",
-        response
-      );
 
       if (response.success && response.data) {
         if (response.data.isPublic === true) {
@@ -130,17 +117,7 @@ const TicketDetail = () => {
         reply: replyContent.trim(),
       };
 
-      console.log(
-        `%c[API 요청] 관리자 답변 제출 (ID: ${ticketId})`,
-        "color: #71a4d4; font-weight: bold;",
-        replyData
-      );
       const response = await authApi.submitSupportReply(ticketId, replyData);
-      console.log(
-        "%c[API 응답] 답변 제출 결과:",
-        "color: #5a9b5a; font-weight: bold;",
-        response
-      );
 
       if (response.success) {
         // 답변 등록 성공 후, 문의 정보를 다시 불러와 상태를 업데이트합니다.

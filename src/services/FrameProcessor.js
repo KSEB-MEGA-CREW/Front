@@ -2,7 +2,6 @@
 import { keypointUtils } from "../utils/keypointUtils.js";
 import { performanceLogger } from "../utils/performanceUtils.js";
 import { MEDIAPIPE_CONFIG } from "../constants/videoConfig.js";
-console.log('🔄 FrameProcessor.js 모듈 로드됨');
 
 export class FrameProcessor {
     constructor() {
@@ -16,10 +15,8 @@ export class FrameProcessor {
     }
 
     async initialize() {
-        console.log('🔄 FrameProcessor 초기화 시작...');
 
         if (this.initPromise) {
-            console.log('⏳ 이미 초기화 중...');
             return this.initPromise;
         }
 
@@ -38,11 +35,9 @@ export class FrameProcessor {
             await this.waitForMediaPipe();
 
             // 3. Hands 인스턴스 생성
-            console.log('🤲 MediaPipe Hands 인스턴스 생성 중...');
             this.hands = new window.Hands({
                 locateFile: (file) => {
                     const url = `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-                    console.log(`📁 MediaPipe 파일 로드: ${url}`);
                     return url;
                 }
             });
@@ -59,7 +54,6 @@ export class FrameProcessor {
             this.isReady = true;
             this.initPromise = null;
 
-            console.log('✅ FrameProcessor 초기화 완료');
             return true;
 
         } catch (error) {
@@ -82,7 +76,6 @@ export class FrameProcessor {
         return new Promise((resolve, reject) => {
             const checkMediaPipe = () => {
                 if (window.Hands) {
-                    console.log('✅ MediaPipe Hands 로드 완료');
                     resolve();
                     return;
                 }
@@ -93,7 +86,6 @@ export class FrameProcessor {
                     return;
                 }
 
-                console.log(`⏳ MediaPipe 로드 대기 중... (${waitTime}ms)`);
                 setTimeout(checkMediaPipe, checkInterval);
             };
 
@@ -111,7 +103,6 @@ export class FrameProcessor {
         }
 
         if (this.isProcessing) {
-            console.log('⏭️ 이전 프레임 처리 중... 스킵');
             return null;
         }
 
@@ -143,11 +134,9 @@ export class FrameProcessor {
                 this.frameBuffer = [];
                 performanceLogger.addMetric('keypointExtraction', extractionTime);
 
-                console.log(`📦 배치 완성: ${batchData.batchSize}프레임`);
                 return batchData;
             }
 
-            console.log(`📊 버퍼 상태: ${this.frameBuffer.length}/10 프레임`);
             return null;
 
         } catch (error) {
@@ -189,7 +178,6 @@ export class FrameProcessor {
     resetFrameIndex() {
         this.frameIndex = 0;
         this.frameBuffer = [];
-        console.log('🔄 프레임 인덱스 리셋');
     }
 
     getCurrentBufferSize() {
@@ -198,7 +186,6 @@ export class FrameProcessor {
 
     cleanup() {
         try {
-            console.log('🧹 FrameProcessor 정리 시작...');
 
             if (this.loadingTimeout) {
                 clearTimeout(this.loadingTimeout);
@@ -215,7 +202,6 @@ export class FrameProcessor {
             this.frameBuffer = [];
             this.initPromise = null;
 
-            console.log('✅ FrameProcessor 정리 완료');
         } catch (error) {
             console.error('❌ FrameProcessor 정리 오류:', error);
         }

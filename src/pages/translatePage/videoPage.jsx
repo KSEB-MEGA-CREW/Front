@@ -19,7 +19,6 @@ const VideoPage = () => {
   const { isDarkMode } = useTheme();
   const videoRef = useRef(null);
 
-  // 1. stream 객체를 관리하기 위해 useRef를 사용합니다.
   const streamRef = useRef(null);
 
   const [isCameraReady, setIsCameraReady] = useState(false);
@@ -34,7 +33,6 @@ const VideoPage = () => {
   const [translationText, setTranslationText] = useState("");
   const [translationHistory, setTranslationHistory] = useState([]);
 
-  // 웹소켓 아키텍처 기반 프레임 추출 훅 사용
   const {
     isProcessing,
     result,
@@ -48,18 +46,14 @@ const VideoPage = () => {
     cleanup,
   } = useFrameExtraction();
 
-  // 2. getCamera 함수를 수정하여 stream 상태 대신 streamRef를 사용하고, 의존성 배열을 정리합니다.
   const getCamera = useCallback(async (deviceId) => {
-    console.log("📷 카메라 초기화 시작 (Ref 기반)...");
 
     if (!videoRef.current) {
-      console.error("❌ videoRef가 존재하지 않아 카메라를 시작할 수 없습니다.");
       return;
     }
 
     try {
       if (streamRef.current) {
-        console.log("기존 스트림 정리 중...");
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
 
@@ -73,19 +67,15 @@ const VideoPage = () => {
         audio: false,
       };
 
-      console.log("📷 getUserMedia 호출 중...", constraints);
       const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-      console.log("✅ 스트림 획득 성공:", newStream);
 
       streamRef.current = newStream;
       videoRef.current.srcObject = newStream;
 
       videoRef.current.onloadedmetadata = () => {
-        console.log("📺 비디오 메타데이터 로드 완료");
         videoRef.current
           .play()
           .then(() => {
-            console.log("✅ 비디오 재생 시작!");
             setIsCameraReady(true);
             setCameraError("");
 
@@ -98,23 +88,19 @@ const VideoPage = () => {
             });
           })
           .catch((playErr) => {
-            console.error("❌ 비디오 재생 실패:", playErr);
             setCameraError("비디오 재생에 실패했습니다.");
           });
       };
     } catch (err) {
-      console.error("❌ 카메라 접근 실패:", err);
       setCameraError("카메라 접근에 실패했습니다. 권한을 확인해 주세요.");
       setIsCameraReady(false);
     }
   }, []);
 
-  // 3. 카메라 관련 로직을 하나의 useEffect로 통합하여 관리합니다.
   useEffect(() => {
     let isMounted = true;
 
     const initializeCameraAndDevices = async () => {
-      console.log("🚀 카메라 및 장치 초기화 프로세스 시작");
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
         if (!isMounted) return;
@@ -122,26 +108,17 @@ const VideoPage = () => {
         const videoDevices = devices.filter(
           (device) => device.kind === "videoinput"
         );
-        console.log("📋 발견된 비디오 디바이스:", videoDevices);
         setAvailableDevices(videoDevices);
 
         const currentDeviceExists = videoDevices.some(
           (d) => d.deviceId === selectedDeviceId
         );
         if (videoDevices.length > 0 && !currentDeviceExists) {
-          console.log(
-            "📷 기본 카메라 장치를 선택합니다:",
-            videoDevices[0].deviceId
-          );
           setSelectedDeviceId(videoDevices[0].deviceId);
         } else if (currentDeviceExists) {
-          console.log(
-            `📷 선택된 장치(${selectedDeviceId})로 카메라를 시작합니다.`
-          );
           await getCamera(selectedDeviceId);
         }
       } catch (err) {
-        console.error("❌ 카메라 초기화 실패:", err);
         if (isMounted) {
           setCameraError("카메라 초기화에 실패했습니다.");
         }
@@ -156,11 +133,7 @@ const VideoPage = () => {
 
     return () => {
       isMounted = false;
-      console.log(
-        "🧹 VideoPage 언마운트 또는 의존성 변경으로 인한 클린업 실행"
-      );
       if (streamRef.current) {
-        console.log("스트림 정리:", streamRef.current.id);
         streamRef.current.getTracks().forEach((track) => track.stop());
       }
       if (typeof cleanup === "function") {
@@ -236,7 +209,6 @@ const VideoPage = () => {
 
   const toggleRecording = useCallback(async () => {
     if (!videoRef.current) {
-      console.error("❌ 비디오 요소가 없어서 토글할 수 없습니다.");
       return;
     }
     try {
@@ -246,18 +218,15 @@ const VideoPage = () => {
         stopFrameExtraction();
       }
     } catch (error) {
-      console.error("❌ 녹화 토글 에러:", error);
     }
   }, [isProcessing, startFrameExtraction, stopFrameExtraction]);
 
   const restartCamera = useCallback(async () => {
-    console.log("🔄 카메라 재시작 시도");
     setCameraError("");
     await getCamera(selectedDeviceId);
   }, [getCamera, selectedDeviceId]);
 
   const switchDevice = useCallback((deviceId) => {
-    console.log("📷 디바이스 변경:", deviceId);
     setSelectedDeviceId(deviceId);
   }, []);
 

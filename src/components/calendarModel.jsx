@@ -9,7 +9,6 @@ const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// 색상 테마 정의
 const COLOR_THEMES = {
   green: {
     name: "초록색",
@@ -130,7 +129,6 @@ function CalendarModel({ userId }) {
           return acc;
         }, {});
         setQuizHistory(historyMap);
-        console.log("퀴즈", activeDate, quizHistory);
       } catch (error) {
         console.error("퀴즈 기록 로딩 실패:", error);
         setQuizHistory({});

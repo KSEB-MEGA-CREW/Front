@@ -94,7 +94,6 @@ const InquiryBoard = () => {
             response = await authApi.getPublicSupportTickets(page, size);
         }
 
-        console.log(`[${viewMode} 모드] API 전체 응답:`, response);
 
         if (response.success && response.data) {
           let ticketData;
@@ -119,10 +118,7 @@ const InquiryBoard = () => {
               number: 0,
             };
           }
-          console.log("응답 데이타:", response.data);
 
-          console.log("처리된 티켓 데이터:", ticketData);
-          console.log("계산된 페이지 정보:", currentPageInfo);
 
           setTickets(ticketData);
           setPageInfo((prev) => ({
@@ -201,7 +197,6 @@ const InquiryBoard = () => {
   // 게시글 클릭 핸들러
   const handleTicketClick = (ticket) => {
     const canView = canViewTicket(ticket, user, isAdmin);
-    console.log("티켓 클릭:", ticket.id, "열람 가능:", canView);
     if (!canView) {
       alert("비공개 문의입니다. 작성자 또는 관리자만 열람할 수 있습니다.");
       return;

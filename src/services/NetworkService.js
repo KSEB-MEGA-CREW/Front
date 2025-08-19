@@ -12,7 +12,6 @@ export class NetworkService {
      */
     async verifyToken(token) {
         try {
-            console.log('🔍 Verifying token:', token.substring(0, 20) + '...');
 
             const response = await fetch(`${this.baseURL}${API_CONFIG.ENDPOINTS.VERIFY_TOKEN}`, {
                 method: 'POST',
@@ -27,14 +26,12 @@ export class NetworkService {
                 return false;
             }
             
-            console.log('🔍 Token verification response status:', response.status);
             if (!response.ok) {
                 console.warn('🔍 Token verification failed with status:', response.status);
                 return false;
             }
 
             const data = await response.json();
-            console.log('🔍 Token verification response:', data);
 
             return data.success && data.data && data.data.valid === true;
 
@@ -73,7 +70,6 @@ export class NetworkService {
     abort() {
         this.controller.abort();
         this.controller = new AbortController();
-        console.log('🛑 HTTP 요청 중단');
     }
 
     /**
@@ -82,7 +78,6 @@ export class NetworkService {
     async convertTextToSign(translationRequest) {
         const MAX_RETRIES = API_CONFIG.MAX_RETRIES || 3;
 
-        console.log(`텍스트-수어 변환 요청: "${translationRequest.text}"`);
 
         for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
             try {
@@ -104,7 +99,6 @@ export class NetworkService {
                 }
 
                 const result = await response.json();
-                console.log('텍스트-수어 변환 응답:', result);
                 return result;
 
             } catch (error) {

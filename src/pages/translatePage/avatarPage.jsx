@@ -1,4 +1,3 @@
-// AvatarPage.jsx 상단 import들 아래에 추가
 import GLBAvatarPlayer from "./GLBAvatarPlayer.jsx";
 
 import React, {
@@ -20,23 +19,18 @@ import {
   Clock,
 } from "lucide-react";
 
-// ThemeContext import
 import { useTheme } from "../../Context/themeContext";
 
-// 2. useUnityAvatar Hook Mock
-// "../../hooks/useUnityAvatar" 파일이 없어 임시로 생성합니다.
 const useUnityAvatar = () => {
   const containerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
   // 애니메이션 재생을 시뮬레이션하는 함수
   const sendAnimationData = () => {
-    console.log("Mock: 애니메이션 데이터 전송 시도");
     setIsPlaying(true);
   };
 
   const stopAnimation = () => {
-    console.log("Mock: 애니메이션 정지");
     setIsPlaying(false);
   };
 
@@ -46,10 +40,10 @@ const useUnityAvatar = () => {
     error: null, // 에러가 없는 상태로 가정
     isPlaying, // 현재 재생 상태
     containerRef,
-    initializeUnity: () => console.log("Mock: Unity 초기화"),
+    initializeUnity: () => {},
     sendAnimationData,
     stopAnimation,
-    resetAvatar: () => console.log("Mock: 아바타 리셋"),
+    resetAvatar: () => {},
   };
 };
 
@@ -60,11 +54,9 @@ const useTextToSignAPI = () => {
 
   const convertTextToSignLanguage = async (text) => {
     setIsLoading(true);
-    console.log(`Mock API: "${text}" 변환 중...`);
     // 1.5초 동안 API 호출을 시뮬레이션합니다.
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsLoading(false);
-    console.log("Mock API: 변환 완료");
     return {
       success: true,
       data: { requestId: `mock-${Date.now()}`, status: "SUBMITTED" },
@@ -172,7 +164,6 @@ const AvatarPage = () => {
         }
       } else {
         // 파일이 없거나 타입이 맞지 않으면 동작하지 않음
-        console.log(`애니메이션 파일을 찾을 수 없거나 타입이 올바르지 않습니다: ${animationFileUrl}`);
       }
     } catch (error) {
       console.error("애니메이션 파일 확인 중 오류 발생:", error);
