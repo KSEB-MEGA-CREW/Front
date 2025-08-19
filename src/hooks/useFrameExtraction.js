@@ -1,9 +1,6 @@
-// useFrameExtraction.js
 import { useCallback, useRef, useState, useEffect } from 'react';
 import { useWebSocket } from './useWebSocket';
 import { useAuth } from '../Context/authContext';
-import { FrameProcessor } from '../services/FrameProcessor';
-import { NetworkService } from '../services/NetworkService';
 import { VIDEO_CONFIG } from '../constants/videoConfig';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -15,15 +12,12 @@ class FrameProcessor {
     this.frameBuffer = [];
     this.hands = null;
     this.isProcessing = false;
-
   }
 
   async initialize() {
-
     try {
       // MediaPipe 확인
       if (typeof window !== 'undefined' && window.Hands) {
-
         this.hands = new window.Hands({
           locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
         });
@@ -54,7 +48,6 @@ class FrameProcessor {
   }
 
   async extractKeypoints(videoElement, sessionId) {
-
     if (!this.ready) {
       throw new Error('FrameProcessor가 초기화되지 않았습니다');
     }
@@ -73,7 +66,6 @@ class FrameProcessor {
       this.frameBuffer.push(fakeKeypoints);
       this.frameIndex++;
 
-
       if (this.frameBuffer.length >= 10) {
         const batchData = {
           keypoints: [...this.frameBuffer],
@@ -87,7 +79,6 @@ class FrameProcessor {
       }
 
       return null;
-
     } catch (error) {
       console.error('키포인트 추출 실패:', error);
       throw error;
@@ -104,7 +95,6 @@ class FrameProcessor {
   }
 
   cleanup() {
-
     try {
       if (this.hands) {
         this.hands.close();
@@ -114,7 +104,6 @@ class FrameProcessor {
       this.ready = false;
       this.frameBuffer = [];
       this.frameIndex = 0;
-
     } catch (error) {
       console.error('FrameProcessor 정리 오류:', error);
     }
@@ -146,6 +135,7 @@ const performanceLogger = {
   },
 
   logPerformance(message, duration, extra = {}) {
+    console.log(`🔧 ${message}`, { duration, ...extra });
   }
 };
 
@@ -156,9 +146,8 @@ export const useFrameExtraction = () => {
   const [status, setStatus] = useState('idle');
 
   const { user } = useAuth();
-  const networkService = useRef(new NetworkService());
 
-  // 🔄 수정: 번역 상태 및 새로운 함수들 추가
+  // ✅ WebSocket 훅 사용
   const {
     isConnected,
     connectionState,
@@ -198,27 +187,30 @@ export const useFrameExtraction = () => {
       throw new Error('인증 토큰이 없습니다. 다시 로그인해주세요.');
     }
 
-    const isValid = await networkService.current.verifyToken(token);
-    if (!isValid) {
-      localStorage.removeItem('token');
-      sessionStorage.removeItem('token');
-      throw new Error('토큰이 유효하지 않습니다. 다시 로그인해주세요.');
-    }
+    // 간단한 토큰 검증 (실제로는 서버 검증 필요)
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const isExpired = payload.exp * 1000 < Date.now();
 
-    return token;
+      if (isExpired) {
+        throw new Error('토큰이 만료되었습니다.');
+      }
+
+      return token;
+    } catch (decodeError) {
+      throw new Error('토큰이 유효하지 않습니다.');
+    }
   }, []);
 
   // 사용자 검증
   const validateUser = useCallback(async () => {
     console.log("🔐 validateUser() 시작");
     try {
-
       if (!user?.id) {
         throw new Error('사용자 정보가 없습니다.');
       }
 
       const token = await getValidToken();
-
       return { token, user };
     } catch (error) {
       console.error("validateUser 실패:", error);
@@ -228,13 +220,9 @@ export const useFrameExtraction = () => {
 
   // FrameProcessor 초기화 함수
   const initializeFrameProcessor = useCallback(() => {
-
     if (!frameProcessor.current) {
       try {
         frameProcessor.current = new FrameProcessor();
-
-        // 메서드 확인
-
         return true;
       } catch (error) {
         console.error("FrameProcessor 생성 실패:", error);
@@ -264,41 +252,34 @@ export const useFrameExtraction = () => {
 
       if (typeof frameProcessor.current.isReady !== 'function') {
         console.error("isReady 메서드가 함수가 아님:", typeof frameProcessor.current.isReady);
-        console.error("FrameProcessor 인스턴스:", frameProcessor.current);
         throw new Error('FrameProcessor의 isReady 메서드가 함수가 아닙니다');
       }
 
       if (!frameProcessor.current.isReady()) {
         await frameProcessor.current.initialize();
-      } else {
       }
 
       console.log("3️⃣ WebSocket 연결 시도 중...");
       try {
         if (!isConnected) {
           await connect(token, user.id);
-        } else {
         }
       } catch (wsError) {
         console.warn("WebSocket 연결 실패 (계속 진행):", wsError.message);
       }
 
       return true;
-
     } catch (err) {
       console.error("초기화 실패:", err);
-      console.error("Error stack:", err.stack);
-
       const errorMsg = err.message || 'Initialization failed';
       setError(errorMsg);
       setStatus('error');
       throw new Error(errorMsg);
     }
-  }, [validateUser, isConnected, connect, clearWsError]);
+  }, [validateUser, isConnected, connect, clearWsError, initializeFrameProcessor]);
 
-  // 🔄 수정: 프레임 추출 시작 (번역 시작 메시지 추가)
+  // ✅ 수정: 프레임 추출 시작
   const startFrameExtraction = useCallback(async (videoElement) => {
-
     if (!videoElement || isProcessing) {
       return;
     }
@@ -317,14 +298,13 @@ export const useFrameExtraction = () => {
       sessionStartTime.current = Date.now();
       frameCount.current = 0;
 
-      // 🔄 추가: 번역 시작 메시지 전송
+      // ✅ 번역 시작 메시지 전송
       console.log("🚀 번역 세션 시작 신호 전송...");
       try {
         await startTranslation(sessionId.current);
         console.log("✅ 번역 세션 시작 완료");
       } catch (translationError) {
         console.warn("⚠️ 번역 시작 신호 전송 실패:", translationError.message);
-        // 번역 시작 실패해도 프레임 처리는 계속 진행
       }
 
       performanceLogger.clearMetrics();
@@ -346,33 +326,21 @@ export const useFrameExtraction = () => {
             sessionId.current
           );
 
-          // 배치 완성 시에만 처리
+          // ✅ 배치 완성 시에만 처리
           if (batchData) {
-            const realTimeState = getConnectionState ? getConnectionState() : 'UNKNOWN';
+            const realTimeState = getConnectionState ? getConnectionState() : connectionState;
             const realTimeConnected = realTimeState === 'OPEN';
 
-            console.log('🎯 배치 완성! 상태 확인:', {
+            console.log('🎯 배치 완성!', {
               batchSize: batchData.batchSize,
               frameIndex: batchData.frameIndex,
-              storedIsConnected: isConnected,
+              isConnected,
               realTimeConnected,
               realTimeState,
-              connectionState,
               sessionId: sessionId.current
             });
 
-            // 키포인트 데이터 검증
-            console.log('🔤 키포인트 데이터 검증:', {
-              firstFrameFirstValues: batchData.keypoints[0]?.slice(0, 10),
-              isAllZero: batchData.keypoints[0]?.every(val => val === 0.0),
-              totalFrames: batchData.keypoints.length,
-              keypointsPerFrame: batchData.keypoints[0]?.length,
-              hasNonZeroValues: batchData.keypoints.some(frame =>
-                frame.some(val => val !== 0.0)
-              )
-            });
-
-            // 🔄 수정: WebSocket 전송에 세션 ID 추가
+            // ✅ WebSocket 전송 (중복 제거)
             if (realTimeConnected || isConnected) {
               console.log('📤 WebSocket 전송 시작');
               try {
@@ -406,20 +374,9 @@ export const useFrameExtraction = () => {
                 }
               }
             } else {
-              console.warn('⚠️ WebSocket 연결 없음 - 배치 전송 불가', {
-                storedIsConnected: isConnected,
-                realTimeConnected,
-                realTimeState,
-                connectionState,
-                batchSize: batchData.batchSize
-              });
+              console.warn('⚠️ WebSocket 연결 없음 - 배치 전송 불가');
             }
-          // 10프레임 배치 완료시 WebSocket 전송
-          if (batchData && isConnected) {
-            await sendFrame(batchData.keypoints, batchData.frameIndex);
-          } else if (batchData) {
           }
-
         } catch (err) {
           console.error('Frame processing cycle error:', err);
           setError(err.message);
@@ -431,16 +388,25 @@ export const useFrameExtraction = () => {
         }
       }, VIDEO_CONFIG.FRAME_INTERVAL);
 
-
     } catch (err) {
       console.error('Frame extraction start failed:', err);
       setError(err.message);
       setIsProcessing(false);
       setStatus('error');
     }
-  }, [isProcessing, initialize, isConnected, startTranslation, sendFrame, getConnectionState, validateUser, connect]);
+  }, [
+    isProcessing,
+    initialize,
+    isConnected,
+    connectionState,
+    startTranslation,
+    sendFrame,
+    getConnectionState,
+    validateUser,
+    connect
+  ]);
 
-  // 🔄 수정: 프레임 추출 중단 (번역 종료 메시지 추가)
+  // ✅ 수정: 프레임 추출 중단
   const stopFrameExtraction = useCallback(() => {
     console.log('\n🛑 === 프레임 추출 세션 종료 ===');
 
@@ -452,7 +418,7 @@ export const useFrameExtraction = () => {
     setIsProcessing(false);
     setStatus('idle');
 
-    // 🔄 추가: 번역 종료 메시지 전송
+    // ✅ 번역 종료 메시지 전송
     console.log("🛑 번역 세션 종료 신호 전송...");
     try {
       stopTranslation(sessionId.current);
@@ -461,18 +427,34 @@ export const useFrameExtraction = () => {
       console.warn("⚠️ 번역 종료 신호 전송 실패:", translationError.message);
     }
 
-    // WebSocket 연결 종료
-    disconnect();
-  }, [stopTranslation, disconnect]);
+    // ✅ 주의: 즉시 연결 종료하지 않음 (마지막 문장 대기)
+    console.log("🕐 마지막 문장 처리 대기 중...");
+  }, [stopTranslation]);
 
-  // 정리 함수
+  // ✅ 완전한 정리 함수 (연결 종료 포함)
   const cleanup = useCallback(() => {
-    stopFrameExtraction();
+    console.log("🧹 완전한 정리 시작...");
+
+    // 프레임 처리 중단
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    setIsProcessing(false);
+    setStatus('idle');
+
+    // FrameProcessor 정리
     if (frameProcessor.current) {
       frameProcessor.current.cleanup();
     }
+
+    // WebSocket 연결 종료
+    disconnect();
+
     performanceLogger.clearMetrics();
-  }, [stopFrameExtraction]);
+    console.log("✅ 완전한 정리 완료");
+  }, [disconnect]);
 
   // 컴포넌트 언마운트 시 정리
   useEffect(() => {
@@ -480,19 +462,28 @@ export const useFrameExtraction = () => {
   }, [cleanup]);
 
   return {
+    // 상태
     isProcessing,
     result,
     error: error || wsError,
     status,
     sessionStats,
+
+    // WebSocket 상태
     isConnected,
     connectionState,
-    translationState, // 🔄 추가: 번역 상태
+    translationState,
+
+    // 세션 정보
     sessionId: sessionId.current,
     frameCount: frameCount.current,
+
+    // 메서드
     startFrameExtraction,
     stopFrameExtraction,
     cleanup,
+
+    // 유틸리티
     clearError: useCallback(() => {
       setError(null);
       clearWsError();
