@@ -348,6 +348,7 @@ const AvatarPage = () => {
     animationUrl={animationUrl} 
     play={isPlaying}
     dark={isDarkMode}
+    onEnd={stopAnimation}
   />
 </div>
 

@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 
-function AvatarWithAnimation({ avatarUrl, animationUrl, play }) {
+function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd }) {
   const groupRef = useRef();
   const mixerRef = useRef();
   const actionRef = useRef();
@@ -32,22 +32,24 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play }) {
     const mixer = new THREE.AnimationMixer(avatarScene);
     mixerRef.current = mixer;
 
-    let action;
+    // 애니메이션 종료 이벤트 핸들러
+    const onFinished = (e) => {
+      if (e.action === actionRef.current) {
+        onEnd?.(); // onEnd prop이 있으면 호출
+      }
+    };
+    mixer.addEventListener('finished', onFinished);
 
+    let action;
     const srcClips = (animGltf && animGltf.animations) ? animGltf.animations : [];
-    // 기본적으로 첫 번째 클립 사용
     const clip = srcClips[0];
 
     if (clip) {
-      // skeleton 구조가 동일/유사하면 retargetClip으로 대상 스켈레톤에 맞춰 animation 복사
-      // (만약 두 GLB가 동일 리그/이름 체계를 공유한다면 바로 잘 맞습니다.)
       let retargeted;
       try {
-        // target = avatarScene, source = animGltf.scene (관례적으로 이렇게 사용)
         retargeted = SkeletonUtils.retargetClip(avatarScene, animGltf.scene || avatarScene, clip);
       } catch (error) {
         console.error("Failed to retarget animation, using original clip.", error);
-        // retarget 실패 시 원본 클립 그대로 시도 (이름이 일치할 때는 이것만으로도 동작)
         retargeted = clip;
       }
 
@@ -59,11 +61,12 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play }) {
     }
 
     return () => {
+      mixer.removeEventListener('finished', onFinished);
       mixer.stopAllAction();
       actionRef.current = null;
       mixerRef.current = null;
     };
-  }, [avatarScene, animGltf]);
+  }, [avatarScene, animGltf, onEnd]);
 
   // 외부에서 넘어오는 play 신호로 재생/정지
   useEffect(() => {
@@ -73,7 +76,6 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play }) {
     if (play) {
       action.reset().play();
     } else {
-      // 원 코드가 3초 후 isPlaying=false로 바꾸므로, false 시 정지
       action.stop();
     }
   }, [play]);
@@ -97,6 +99,7 @@ export default function GLBAvatarPlayer({
   animationUrl = "/만나서_반갑습니다.glb",
   play = false,
   dark = false,
+  onEnd,
 }) {
   // Canvas를 부모 컨테이너에 딱 맞추도록 100% 레이아웃
   // 그림자, 조명, 카메라 컨트롤 포함
@@ -156,6 +159,7 @@ export default function GLBAvatarPlayer({
             avatarUrl={avatarUrl}
             animationUrl={animationUrl}
             play={play}
+            onEnd={onEnd}
           />
         </React.Suspense>
 
