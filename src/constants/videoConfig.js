@@ -30,3 +30,14 @@ export const MEDIAPIPE_CONFIG = {
     SINGLE_HAND_LANDMARKS: 21,
     COORDINATES_PER_LANDMARK: 3 // x, y, z
 };
+
+// AI 서버 메시지 타입 정의
+export const MESSAGE_TYPES = {
+    START_TRANSLATION: 'start_translation',
+    STOP_TRANSLATION: 'stop_translation',
+    KEYPOINTS: 'keypoints',
+    PREDICTION_RESULT: 'prediction_result',
+    SENTENCE_GENERATED: 'sentence_generated',
+    ERROR: 'error',
+    STATUS: 'status'
+};
