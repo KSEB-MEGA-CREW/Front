@@ -65,25 +65,12 @@ const TicketDetail = () => {
       // 분기 처리: 관리자인 경우와 일반 사용자인 경우 다른 API를 호출합니다.
       if (isAdmin()) {
         // 관리자용 API 호출
-        console.log(
-          `%c[API 요청] 관리자용 문의 상세 조회 (ID: ${ticketId})`,
-          "color: #71a4d4; font-weight: bold;"
-        );
         response = await authApi.getSupportTicketByAdminId(ticketId);
       } else {
         // 일반 사용자용 API 호출
-        console.log(
-          `%c[API 요청] 사용자용 문의 상세 조회 (ID: ${ticketId})`,
-          "color: #71a4d4; font-weight: bold;"
-        );
         response = await authApi.getSupportTicketById(ticketId);
       }
 
-      console.log(
-        "%c[API 응답] 문의 상세 정보:",
-        "color: #5a9b5a; font-weight: bold;",
-        response
-      );
 
       if (response.success && response.data) {
         if (response.data.isPublic === true) {
@@ -130,17 +117,7 @@ const TicketDetail = () => {
         reply: replyContent.trim(),
       };
 
-      console.log(
-        `%c[API 요청] 관리자 답변 제출 (ID: ${ticketId})`,
-        "color: #71a4d4; font-weight: bold;",
-        replyData
-      );
       const response = await authApi.submitSupportReply(ticketId, replyData);
-      console.log(
-        "%c[API 응답] 답변 제출 결과:",
-        "color: #5a9b5a; font-weight: bold;",
-        response
-      );
 
       if (response.success) {
         // 답변 등록 성공 후, 문의 정보를 다시 불러와 상태를 업데이트합니다.
@@ -408,7 +385,8 @@ const TicketDetail = () => {
             {/* 수정/삭제 버튼 */}
             {(canEdit() || canDelete()) && !isEditing && (
               <div className="flex gap-2">
-                {canEdit() && (
+                {/* 👇 이 부분에 조건을 추가합니다. */}
+                {canEdit() && ticket.status === "PENDING" && (
                   <button
                     onClick={handleEditStart}
                     className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
@@ -420,6 +398,7 @@ const TicketDetail = () => {
                     <Pencil size={14} />
                   </button>
                 )}
+
                 {canDelete() && (
                   <button
                     onClick={() => setShowDeleteModal(true)}
@@ -597,7 +576,7 @@ const TicketDetail = () => {
                 문의 내용 *
               </label>
               <div
-                className={`p-4 rounded-lg border mb-3 ${
+                className={`p-4 rounded-lg border mb-3 min-h-[155px] ${
                   isDarkMode
                     ? "bg-gray-700 border-gray-600"
                     : "bg-gray-50 border-gray-200"
@@ -614,11 +593,15 @@ const TicketDetail = () => {
             </>
           )}
 
-          <div className="flex items-center gap-2 ">
+          <div
+            className={`flex gap-2 ${
+              isDarkMode ? "text-gray-300" : "text-gray-800"
+            }`}
+          >
             <User size={14} />
             <span
               className={`text-xs ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
+                isDarkMode ? "text-gray-300" : "text-gray-800"
               }`}
             >
               {ticket.userName || "익명"}
@@ -636,7 +619,7 @@ const TicketDetail = () => {
                 관리자 답변
               </h3>
               <div
-                className={`p-4 rounded-lg border border-l-4 border-l-blue-500 ${
+                className={`p-4 rounded-lg min-h-[130px] ${
                   isDarkMode
                     ? "bg-blue-900/20 border-blue-700/30"
                     : "bg-blue-50 border-blue-200"
@@ -664,8 +647,8 @@ const TicketDetail = () => {
                   </span>
                 </div>
                 <p
-                  className={`text-sm whitespace-pre-wrap ${
-                    isDarkMode ? "text-blue-200" : "text-blue-700"
+                  className={`text-sx whitespace-pre-wrap ${
+                    isDarkMode ? "text-gray-200" : "text-gray-700"
                   }`}
                 >
                   {ticket.adminResponse}

@@ -14,9 +14,8 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  const [loading, setLoading] = useState(true); // 초기 로딩 상태
+  const [loading, setLoading] = useState(true);
 
-  // 초기화 시 토큰 확인
   useEffect(() => {
     const initializeAuth = async () => {
       try {
@@ -24,21 +23,17 @@ export const AuthProvider = ({ children }) => {
         const storedUser = localStorage.getItem("user");
 
         if (storedToken && storedUser) {
-          // 토큰 유효성 검증
-
           const isValid = await validateToken();
           if (isValid) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
           } else {
-            // 토큰이 유효하지 않으면 로컬스토리지 정리
             localStorage.removeItem("token");
             localStorage.removeItem("user");
           }
         }
       } catch (error) {
         console.error("Auth 초기화 오류:", error);
-        // 에러 발생 시 로컬 스토리지 정리
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       } finally {
@@ -50,15 +45,10 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = ({ token, user }) => {
-    console.log("🔐 AuthContext login 시작:", {
-      tokenExists: !!token,
-      userExists: !!user,
-      userDetails: user,
-    });
 
     if (!token || !user) {
       const errorMsg = "Login failed: Invalid auth data";
-      console.error("❌", errorMsg, { token, user });
+      console.error(errorMsg, { token, user });
 
       // 에러를 상위 컴포넌트로 전파하기 위해 throw
       throw new Error(!token ? "토큰이 없습니다" : "사용자 정보가 없습니다");
@@ -74,20 +64,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(user));
 
       // 성공 로그
-      console.log("✅ AuthContext login 성공:", {
-        tokenStored: !!localStorage.getItem("token"),
-        userStored: !!localStorage.getItem("user"),
-        userRole: user.role,
-        username: user.username,
-      });
 
       // 관리자 권한 즉시 확인
-      const adminCheck = user?.role === "ADMIN";
-      console.log("👑 관리자 권한 확인:", adminCheck);
 
       return { success: true };
     } catch (error) {
-      console.error("❌ localStorage 저장 실패:", error);
+      console.error("localStorage 저장 실패:", error);
 
       // 실패 시 상태 롤백
       setToken(null);
@@ -117,7 +99,6 @@ export const AuthProvider = ({ children }) => {
   const updateUser = async (updatedData) => {
     try {
       // 1. 서버에 사용자 정보 업데이트 요청
-      console.log("🔄 !!!!사용자 정보 업데이트 요청:", updatedData);
       const response = await authApi.updateUserProfile(updatedData);
 
       if (response.success) {

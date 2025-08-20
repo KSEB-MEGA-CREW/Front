@@ -1,6 +1,19 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useFrameExtraction } from "../../hooks/useFrameExtraction";
-import { AlertCircle, Settings, Maximize, Minimize, Volume2, VolumeX, Play, Square, RotateCcw, Wifi, WifiOff } from "lucide-react";
+import { useTheme } from "../../Context/themeContext";
+import {
+  AlertCircle,
+  Settings,
+  Maximize,
+  Minimize,
+  Volume2,
+  VolumeX,
+  Play,
+  Square,
+  RotateCcw,
+  Wifi,
+  WifiOff,
+} from "lucide-react";
 
 const VideoPage = () => {
  const videoRef = useRef(null);

@@ -34,13 +34,11 @@ export const useTextToSignAPI = () => {
         language: 'ko'
       };
 
-      console.log('텍스트-수어 변환 요청:', translationRequest);
 
       const result = await networkService.current.convertTextToSign(translationRequest);
 
       if (result && result.success) {
         setLastResult(result.data);
-        console.log('번역 요청 전송 완료:', result.data);
 
         return {
           success: true,
@@ -71,7 +69,6 @@ export const useTextToSignAPI = () => {
     sessionId.current = uuidv4();
     setError(null);
     setLastResult(null);
-    console.log('새 번역 세션 시작:', sessionId.current);
   }, []);
 
   return {
@@ -82,6 +79,5 @@ export const useTextToSignAPI = () => {
     convertTextToSignLanguage,
     clearError,
     abortRequests,
-    startNewSession
   };
 };

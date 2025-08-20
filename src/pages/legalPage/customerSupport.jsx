@@ -169,7 +169,12 @@ const CustomerSupport = () => {
                 isDarkMode ? "text-blue-400" : "text-blue-600"
               }`}
             >
-              dissolve1882@naver.com
+              <a
+                href="mailto:dissolve1882@naver.com"
+                className={`hover:text-blue-500 transition-colors`}
+              >
+                dissolve1882@naver.com
+              </a>
             </p>
           </div>
 
@@ -254,14 +259,20 @@ const CustomerSupport = () => {
                 isDarkMode ? "text-gray-400" : "text-gray-600"
               }`}
             >
-              즉시 응답
+              평일 09:00~18:00
             </p>
             <p
               className={`font-medium ${
                 isDarkMode ? "text-purple-400" : "text-purple-600"
               }`}
             >
-              평일 09:00~18:00
+              <a
+                href="https://open.kakao.com/o/sKrWTeNh"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                오픈채팅 바로가기
+              </a>
             </p>
           </div>
         </div>
@@ -444,7 +455,7 @@ const CustomerSupport = () => {
                     />
                     <div className="ml-3">
                       <div
-                        className={`text-sm font-semibold ${
+                        className={`text-sx font-semibold ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >
@@ -469,7 +480,7 @@ const CustomerSupport = () => {
                     />
                     <div className="ml-3">
                       <div
-                        className={`text-sm font-semibold ${
+                        className={`text-sx font-semibold ${
                           isDarkMode ? "text-white" : "text-gray-900"
                         }`}
                       >

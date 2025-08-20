@@ -67,7 +67,6 @@ export const useUnityAvatar = () => {
         setError(parameter);
         break;
       default:
-        console.log(`Unity 메시지: ${gameObject}.${methodName}(${parameter})`);
     }
   }, []);
 

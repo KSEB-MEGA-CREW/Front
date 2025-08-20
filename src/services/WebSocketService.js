@@ -1,6 +1,6 @@
-// WebSocket 통신
-import { API_CONFIG } from "../constants/videoConfig";
-import { performanceLogger } from "../utils/performanceUtils";
+// WebSocket 통신 서비스
+import { API_CONFIG, MESSAGE_TYPES } from "../constants/videoConfig.js";
+import { performanceLogger } from "../utils/performanceUtils.js";
 
 export class WebSocketService {
     constructor() {
@@ -11,6 +11,7 @@ export class WebSocketService {
         this.reconnectTimer = null;
         this.pingInterval = null;
         this.connectionPromise = null;
+        this.currentSessionId = null;
     }
 
     connect(token) {
@@ -27,7 +28,6 @@ export class WebSocketService {
         return new Promise((resolve, reject) => {
             try {
                 const wsUrl = `${API_CONFIG.WEBSOCKET_URL}?token=${encodeURIComponent(token)}`;
-                console.log('🔌 WebSocket connecting to:', wsUrl);
 
                 this.ws = new WebSocket(wsUrl);
 
@@ -45,7 +45,6 @@ export class WebSocketService {
                     this.reconnectAttempts = 0;
                     this.connectionPromise = null;
 
-                    console.log('✅ WebSocket connected successfully');
 
                     // Ping 간격 설정 (30초마다)
                     this.startPing();
@@ -68,7 +67,6 @@ export class WebSocketService {
                     this.connectionPromise = null;
                     this.stopPing();
 
-                    console.log(`🔌 WebSocket disconnected: ${event.code} - ${event.reason}`);
 
                     // 정상 종료가 아닌 경우 재연결 시도
                     if (event.code !== 1000 && event.code !== 1001) {
@@ -78,7 +76,7 @@ export class WebSocketService {
 
                 this.ws.onerror = (error) => {
                     clearTimeout(connectTimeout);
-                    console.error('❌ WebSocket error:', error);
+                    console.error('WebSocket error:', error);
 
                     if (this.ws && this.ws.readyState === WebSocket.CONNECTING) {
                         reject(new Error('WebSocket connection failed'));
@@ -92,16 +90,68 @@ export class WebSocketService {
         });
     }
 
-    sendFrame(keypoints, frameIndex) {
+    // 🔄 추가: 번역 시작 메시지
+    sendTranslationStart(sessionId) {
         if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             throw new Error('WebSocket not connected');
+        }
+
+        this.currentSessionId = sessionId;
+
+        const message = {
+            type: MESSAGE_TYPES.START_TRANSLATION,
+            session_id: sessionId,
+            timestamp: Date.now()
+        };
+
+        try {
+            this.ws.send(JSON.stringify(message));
+            console.log('🚀 Translation session started:', sessionId);
+        } catch (error) {
+            console.error('Translation start send error:', error);
+            throw error;
+        }
+    }
+
+    // 🔄 추가: 번역 종료 메시지
+    sendTranslationStop(sessionId) {
+        if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            console.warn('WebSocket not connected for stop message');
+            return;
+        }
+
+        const message = {
+            type: MESSAGE_TYPES.STOP_TRANSLATION,
+            session_id: sessionId,
+            timestamp: Date.now()
+        };
+
+        try {
+            this.ws.send(JSON.stringify(message));
+            console.log('🛑 Translation session stopped:', sessionId);
+            this.currentSessionId = null;
+        } catch (error) {
+            console.error('Translation stop send error:', error);
+        }
+    }
+
+    // 🔄 수정: 키포인트 전송에 메시지 타입과 세션 ID 추가
+    sendFrame(keypoints, frameIndex, sessionId) {
+        if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            throw new Error('WebSocket not connected');
+        }
+
+        if (!sessionId) {
+            throw new Error('Session ID is required');
         }
 
         performanceLogger.startTimer('websocket_send');
 
         const message = {
-            keypoints,
+            type: MESSAGE_TYPES.KEYPOINTS,
+            session_id: sessionId,
             frame_index: frameIndex,
+            keypoints: keypoints,
             timestamp: Date.now()
         };
 
@@ -111,6 +161,7 @@ export class WebSocketService {
             const sendTime = performanceLogger.endTimer('websocket_send');
             performanceLogger.addMetric('websocketSend', sendTime, {
                 frameIndex,
+                sessionId,
                 messageSize: JSON.stringify(message).length
             });
 
@@ -165,7 +216,7 @@ export class WebSocketService {
 
     attemptReconnect(token) {
         if (this.reconnectAttempts >= API_CONFIG.MAX_RECONNECT_ATTEMPTS) {
-            console.error('❌ Max reconnection attempts reached');
+            console.error('Max reconnection attempts reached');
             return;
         }
 
@@ -176,7 +227,6 @@ export class WebSocketService {
         this.reconnectAttempts++;
         const delay = API_CONFIG.RECONNECT_INTERVAL * this.reconnectAttempts;
 
-        console.log(`🔄 Reconnecting in ${delay}ms... (${this.reconnectAttempts}/${API_CONFIG.MAX_RECONNECT_ATTEMPTS})`);
 
         this.reconnectTimer = setTimeout(() => {
             this.reconnectTimer = null;
@@ -187,6 +237,11 @@ export class WebSocketService {
     }
 
     disconnect() {
+        // 번역 세션이 활성화되어 있으면 종료 메시지 전송
+        if (this.currentSessionId) {
+            this.sendTranslationStop(this.currentSessionId);
+        }
+
         // 재연결 타이머 정리
         if (this.reconnectTimer) {
             clearTimeout(this.reconnectTimer);
@@ -203,8 +258,8 @@ export class WebSocketService {
         this.isConnected = false;
         this.connectionPromise = null;
         this.reconnectAttempts = 0;
+        this.currentSessionId = null;
 
-        console.log('🔌 WebSocket disconnected manually');
     }
 
     getConnectionState() {
