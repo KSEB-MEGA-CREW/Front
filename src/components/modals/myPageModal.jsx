@@ -169,9 +169,11 @@ const MyPageModal = ({ isOpen, onClose }) => {
               className={`
                 p-2 rounded-lg transition-colors
                 ${
-                  isDarkMode
-                    ? "hover:bg-gray-700 text-gray-400 hover:text-white"
-                    : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                    : (isDarkMode
+                      ? "hover:bg-gray-700 text-gray-400 hover:text-white"
+                      : "hover:bg-gray-100 text-gray-500 hover:text-gray-700")
                 }
               `}
             >
@@ -229,9 +231,11 @@ const MyPageModal = ({ isOpen, onClose }) => {
                 className={`
                 p-2 rounded-lg
                 ${
-                  isDarkMode
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-blue-100 text-blue-600"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                    : (isDarkMode
+                      ? "bg-blue-500/20 text-blue-400"
+                      : "bg-blue-100 text-blue-600")
                 }
               `}
               >

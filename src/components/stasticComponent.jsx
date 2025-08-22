@@ -22,7 +22,7 @@ const getRecentSevenDays = () => {
 };
 
 const StasticComponent = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const [weeklyData, setWeeklyData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -139,14 +139,18 @@ const StasticComponent = () => {
     return (
       <div
         className={`rounded-2xl shadow-sm border p-6 ${
-          isDarkMode
+          theme === "high-contrast"
+            ? "bg-black border-2 border-yellow-400"
+            : isDarkMode
             ? "bg-gray-800 border-gray-700"
             : "bg-white border-gray-100"
         }`}
       >
         <h2
           className={`text-lg font-bold mb-6 ${
-            isDarkMode ? "text-white" : "text-gray-900"
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode ? "text-white" : "text-gray-900"
           }`}
         >
           주간 학습
@@ -156,7 +160,9 @@ const StasticComponent = () => {
             <div className="animate-spin w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full"></div>
             <span
               className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-400" : "text-gray-500"
               }`}
             >
               데이터를 불러오는 중...
@@ -172,21 +178,27 @@ const StasticComponent = () => {
     return (
       <div
         className={`rounded-2xl shadow-sm border p-6 ${
-          isDarkMode
+          theme === "high-contrast"
+            ? "bg-black border-2 border-yellow-400"
+            : isDarkMode
             ? "bg-gray-800 border-gray-700"
             : "bg-white border-gray-100"
         }`}
       >
         <h2
           className={`text-lg font-bold mb-6 ${
-            isDarkMode ? "text-white" : "text-gray-900"
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode ? "text-white" : "text-gray-900"
           }`}
         >
           주간 학습
         </h2>
         <div
           className={`flex justify-center items-center h-48 rounded-xl ${
-            isDarkMode ? "bg-red-900/20" : "bg-red-50"
+            theme === "high-contrast"
+              ? "bg-red-500 border-2 border-yellow-400"
+              : isDarkMode ? "bg-red-900/20" : "bg-red-50"
           }`}
         >
           <div className="text-center">
@@ -206,7 +218,9 @@ const StasticComponent = () => {
   return (
     <div
       className={`rounded-2xl shadow-sm border p-6 ${
-        isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"
+        theme === "high-contrast"
+          ? "bg-black border-2 border-yellow-400"
+          : isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"
       }`}
     >
       {/* 헤더 */}
@@ -214,14 +228,18 @@ const StasticComponent = () => {
         <div>
           <h2
             className={`text-lg font-bold flex items-center gap-2 ${
-              isDarkMode ? "text-white" : "text-gray-900"
+              theme === "high-contrast"
+                ? "text-yellow-400"
+                : isDarkMode ? "text-white" : "text-gray-900"
             }`}
           >
             주간 학습 성취도
           </h2>
           <p
             className={`text-sm mt-1 ${
-              isDarkMode ? "text-gray-400" : "text-gray-500"
+              theme === "high-contrast"
+                ? "text-yellow-400"
+                : isDarkMode ? "text-gray-400" : "text-gray-500"
             }`}
           >
             최근 7일간의 학습 기록을 확인해보세요
@@ -230,7 +248,9 @@ const StasticComponent = () => {
         <div className="text-right">
           <span
             className={`text-xs px-3 py-1.5 rounded-full font-semibold border ${
-              isDarkMode
+              theme === "high-contrast"
+                ? "text-black bg-yellow-400 border-yellow-400"
+                : isDarkMode
                 ? "text-blue-300 bg-blue-900/30 border-blue-700"
                 : "text-blue-600 bg-blue-50 border-blue-100"
             }`}
@@ -244,7 +264,9 @@ const StasticComponent = () => {
       <div className="mb-10">
         <div
           className={`rounded-2xl p-6 mb-6 ${
-            isDarkMode
+            theme === "high-contrast"
+              ? "bg-gray-900 border-2 border-yellow-400"
+              : isDarkMode
               ? "bg-gradient-to-b from-gray-700/30 to-transparent"
               : "bg-gradient-to-b from-gray-50/50 to-transparent"
           }`}
@@ -342,7 +364,11 @@ const StasticComponent = () => {
                   <p
                     className={`text-sm font-semibold ${
                       isToday
-                        ? "text-blue-600"
+                        ? theme === "high-contrast"
+                          ? "text-yellow-400"
+                          : "text-blue-600"
+                        : theme === "high-contrast"
+                        ? "text-yellow-400"
                         : isDarkMode
                         ? "text-gray-300"
                         : "text-gray-700"
@@ -353,9 +379,13 @@ const StasticComponent = () => {
                   <p
                     className={`text-xs mt-1 px-2 py-1 rounded-full ${
                       isToday
-                        ? isDarkMode
+                        ? theme === "high-contrast"
+                          ? "text-black bg-yellow-400 border border-yellow-400"
+                          : isDarkMode
                           ? "text-blue-300 bg-blue-900/30 border border-blue-700"
                           : "text-blue-600 bg-blue-50 border border-blue-200"
+                        : theme === "high-contrast"
+                        ? "text-yellow-400"
                         : isDarkMode
                         ? "text-gray-500"
                         : "text-gray-400"
@@ -373,12 +403,16 @@ const StasticComponent = () => {
       {/* 범례 - 개선된 디자인 */}
       <div
         className={`rounded-xl p-4 ${
-          isDarkMode ? "bg-gray-700/30" : "bg-gray-50"
+          theme === "high-contrast"
+            ? "bg-gray-900 border-2 border-yellow-400"
+            : isDarkMode ? "bg-gray-700/30" : "bg-gray-50"
         }`}
       >
         <h3
           className={`text-sm font-semibold text-center mb-3 ${
-            isDarkMode ? "text-gray-300" : "text-gray-700"
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode ? "text-gray-300" : "text-gray-700"
           }`}
         >
           성취도 가이드
@@ -386,13 +420,17 @@ const StasticComponent = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-xs">
           <div
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
-              isDarkMode ? "bg-gray-700" : "bg-white"
+              theme === "high-contrast"
+                ? "bg-gray-900 border border-yellow-400"
+                : isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#004D40] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
               80% 이상
@@ -400,13 +438,17 @@ const StasticComponent = () => {
           </div>
           <div
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
-              isDarkMode ? "bg-gray-700" : "bg-white"
+              theme === "high-contrast"
+                ? "bg-gray-900 border border-yellow-400"
+                : isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#00838F] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
               60-79%
@@ -414,13 +456,17 @@ const StasticComponent = () => {
           </div>
           <div
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
-              isDarkMode ? "bg-gray-700" : "bg-white"
+              theme === "high-contrast"
+                ? "bg-gray-900 border border-yellow-400"
+                : isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#00ACC1] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
               40-59%
@@ -428,13 +474,17 @@ const StasticComponent = () => {
           </div>
           <div
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
-              isDarkMode ? "bg-gray-700" : "bg-white"
+              theme === "high-contrast"
+                ? "bg-gray-900 border border-yellow-400"
+                : isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#26C6DA] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
               20-39%
@@ -442,13 +492,17 @@ const StasticComponent = () => {
           </div>
           <div
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
-              isDarkMode ? "bg-gray-700" : "bg-white"
+              theme === "high-contrast"
+                ? "bg-gray-900 border border-yellow-400"
+                : isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#80DEEA] rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
               20% 미만
@@ -456,13 +510,17 @@ const StasticComponent = () => {
           </div>
           <div
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
-              isDarkMode ? "bg-gray-700" : "bg-white"
+              theme === "high-contrast"
+                ? "bg-gray-900 border border-yellow-400"
+                : isDarkMode ? "bg-gray-700" : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-gray-300 rounded-full shadow-sm"></div>
             <span
               className={`font-semibold ${
-                isDarkMode ? "text-gray-300" : "text-gray-700"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-300" : "text-gray-700"
               }`}
             >
               기록 없음

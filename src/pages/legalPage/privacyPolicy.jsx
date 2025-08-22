@@ -4,13 +4,15 @@ import { ArrowLeft, Shield, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const PrivacyPolicy = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   return (
     <div
       className={`min-h-screen p-6 ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        theme === "high-contrast"
+          ? "bg-black"
+          : isDarkMode ? "bg-gray-900" : "bg-gray-50"
       }`}
     >
       <div className="max-w-4xl mx-auto space-y-8">
@@ -21,7 +23,9 @@ const PrivacyPolicy = () => {
             className={`
               p-2 rounded-lg transition-colors
               ${
-                isDarkMode
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                  : isDarkMode
                   ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                   : "hover:bg-white text-gray-600 hover:text-gray-900"
               }
@@ -34,7 +38,9 @@ const PrivacyPolicy = () => {
               className={`
               p-3 rounded-lg
               ${
-                isDarkMode
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                  : isDarkMode
                   ? "bg-green-500/20 text-green-400"
                   : "bg-green-100 text-green-600"
               }
@@ -44,7 +50,9 @@ const PrivacyPolicy = () => {
             </div>
             <h1
               className={`text-4xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
               개인정보 처리방침
@@ -57,7 +65,9 @@ const PrivacyPolicy = () => {
           className={`
           p-8 rounded-2xl shadow-lg border
           ${
-            isDarkMode
+            theme === "high-contrast"
+              ? "bg-black border-2 border-yellow-400"
+              : isDarkMode
               ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-200"
           }
@@ -68,14 +78,20 @@ const PrivacyPolicy = () => {
             <div
               className={`
               p-4 rounded-lg border-l-4 border-blue-500
-              ${isDarkMode ? "bg-blue-900/20" : "bg-blue-50"}
+              ${
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400"
+                  : isDarkMode ? "bg-blue-900/20" : "bg-blue-50"
+              }
             `}
             >
               <div className="flex items-center gap-2 mb-2">
                 <FileText size={18} className="text-blue-500" />
                 <span
                   className={`font-semibold ${
-                    isDarkMode ? "text-blue-300" : "text-blue-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-blue-300" : "text-blue-700"
                   }`}
                 >
                   최종 업데이트: 2025년 8월 16일
@@ -83,7 +99,9 @@ const PrivacyPolicy = () => {
               </div>
               <p
                 className={`text-sm ${
-                  isDarkMode ? "text-blue-200" : "text-blue-600"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-blue-200" : "text-blue-600"
                 }`}
               >
                 수담(수어 번역 서비스)은 사용자의 개인정보 보호를 최우선으로
@@ -95,7 +113,9 @@ const PrivacyPolicy = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 1. 수집하는 개인정보 항목
@@ -104,14 +124,18 @@ const PrivacyPolicy = () => {
                 <div>
                   <h3
                     className={`text-lg font-semibold mb-2 ${
-                      isDarkMode ? "text-gray-200" : "text-gray-800"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode ? "text-gray-200" : "text-gray-800"
                     }`}
                   >
                     필수 수집 정보
                   </h3>
                   <ul
                     className={`space-y-2 ml-4 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
                     <li>• 이메일 주소 (계정 생성 및 로그인)</li>
@@ -122,14 +146,18 @@ const PrivacyPolicy = () => {
                 <div>
                   <h3
                     className={`text-lg font-semibold mb-2 ${
-                      isDarkMode ? "text-gray-200" : "text-gray-800"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode ? "text-gray-200" : "text-gray-800"
                     }`}
                   >
                     선택 수집 정보
                   </h3>
                   <ul
                     className={`space-y-2 ml-4 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-700"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode ? "text-gray-300" : "text-gray-700"
                     }`}
                   >
                     <li>• 학습 진행 상황 (맞춤형 서비스 제공)</li>
@@ -143,14 +171,18 @@ const PrivacyPolicy = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 2. 개인정보 이용 목적
               </h2>
               <ul
                 className={`space-y-2 ml-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <li>• 회원가입 및 로그인 서비스 제공</li>
@@ -166,14 +198,18 @@ const PrivacyPolicy = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 3. 개인정보 보유 및 이용기간
               </h2>
               <p
                 className={`mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 원칙적으로 개인정보 수집 및 이용목적이 달성된 후에는 해당 정보를
@@ -181,7 +217,9 @@ const PrivacyPolicy = () => {
               </p>
               <ul
                 className={`space-y-2 ml-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <li>• 회원 탈퇴 시: 즉시 삭제</li>
@@ -194,20 +232,28 @@ const PrivacyPolicy = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 4. 개인정보의 제3자 제공
               </h2>
               <p
-                className={`${isDarkMode ? "text-gray-300" : "text-gray-700"}`}
+                className={`${
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
               >
                 회사는 이용자의 개인정보를 원칙적으로 외부에 제공하지 않습니다.
                 다만, 다음과 같은 경우에는 예외로 합니다.
               </p>
               <ul
                 className={`space-y-2 ml-4 mt-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <li>• 이용자가 사전에 동의한 경우</li>
@@ -222,14 +268,18 @@ const PrivacyPolicy = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 5. 이용자의 권리
               </h2>
               <p
                 className={`mb-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 이용자는 언제든지 다음과 같은 개인정보 관련 권리를 행사할 수
@@ -237,7 +287,9 @@ const PrivacyPolicy = () => {
               </p>
               <ul
                 className={`space-y-2 ml-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <li>• 개인정보 열람 요구</li>
@@ -251,7 +303,9 @@ const PrivacyPolicy = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 6. 개인정보 보호책임자 및 문의
@@ -259,12 +313,18 @@ const PrivacyPolicy = () => {
               <div
                 className={`
                 p-4 rounded-lg
-                ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}
+                ${
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400"
+                    : isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                }
               `}
               >
                 <div
                   className={`space-y-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   <p>

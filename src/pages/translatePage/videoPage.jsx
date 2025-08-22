@@ -21,7 +21,7 @@ const VideoPage = () => {
  const [isCameraReady, setIsCameraReady] = useState(false);
  const [cameraError, setCameraError] = useState("");
  const [stream, setStream] = useState(null);
- const { theme, isDarkMode } = useTheme();
+ const { theme, isDarkMode, toggleTheme } = useTheme();
  const [isFullscreen, setIsFullscreen] = useState(false);
  const [showSettings, setShowSettings] = useState(false);
  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
@@ -571,7 +571,7 @@ useEffect(() => {
                      다크 모드
                    </label>
                    <button
-                     onClick={() => setIsDarkMode(!isDarkMode)}
+                     onClick={toggleTheme}
                      className={`
                        w-full rounded-lg px-3 py-2 text-sm border transition-colors
                        ${
@@ -629,7 +629,9 @@ useEffect(() => {
              {translationText ? (
                <p
                  className={`text-lg font-medium ${
-                   isDarkMode ? "text-white" : "text-gray-800"
+                   theme === "high-contrast"
+                     ? "text-yellow-400"
+                     : isDarkMode ? "text-white" : "text-gray-800"
                  }`}
                >
                  {translationText}
@@ -637,7 +639,9 @@ useEffect(() => {
              ) : (
                <p
                  className={`text-gray-400 italic ${
-                   isDarkMode ? "text-gray-400" : "text-gray-500"
+                   theme === "high-contrast"
+                     ? "text-yellow-400"
+                     : isDarkMode ? "text-gray-400" : "text-gray-500"
                  }`}
                >
                  수어를 인식하면 여기에 번역 결과가 표시됩니다.
@@ -659,7 +663,9 @@ useEffect(() => {
          >
            <h3
              className={`text-lg font-semibold mb-4 ${
-               isDarkMode ? "text-white" : "text-gray-800"
+               theme === "high-contrast"
+                 ? "text-yellow-400"
+                 : isDarkMode ? "text-white" : "text-gray-800"
              }`}
            >
              번역 히스토리
@@ -668,7 +674,9 @@ useEffect(() => {
              {translationHistory.length === 0 ? (
                <p
                  className={`text-sm italic ${
-                   isDarkMode ? "text-gray-400" : "text-gray-500"
+                   theme === "high-contrast"
+                     ? "text-yellow-400"
+                     : isDarkMode ? "text-gray-400" : "text-gray-500"
                  }`}
                >
                  아직 번역 기록이 없습니다.
@@ -688,14 +696,18 @@ useEffect(() => {
                  >
                    <p
                      className={`font-medium ${
-                       isDarkMode ? "text-white" : "text-gray-800"
+                       theme === "high-contrast"
+                         ? "text-yellow-400"
+                         : isDarkMode ? "text-white" : "text-gray-800"
                      }`}
                    >
                      {item.text}
                    </p>
                    <div
                      className={`flex justify-between items-center mt-1 text-xs ${
-                       isDarkMode ? "text-gray-400" : "text-gray-500"
+                       theme === "high-contrast"
+                         ? "text-yellow-400"
+                         : isDarkMode ? "text-gray-400" : "text-gray-500"
                      }`}
                    >
                      <span>{item.timestamp.toLocaleTimeString()}</span>

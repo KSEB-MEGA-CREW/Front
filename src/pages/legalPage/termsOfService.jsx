@@ -4,13 +4,15 @@ import { ArrowLeft, FileText, AlertTriangle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const TermsOfService = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   return (
     <div
       className={`min-h-screen p-6 ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        theme === "high-contrast"
+          ? "bg-black"
+          : isDarkMode ? "bg-gray-900" : "bg-gray-50"
       }`}
     >
       <div className="max-w-4xl mx-auto space-y-8">
@@ -21,7 +23,9 @@ const TermsOfService = () => {
             className={`
               p-2 rounded-lg transition-colors
               ${
-                isDarkMode
+                theme === "high-contrast"
+                  ? "hover:bg-yellow-400 hover:text-black text-yellow-400 border-2 border-yellow-400"
+                  : isDarkMode
                   ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                   : "hover:bg-white text-gray-600 hover:text-gray-900"
               }
@@ -34,7 +38,9 @@ const TermsOfService = () => {
               className={`
               p-3 rounded-lg
               ${
-                isDarkMode
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                  : isDarkMode
                   ? "bg-blue-500/20 text-blue-400"
                   : "bg-blue-100 text-blue-600"
               }
@@ -44,7 +50,9 @@ const TermsOfService = () => {
             </div>
             <h1
               className={`text-4xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
               이용약관
@@ -57,7 +65,9 @@ const TermsOfService = () => {
           className={`
           p-8 rounded-2xl shadow-lg border
           ${
-            isDarkMode
+            theme === "high-contrast"
+              ? "bg-black border-2 border-yellow-400"
+              : isDarkMode
               ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-200"
           }
@@ -68,14 +78,20 @@ const TermsOfService = () => {
             <div
               className={`
               p-4 rounded-lg border-l-4 border-blue-500
-              ${isDarkMode ? "bg-blue-900/20" : "bg-blue-50"}
+              ${
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400"
+                  : isDarkMode ? "bg-blue-900/20" : "bg-blue-50"
+              }
             `}
             >
               <div className="flex items-center gap-2 mb-2">
                 <FileText size={18} className="text-blue-500" />
                 <span
                   className={`font-semibold ${
-                    isDarkMode ? "text-blue-300" : "text-blue-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-blue-300" : "text-blue-700"
                   }`}
                 >
                   최종 업데이트: 2025년 8월 16일
@@ -83,7 +99,9 @@ const TermsOfService = () => {
               </div>
               <p
                 className={`text-sm ${
-                  isDarkMode ? "text-blue-200" : "text-blue-600"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-blue-200" : "text-blue-600"
                 }`}
               >
                 수담 서비스 이용약관에 오신 것을 환영합니다.
@@ -94,13 +112,19 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제1조 (목적)
               </h2>
               <p
-                className={`${isDarkMode ? "text-gray-300" : "text-gray-700"}`}
+                className={`${
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
+                }`}
               >
                 이 약관은 수담(이하 "회사")이 제공하는 수어 번역 및 학습
                 서비스(이하 "서비스")의 이용과 관련하여 회사와 이용자 간의 권리,
@@ -112,14 +136,18 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제2조 (정의)
               </h2>
               <ul
                 className={`space-y-3 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <li>
@@ -143,14 +171,18 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제3조 (약관의 효력 및 변경)
               </h2>
               <div
                 className={`space-y-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <p>
@@ -172,14 +204,18 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제4조 (서비스의 제공)
               </h2>
               <div
                 className={`space-y-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <p>회사가 제공하는 서비스는 다음과 같습니다:</p>
@@ -198,14 +234,18 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제5조 (회원가입)
               </h2>
               <div
                 className={`space-y-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <p>
@@ -236,7 +276,9 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제6조 (이용자의 의무)
@@ -244,14 +286,20 @@ const TermsOfService = () => {
               <div
                 className={`
                 p-4 rounded-lg border-l-4 border-yellow-500 mb-4
-                ${isDarkMode ? "bg-yellow-900/20" : "bg-yellow-50"}
+                ${
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400"
+                    : isDarkMode ? "bg-yellow-900/20" : "bg-yellow-50"
+                }
               `}
               >
                 <div className="flex items-center gap-2 mb-2">
                   <AlertTriangle size={18} className="text-yellow-500" />
                   <span
                     className={`font-semibold ${
-                      isDarkMode ? "text-yellow-300" : "text-yellow-700"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode ? "text-yellow-300" : "text-yellow-700"
                     }`}
                   >
                     중요한 이용자 의무사항
@@ -260,7 +308,9 @@ const TermsOfService = () => {
               </div>
               <ul
                 className={`space-y-3 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <li>
@@ -288,14 +338,18 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제7조 (서비스 이용 제한)
               </h2>
               <div
                 className={`space-y-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <p>
@@ -322,14 +376,18 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제8조 (면책조항)
               </h2>
               <div
                 className={`space-y-4 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 <p>
@@ -353,7 +411,9 @@ const TermsOfService = () => {
             <section>
               <h2
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 제9조 (문의사항)
@@ -361,12 +421,18 @@ const TermsOfService = () => {
               <div
                 className={`
                 p-4 rounded-lg
-                ${isDarkMode ? "bg-gray-700" : "bg-gray-100"}
+                ${
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400"
+                    : isDarkMode ? "bg-gray-700" : "bg-gray-100"
+                }
               `}
               >
                 <div
                   className={`space-y-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   <p>
