@@ -18,7 +18,7 @@ import { useTheme } from "../../Context/themeContext";
 import { useNavigate } from "react-router-dom";
 
 function MainPage() {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [translationDemo, setTranslationDemo] = useState(false);
   const [todayUsers] = useState(2847 + Math.floor(Math.random() * 153));
@@ -94,7 +94,11 @@ function MainPage() {
   ];
 
   return (
-    <div className={`min-h-screen ${isDarkMode ? "bg-gray-900" : "bg-white"}`}>
+    <div className={`min-h-screen ${
+      theme === 'high-contrast'
+        ? "bg-black"
+        : (isDarkMode ? "bg-gray-900" : "bg-white")
+    }`}>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Background Pattern */}
@@ -113,9 +117,11 @@ function MainPage() {
             {/* Badge */}
             <div
               className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold mb-8 border-2 ${
-                isDarkMode
-                  ? "border-gray-500 text-white"
-                  : "border-1 border-gray-500 text-gray-800"
+                theme === 'high-contrast'
+                  ? "border-2 border-yellow-400 text-yellow-400"
+                  : (isDarkMode
+                    ? "border-gray-500 text-white"
+                    : "border-1 border-gray-500 text-gray-800")
               }`}
             >
               AI 기반 수어 번역 서비스
@@ -124,7 +130,9 @@ function MainPage() {
             {/* Main Heading */}
             <h1
               className={`text-5xl md:text-7xl font-bold mb-6 leading-tight ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-900")
               }`}
             >
               <span className="block">수어와 문장을</span>
@@ -134,7 +142,9 @@ function MainPage() {
             {/* Subtitle */}
             <p
               className={`text-xl md:text-2xl mb-12 max-w-3xl mx-auto leading-relaxed ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-gray-300" : "text-gray-600")
               }`}
             >
               수어와 문장을 즉시 번역하여
@@ -167,14 +177,18 @@ function MainPage() {
             {/* Demo Section */}
             <div
               className={`max-w-4xl mx-auto p-8 rounded-2xl border ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-700"
-                  : "bg-[#f1f3f5] border-gray-200"
+                theme === 'high-contrast'
+                  ? "bg-black border-2 border-yellow-400"
+                  : (isDarkMode
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-[#f1f3f5] border-gray-200")
               }`}
             >
               <h3
                 className={`text-lg font-semibold mb-6 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-white" : "text-gray-900")
                 }`}
               >
                 실시간 번역 예시
@@ -202,7 +216,9 @@ function MainPage() {
                   </div>
                   <div
                     className={`text-sm mt-2 font-semibold text-center ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-gray-300" : "text-gray-600")
                     }`}
                   >
                     수어
@@ -214,7 +230,11 @@ function MainPage() {
                   <ArrowRightLeft
                     className={`w-8 h-8 transition-all duration-500 ${
                       translationDemo ? "rotate-180" : "rotate-0"
-                    } ${isDarkMode ? "text-gray-400" : "text-gray-500"}`}
+                    } ${
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-gray-400" : "text-gray-500")
+                    }`}
                   />
                 </div>
 
@@ -239,7 +259,9 @@ function MainPage() {
                   </div>
                   <div
                     className={`text-sm mt-2 font-semibold text-center ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-gray-300" : "text-gray-600")
                     }`}
                   >
                     문장
@@ -250,7 +272,9 @@ function MainPage() {
               <div className="text-center">
                 <p
                   className={`text-lg font-semibold ${
-                    isDarkMode ? "text-white" : "text-gray-900"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-900")
                   }`}
                 >
                   {translationDemo
@@ -259,7 +283,9 @@ function MainPage() {
                 </p>
                 <p
                   className={`text-sm mt-2 ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-400" : "text-gray-600")
                   }`}
                 >
                   {translationDemo
@@ -274,20 +300,28 @@ function MainPage() {
 
       {/* Stats Section */}
       <section
-        className={`py-16 ${isDarkMode ? "bg-gray-800" : "bg-[#f1f3f5]"}`}
+        className={`py-16 ${
+          theme === 'high-contrast'
+            ? "bg-black"
+            : (isDarkMode ? "bg-gray-800" : "bg-[#f1f3f5]")
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2
               className={`text-3xl font-bold mb-4 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-900")
               }`}
             >
               실시간 서비스 현황
             </h2>
             <p
               className={`text-lg ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-gray-300" : "text-gray-600")
               }`}
             >
               오늘{" "}
@@ -303,28 +337,36 @@ function MainPage() {
               <div
                 key={index}
                 className={`text-center p-6 rounded-xl ${
-                  isDarkMode ? "bg-gray-900" : "bg-white"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400"
+                    : (isDarkMode ? "bg-gray-900" : "bg-white")
                 } shadow-lg`}
               >
                 <div
                   className={`inline-flex items-center justify-center w-12 h-12 rounded-lg mb-4 ${
-                    isDarkMode
-                      ? "bg-blue-500/20 text-blue-400"
-                      : "bg-blue-100 text-blue-600"
+                    theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                      : (isDarkMode
+                        ? "bg-blue-500/20 text-blue-400"
+                        : "bg-blue-100 text-blue-600")
                   }`}
                 >
                   {stat.icon}
                 </div>
                 <div
                   className={`text-2xl font-bold mb-1 ${
-                    isDarkMode ? "text-white" : "text-gray-900"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-900")
                   }`}
                 >
                   {stat.value}
                 </div>
                 <div
                   className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-400" : "text-gray-600")
                   }`}
                 >
                   {stat.label}
@@ -341,14 +383,18 @@ function MainPage() {
           <div className="text-center mb-16">
             <h2
               className={`text-4xl font-bold mb-4 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-900")
               }`}
             >
               수담의 핵심 기능
             </h2>
             <p
               className={`text-xl max-w-3xl mx-auto ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-gray-300" : "text-gray-600")
               }`}
             >
               최신 AI 기술로 구현된 혁신적인 수어 번역 서비스의 주요 기능들을
@@ -361,7 +407,9 @@ function MainPage() {
               <div
                 key={index}
                 className={`relative p-8 rounded-2xl transition-all duration-300 hover:scale-105 ${
-                  isDarkMode ? "bg-gray-800" : "bg-white"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400"
+                    : (isDarkMode ? "bg-gray-800" : "bg-white")
                 } shadow-lg hover:shadow-xl`}
               >
                 <div
@@ -371,14 +419,18 @@ function MainPage() {
                 </div>
                 <h3
                   className={`text-xl font-bold mb-4 ${
-                    isDarkMode ? "text-white" : "text-gray-900"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-900")
                   }`}
                 >
                   {feature.title}
                 </h3>
                 <p
                   className={`leading-relaxed ${
-                    isDarkMode ? "text-gray-300" : "text-gray-600"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-300" : "text-gray-600")
                   }`}
                 >
                   {feature.description}
@@ -391,20 +443,28 @@ function MainPage() {
 
       {/* Projects Section */}
       <section
-        className={`py-20 ${isDarkMode ? "bg-gray-800" : "bg-[#f1f3f5]"}`}
+        className={`py-20 ${
+          theme === 'high-contrast'
+            ? "bg-black"
+            : (isDarkMode ? "bg-gray-800" : "bg-[#f1f3f5]")
+        }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2
               className={`text-4xl font-bold mb-4 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-900")
               }`}
             >
               수담이 만드는 변화
             </h2>
             <p
               className={`text-xl max-w-3xl mx-auto ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-gray-300" : "text-gray-600")
               }`}
             >
               AI 기술로 연결되는 새로운 소통의 세상, 모든 사람이 함께하는
@@ -417,7 +477,9 @@ function MainPage() {
               <div
                 key={index}
                 className={`rounded-2xl overflow-hidden transition-all duration-300 hover:scale-105 ${
-                  isDarkMode ? "bg-gray-900" : "bg-white"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400"
+                    : (isDarkMode ? "bg-gray-900" : "bg-white")
                 } shadow-lg hover:shadow-xl`}
               >
                 <div className="aspect-video">
@@ -430,14 +492,18 @@ function MainPage() {
                 <div className="p-8">
                   <h3
                     className={`text-xl font-bold mb-4 ${
-                      isDarkMode ? "text-white" : "text-gray-900"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-white" : "text-gray-900")
                     }`}
                   >
                     {project.title}
                   </h3>
                   <p
                     className={`leading-relaxed ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-gray-300" : "text-gray-600")
                     }`}
                   >
                     {project.description}
@@ -462,14 +528,18 @@ function MainPage() {
             {/* <Heart className="w-16 h-16 mx-auto mb-6 text-[#ff4444]" /> */}
             <h2
               className={`text-3xl md:text-4xl font-bold mb-6 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-900")
               }`}
             >
               함께 만들어가는 소통의 세상
             </h2>
             <p
               className={`text-xl mb-8 ${
-                isDarkMode ? "text-gray-300" : "text-gray-600"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-gray-300" : "text-gray-600")
               }`}
             >
               수담과 함께 모든 사람이 자유롭게 소통할 수 있는
@@ -492,9 +562,11 @@ function MainPage() {
       {/* Footer */}
       <footer
         className={`py-12 ${
-          isDarkMode
-            ? "bg-gray-900 border-t border-gray-800"
-            : "bg-[#f1f3f5] border-t border-gray-200"
+          theme === 'high-contrast'
+            ? "bg-black border-t-2 border-yellow-400"
+            : (isDarkMode
+              ? "bg-gray-900 border-t border-gray-800"
+              : "bg-[#f1f3f5] border-t border-gray-200")
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -502,14 +574,18 @@ function MainPage() {
             <div className="mb-4 md:mb-0">
               <h3
                 className={`text-2xl font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-white" : "text-gray-900")
                 }`}
               >
                 수담
               </h3>
               <p
                 className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-gray-400" : "text-gray-600")
                 }`}
               >
                 AI로 연결되는 수어 번역 서비스
@@ -520,7 +596,9 @@ function MainPage() {
               <button
                 onClick={() => navigate("/about")}
                 className={`hover:text-blue-500 transition-colors ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : (isDarkMode ? "text-gray-400" : "text-gray-600")
                 }`}
               >
                 서비스 소개
@@ -529,7 +607,9 @@ function MainPage() {
               <a
                 href="mailto:dissolve1882@naver.com"
                 className={`hover:text-blue-500 transition-colors ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : (isDarkMode ? "text-gray-400" : "text-gray-600")
                 }`}
               >
                 문의하기
@@ -537,7 +617,9 @@ function MainPage() {
               <button
                 onClick={() => navigate("/privacy")}
                 className={`hover:text-blue-500 transition-colors ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : (isDarkMode ? "text-gray-400" : "text-gray-600")
                 }`}
               >
                 개인정보처리방침
@@ -547,9 +629,11 @@ function MainPage() {
 
           <div
             className={`mt-8 pt-8 border-t text-center text-sm ${
-              isDarkMode
-                ? "border-gray-800 text-gray-400"
-                : "border-gray-200 text-gray-600"
+              theme === 'high-contrast'
+                ? "border-yellow-400 text-yellow-400"
+                : (isDarkMode
+                  ? "border-gray-800 text-gray-400"
+                  : "border-gray-200 text-gray-600")
             }`}
           >
             © {new Date().getFullYear()} 수담. All rights reserved.

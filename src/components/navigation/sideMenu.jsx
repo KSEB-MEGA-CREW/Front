@@ -29,7 +29,7 @@ const SideMenu = ({
   onShowQuiz,
 }) => {
   const { user, isAdmin } = useAuth();
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const location = useLocation();
 
   const menuItems = [
@@ -91,15 +91,17 @@ const SideMenu = ({
         fixed left-0 top-0 h-full z-50 transition-all duration-300 ease-in-out
         ${isOpen ? "w-64" : "w-16"}
         ${
-          isDarkMode
-            ? "bg-gray-900 border-r border-gray-800"
-            : "bg-[#e9ecef] border-r border-gray-200"
+          theme === 'high-contrast'
+            ? "bg-black border-r-4 border-yellow-400"
+            : (isDarkMode
+              ? "bg-gray-900 border-r border-gray-800"
+              : "bg-[#e9ecef] border-r border-gray-200")
         }
         ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
       `}
       >
         {/* 헤더 영역 */}
-        <div className="relative flex items-center p-4 h-[65px] border-b border-gray-400 dark:border-gray-700">
+        <div className={`relative flex items-center p-4 h-[65px] border-b ${theme === 'high-contrast' ? "border-yellow-400 border-b-4" : "border-gray-400 dark:border-gray-700"}`}>
           <div
             className={`flex items-center gap-3 transition-opacity duration-300 ${
               isOpen ? "opacity-100" : "opacity-0"
@@ -116,7 +118,9 @@ const SideMenu = ({
             </div>
             <span
               className={`font-bold text-lg whitespace-nowrap ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === 'high-contrast' 
+                  ? "text-yellow-400" 
+                  : (isDarkMode ? "text-white" : "text-gray-900")
               }`}
             >
               수담
@@ -125,9 +129,11 @@ const SideMenu = ({
           <button
             onClick={() => setIsOpen(!isOpen)}
             className={`absolute top-3.5 right-3 p-2 rounded-lg transition-colors ${
-              isDarkMode
-                ? "hover:bg-gray-800 text-gray-300"
-                : "hover:bg-gray-300 text-gray-600"
+              theme === 'high-contrast'
+                ? "hover:bg-yellow-400 hover:text-black text-yellow-400 border-2 border-yellow-400"
+                : (isDarkMode
+                  ? "hover:bg-gray-800 text-gray-300"
+                  : "hover:bg-gray-300 text-gray-600")
             }`}
           >
             {isOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
@@ -151,9 +157,11 @@ const SideMenu = ({
                   className={`
                     w-full flex items-center gap-3 p-3 rounded-lg transition-colors overflow-hidden font-semibold
                     ${
-                      isDarkMode
-                        ? "text-gray-100 hover:bg-gray-800 hover:text-white"
-                        : "text-gray-800 hover:bg-gray-300 hover:text-gray-900"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                        : (isDarkMode
+                          ? "text-gray-100 hover:bg-gray-800 hover:text-white"
+                          : "text-gray-800 hover:bg-gray-300 hover:text-gray-900")
                     }
                   `}
                 >
@@ -174,13 +182,18 @@ const SideMenu = ({
               <>
                 <div
                   className={`border-t my-4 ${
-                    isDarkMode ? "border-gray-700" : "border-gray-400"
+                    theme === 'high-contrast' 
+                      ? "border-yellow-400 border-2" 
+                      : (isDarkMode ? "border-gray-700" : "border-gray-400")
                   }`}
                 />
                 <div
                   className={`px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-opacity duration-300 ${
                     isOpen ? "opacity-100" : "opacity-0"
-                  } ${isDarkMode ? "text-yellow-400" : "text-yellow-600"}`}
+                  } ${theme === 'high-contrast' 
+                      ? "text-yellow-400" 
+                      : (isDarkMode ? "text-yellow-400" : "text-yellow-600")
+                    }`}
                 >
                   👑 관리자 메뉴
                 </div>
@@ -193,13 +206,15 @@ const SideMenu = ({
                       className={`
                         w-full flex items-center gap-3 p-3 rounded-lg transition-colors overflow-hidden font-semibold
                         ${
-                          isActive
-                            ? isDarkMode
-                              ? "bg-blue-800 text-white"
-                              : "bg-blue-100 text-blue-700"
-                            : isDarkMode
-                            ? "text-gray-100 hover:bg-gray-800 hover:text-white"
-                            : "text-gray-800 hover:bg-gray-300 hover:text-gray-900"
+                          theme === 'high-contrast'
+                            ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                            : (isActive
+                              ? (isDarkMode
+                                ? "bg-blue-800 text-white"
+                                : "bg-blue-100 text-blue-700")
+                              : (isDarkMode
+                                ? "text-gray-100 hover:bg-gray-800 hover:text-white"
+                                : "text-gray-800 hover:bg-gray-300 hover:text-gray-900"))
                         }
                       `}
                     >
@@ -220,16 +235,18 @@ const SideMenu = ({
         </div>
 
         {/* 하단 사용자 영역 */}
-        <div className="border-t border-gray-400 dark:border-gray-700 p-3 space-y-2">
+        <div className={`border-t p-3 space-y-2 ${theme === 'high-contrast' ? "border-yellow-400 border-t-4" : "border-gray-400 dark:border-gray-700"}`}>
           {/* 계정 버튼 */}
           <button
             onClick={onShowMyPage}
             className={`
               w-full flex items-center gap-3 p-3 rounded-lg transition-colors overflow-hidden
               ${
-                isDarkMode
-                  ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                  : (isDarkMode
+                    ? "hover:bg-gray-800 text-gray-300 hover:text-white"
+                    : "hover:bg-gray-300 text-gray-700 hover:text-gray-900")
               }
             `}
           >
@@ -251,9 +268,11 @@ const SideMenu = ({
                     className={`
                       inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border
                       ${
-                        isDarkMode
-                          ? " text-yellow-300 border-yellow-700"
-                          : " text-yellow-600 border-yellow-600"
+                        theme === 'high-contrast'
+                          ? "text-black bg-yellow-400 border-yellow-400"
+                          : (isDarkMode
+                            ? "text-yellow-300 border-yellow-700"
+                            : "text-yellow-600 border-yellow-600")
                       }
                     `}
                   >
@@ -271,9 +290,11 @@ const SideMenu = ({
             className={`
               w-full flex items-center gap-3 p-3 rounded-lg transition-colors overflow-hidden
               ${
-                isDarkMode
-                  ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                  : (isDarkMode
+                    ? "hover:bg-gray-800 text-gray-300 hover:text-white"
+                    : "hover:bg-gray-300 text-gray-700 hover:text-gray-900")
               }
             `}
           >
@@ -296,9 +317,11 @@ const SideMenu = ({
             className={`
               w-full flex items-center gap-3 p-3 rounded-lg transition-colors overflow-hidden
               ${
-                isDarkMode
-                  ? "hover:bg-gray-800 text-gray-300 hover:text-white"
-                  : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                  : (isDarkMode
+                    ? "hover:bg-gray-800 text-gray-300 hover:text-white"
+                    : "hover:bg-gray-300 text-gray-700 hover:text-gray-900")
               }
             `}
           >
@@ -321,9 +344,11 @@ const SideMenu = ({
             className={`
               w-full flex items-center gap-3 p-3 rounded-lg transition-colors overflow-hidden
               ${
-                isDarkMode
-                  ? "hover:bg-red-900/50 text-red-400 hover:text-red-300"
-                  : "hover:bg-red-50 text-red-600 hover:text-red-700"
+                theme === 'high-contrast'
+                  ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                  : (isDarkMode
+                    ? "hover:bg-red-900/50 text-red-400 hover:text-red-300"
+                    : "hover:bg-red-50 text-red-600 hover:text-red-700")
               }
             `}
           >

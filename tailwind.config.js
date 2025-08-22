@@ -50,6 +50,21 @@ export default {
           800: '#e2e8f0',
           900: '#f1f5f9',
           950: '#f8fafc'
+        },
+        // 고대비 모드 색상 (WCAG 2.0 AAA 레벨 7:1 대비율)
+        // W3C 이미지 기반: 검은색 배경 + 밝은 노란색 텍스트
+        'high-contrast': {
+          50: '#ffff00',  // 밝은 노란색 (텍스트용)
+          100: '#ffff00', // 밝은 노란색
+          200: '#ffff00', // 밝은 노란색
+          300: '#ffff00', // 밝은 노란색
+          400: '#ffff00', // 밝은 노란색
+          500: '#ffff00', // 기본 노란색 (텍스트)
+          600: '#0000ff', // 진한 파란색 (링크/액센트)
+          700: '#000000', // 검은색
+          800: '#000000', // 검은색
+          900: '#000000', // 검은색 (배경)
+          950: '#000000'  // 검은색
         }
       },
       // 그라데이션 색상
@@ -125,6 +140,50 @@ export default {
           backdropFilter: 'blur(16px)', 
           backgroundColor: 'rgba(0, 0, 0, 0.3)',
           border: '1px solid rgba(255, 255, 255, 0.1)'
+        },
+        // 고대비 모드 전용 유틸리티 (검은색/노란색)
+        '.high-contrast': {
+          filter: 'none !important',
+          backdropFilter: 'none !important',
+          boxShadow: 'none !important',
+          background: '#000000 !important',
+          color: '#ffff00 !important',
+          border: '3px solid #ffff00 !important'
+        },
+        '.hc-text': {
+          color: '#ffff00 !important',
+          textShadow: 'none !important'
+        },
+        '.hc-bg': {
+          backgroundColor: '#000000 !important',
+          backgroundImage: 'none !important'
+        },
+        '.hc-bg-alt': {
+          backgroundColor: '#000000 !important',
+          backgroundImage: 'none !important'
+        },
+        '.hc-border': {
+          border: '3px solid #ffff00 !important',
+          borderRadius: '0 !important'
+        },
+        '.hc-button': {
+          backgroundColor: '#000000 !important',
+          color: '#ffff00 !important',
+          border: '3px solid #ffff00 !important',
+          borderRadius: '4px !important',
+          boxShadow: 'none !important',
+          fontWeight: 'bold !important'
+        },
+        '.hc-button:hover': {
+          backgroundColor: '#ffff00 !important',
+          color: '#000000 !important',
+          border: '3px solid #000000 !important'
+        },
+        '.hc-input': {
+          backgroundColor: '#000000 !important',
+          color: '#ffff00 !important',
+          border: '3px solid #ffff00 !important',
+          borderRadius: '4px !important'
         },
         // 사이드바 애니메이션
         '.sidebar-enter': {

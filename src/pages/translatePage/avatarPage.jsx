@@ -74,7 +74,7 @@ const useTextToSignAPI = () => {
 //=========== Mock 코드 종료 ===========//
 
 const AvatarPage = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const [inputText, setInputText] = useState("");
   const [translationHistory, setTranslationHistory] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
@@ -226,25 +226,31 @@ const AvatarPage = () => {
   return (
     <div
       className={`min-h-screen relative overflow-hidden ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        theme === 'high-contrast'
+          ? "bg-black"
+          : (isDarkMode ? "bg-gray-900" : "bg-gray-50")
       }`}
     >
       <div className="relative w-full h-screen flex flex-col xl:flex-row">
         <div className="flex-1 relative p-4">
           <div
             className={`w-full h-full rounded-3xl overflow-hidden relative border ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+              theme === 'high-contrast'
+                ? "bg-black border-2 border-yellow-400"
+                : (isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200")
             }`}
           >
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
               <div className="flex items-center gap-3">
                 <div
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
-                    isDarkMode
-                      ? "bg-gray-700 text-gray-200"
-                      : "bg-gray-100 text-gray-700"
+                    theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                      : (isDarkMode
+                        ? "bg-gray-700 text-gray-200"
+                        : "bg-gray-100 text-gray-700")
                   } ${getStatusColor()}`}
                 >
                   {isUnityLoading || isConversionLoading ? (
@@ -262,9 +268,11 @@ const AvatarPage = () => {
                 {isPlaying && currentTranslation && (
                   <div
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
-                      isDarkMode
-                        ? "bg-gray-700 text-[#ff4444]"
-                        : "bg-gray-100 text-[#ff4444]"
+                      theme === 'high-contrast'
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                        : (isDarkMode
+                          ? "bg-gray-700 text-[#ff4444]"
+                          : "bg-gray-100 text-[#ff4444]")
                     }`}
                   >
                     <div className="w-2 h-2 bg-[#ff4444] rounded-full animate-pulse font-medium" />
@@ -277,9 +285,11 @@ const AvatarPage = () => {
                 {currentTranslation && (
                   <div
                     className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
-                      isDarkMode
-                        ? "bg-gray-700 text-gray-300"
-                        : "bg-gray-100 text-gray-700"
+                      theme === 'high-contrast'
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                        : (isDarkMode
+                          ? "bg-gray-700 text-gray-300"
+                          : "bg-gray-100 text-gray-700")
                     }`}
                   >
                     신뢰도: {Math.round(currentTranslation.confidence * 100)}%
@@ -289,9 +299,11 @@ const AvatarPage = () => {
                 <button
                   onClick={() => setShowSettings(!showSettings)}
                   className={`p-2 rounded-xl transition-all duration-200 ${
-                    isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                    theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : (isDarkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900")
                   }`}
                 >
                   <Settings size={18} />
@@ -307,14 +319,18 @@ const AvatarPage = () => {
                   </div>
                   <h3
                     className={`text-xl font-bold mb-3 ${
-                      isDarkMode ? "text-white" : "text-gray-800"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-white" : "text-gray-800")
                     }`}
                   >
                     {unityError ? "Unity 로딩 오류" : "AI 서버 오류"}
                   </h3>
                   <p
                     className={`mb-6 ${
-                      isDarkMode ? "text-gray-300" : "text-gray-600"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-gray-300" : "text-gray-600")
                     }`}
                   >
                     {String(unityError || conversionError)}
@@ -347,9 +363,11 @@ const AvatarPage = () => {
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
                     <div
                       className={`text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 ${
-                        isDarkMode
-                          ? "bg-gray-800 border-gray-700 text-gray-200"
-                          : "bg-white border-gray-200 text-gray-800"
+                        theme === 'high-contrast'
+                          ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                          : (isDarkMode
+                            ? "bg-gray-800 border-gray-700 text-gray-200"
+                            : "bg-white border-gray-200 text-gray-800")
                       }`}
                     >
                       <Loader
@@ -368,14 +386,18 @@ const AvatarPage = () => {
             {showSettings && (
               <div
                 className={`absolute top-16 right-4 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px] border ${
-                  isDarkMode
-                    ? "bg-gray-800 border-gray-700"
-                    : "bg-white border-gray-200"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400"
+                    : (isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200")
                 }`}
               >
                 <h4
                   className={`text-lg font-semibold mb-4 ${
-                    isDarkMode ? "text-white" : "text-gray-800"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-800")
                   }`}
                 >
                   아바타 설정
@@ -384,7 +406,9 @@ const AvatarPage = () => {
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-sm font-semibold ${
-                        isDarkMode ? "text-gray-300" : "text-gray-700"
+                        theme === 'high-contrast'
+                          ? "text-yellow-400"
+                          : (isDarkMode ? "text-gray-300" : "text-gray-700")
                       }`}
                     >
                       음성 출력
@@ -392,13 +416,15 @@ const AvatarPage = () => {
                     <button
                       onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
                       className={`p-2 rounded-lg transition-all duration-200 ${
-                        isSpeechEnabled
-                          ? isDarkMode
-                            ? "border-1 border-gray-400 hover:bg-gray-500 text-white"
-                            : "border-1 border-gray-400 hover:bg-gray-500 text-gray-800"
-                          : isDarkMode
-                          ? "border-1 border-gray-400 hover:bg-gray-500 text-gray-300"
-                          : "border-1 border-gray-400 hover:bg-gray-500 text-gray-600"
+                        theme === 'high-contrast'
+                          ? "border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                          : (isSpeechEnabled
+                            ? isDarkMode
+                              ? "border-1 border-gray-400 hover:bg-gray-500 text-white"
+                              : "border-1 border-gray-400 hover:bg-gray-500 text-gray-800"
+                            : isDarkMode
+                            ? "border-1 border-gray-400 hover:bg-gray-500 text-gray-300"
+                            : "border-1 border-gray-400 hover:bg-gray-500 text-gray-600")
                       }`}
                     >
                       {isSpeechEnabled ? (
@@ -410,7 +436,9 @@ const AvatarPage = () => {
                   </div>
                   <div
                     className={`pt-2 border-t ${
-                      isDarkMode ? "border-gray-700" : "border-gray-200"
+                      theme === 'high-contrast'
+                        ? "border-yellow-400"
+                        : (isDarkMode ? "border-gray-700" : "border-gray-200")
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -419,9 +447,13 @@ const AvatarPage = () => {
                         disabled={!isUnityLoaded}
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
                           !isUnityLoaded
-                            ? isDarkMode
-                              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            ? theme === 'high-contrast'
+                              ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
+                              : (isDarkMode
+                                ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed")
+                            : theme === 'high-contrast'
+                            ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                             : "bg-blue-500 hover:bg-blue-600 text-white"
                         }`}
                       >
@@ -433,9 +465,13 @@ const AvatarPage = () => {
                         disabled={!isPlaying}
                         className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
                           !isPlaying
-                            ? isDarkMode
-                              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            ? theme === 'high-contrast'
+                              ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
+                              : (isDarkMode
+                                ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed")
+                            : theme === 'high-contrast'
+                            ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                             : "bg-[#ff4444] hover:bg-red-600 text-white"
                         }`}
                       >
@@ -453,19 +489,27 @@ const AvatarPage = () => {
         <div className="w-full xl:w-96 p-4 flex flex-col max-h-[50vh] xl:max-h-none">
           <div
             className={`rounded-2xl shadow-lg p-6 mb-4 border ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+              theme === 'high-contrast'
+                ? "bg-black border-2 border-yellow-400"
+                : (isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200")
             }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <MessageSquare
                 size={20}
-                className={`${isDarkMode ? "text-gray-300" : "text-gray-700"}`}
+                className={`${
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-gray-300" : "text-gray-700")
+                }`}
               />
               <h3
                 className={`text-lg font-semibold ${
-                  isDarkMode ? "text-white" : "text-gray-800"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-white" : "text-gray-800")
                 }`}
               >
                 텍스트 입력
@@ -477,9 +521,11 @@ const AvatarPage = () => {
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder="수어로 변환할 텍스트를 입력하세요..."
                 className={`w-full h-32 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 border ${
-                  isDarkMode
-                    ? "bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
-                    : "bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-500"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 placeholder-yellow-400"
+                    : (isDarkMode
+                      ? "bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
+                      : "bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-500")
                 }`}
               />
               <div className="flex items-center gap-2">
@@ -496,9 +542,13 @@ const AvatarPage = () => {
                     !isUnityLoaded ||
                     isConversionLoading ||
                     isPlaying
-                      ? isDarkMode
-                        ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      ? theme === 'high-contrast'
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
+                        : (isDarkMode
+                          ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed")
+                      : theme === 'high-contrast'
+                      ? "bg-black border-4 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                       : "bg-blue-500 hover:bg-blue-600 text-white hover:scale-[1.02]"
                   }`}
                 >
@@ -507,9 +557,11 @@ const AvatarPage = () => {
                 <button
                   onClick={clearInput}
                   className={`p-3 rounded-xl transition-all duration-200 ${
-                    isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-600"
+                    theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : (isDarkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-600")
                   }`}
                 >
                   <RotateCcw size={18} />
@@ -520,14 +572,18 @@ const AvatarPage = () => {
 
           <div
             className={`rounded-2xl shadow-lg p-6 mb-4 border ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+              theme === 'high-contrast'
+                ? "bg-black border-2 border-yellow-400"
+                : (isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200")
             }`}
           >
             <h3
               className={`text-lg font-semibold mb-4 ${
-                isDarkMode ? "text-white" : "text-gray-800"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-800")
               }`}
             >
               자주 사용하는 구문
@@ -539,10 +595,14 @@ const AvatarPage = () => {
                   onClick={() => handlePredefinedSelect(phrase)}
                   className={`p-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
                     selectedPredefined === phrase
-                      ? "bg-blue-500 text-white shadow-lg"
-                      : isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
+                      ? theme === 'high-contrast'
+                        ? "bg-yellow-400 text-black border-2 border-yellow-400"
+                        : "bg-blue-500 text-white shadow-lg"
+                      : theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : (isDarkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700")
                   }`}
                 >
                   {phrase}
@@ -553,9 +613,11 @@ const AvatarPage = () => {
 
           <div
             className={`rounded-2xl shadow-lg p-6 flex-1 border ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+              theme === 'high-contrast'
+                ? "bg-black border-2 border-yellow-400"
+                : (isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200")
             }`}
           >
             <div className="flex items-center justify-between mb-4">
@@ -563,12 +625,16 @@ const AvatarPage = () => {
                 <Clock
                   size={20}
                   className={`${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-300" : "text-gray-700")
                   }`}
                 />
                 <h3
                   className={`text-lg font-semibold ${
-                    isDarkMode ? "text-white" : "text-gray-800"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-800")
                   }`}
                 >
                   변환 기록
@@ -577,9 +643,11 @@ const AvatarPage = () => {
               <button
                 onClick={clearHistory}
                 className={`p-2 rounded-lg transition-all duration-200 ${
-                  isDarkMode
-                    ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200"
-                    : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+                  theme === 'high-contrast'
+                    ? "hover:bg-yellow-400 text-yellow-400 hover:text-black border-2 border-yellow-400"
+                    : (isDarkMode
+                      ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200"
+                      : "hover:bg-gray-100 text-gray-500 hover:text-gray-700")
                 }`}
                 title="기록 지우기"
               >
@@ -590,7 +658,9 @@ const AvatarPage = () => {
               {translationHistory.length === 0 ? (
                 <p
                   className={`text-center py-8 italic ${
-                    isDarkMode ? "text-gray-400" : "text-gray-500"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-400" : "text-gray-500")
                   }`}
                 >
                   변환 기록이 없습니다
@@ -600,21 +670,27 @@ const AvatarPage = () => {
                   <div
                     key={item.id}
                     className={`rounded-lg p-3 border ${
-                      isDarkMode
-                        ? "bg-gray-700 border-gray-600"
-                        : "bg-gray-50 border-gray-200"
+                      theme === 'high-contrast'
+                        ? "bg-black border-2 border-yellow-400"
+                        : (isDarkMode
+                          ? "bg-gray-700 border-gray-600"
+                          : "bg-gray-50 border-gray-200")
                     }`}
                   >
                     <p
                       className={`text-sm leading-relaxed mb-2 ${
-                        isDarkMode ? "text-gray-200" : "text-gray-800"
+                        theme === 'high-contrast'
+                          ? "text-yellow-400"
+                          : (isDarkMode ? "text-gray-200" : "text-gray-800")
                       }`}
                     >
                       {item.text}
                     </p>
                     <div
                       className={`flex items-center justify-between text-xs ${
-                        isDarkMode ? "text-gray-400" : "text-gray-500"
+                        theme === 'high-contrast'
+                          ? "text-yellow-400"
+                          : (isDarkMode ? "text-gray-400" : "text-gray-500")
                       }`}
                     >
                       <span>{item.timestamp.toLocaleTimeString()}</span>

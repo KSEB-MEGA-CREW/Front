@@ -20,7 +20,7 @@ import BasicLayout from "../../layouts/basicLayout";
 
 function StudyWord() {
   const { user } = useAuth();
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const [quizList, setQuizList] = useState([]);
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
@@ -121,7 +121,9 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-gray-50"
+            theme === 'high-contrast'
+              ? "bg-black"
+              : (isDarkMode ? "bg-gray-900" : "bg-gray-50")
           }`}
         >
           <div className="flex justify-center items-center min-h-screen">
@@ -129,9 +131,11 @@ function StudyWord() {
               className={`
               p-8 rounded-3xl shadow-2xl border
               ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-700"
-                  : "bg-white border-gray-200"
+                theme === 'high-contrast'
+                  ? "bg-black border-2 border-yellow-400"
+                  : (isDarkMode
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-white border-gray-200")
               }
             `}
             >
@@ -139,7 +143,9 @@ function StudyWord() {
                 <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
                 <p
                   className={`text-lg font-semibold ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-300" : "text-gray-700")
                   }`}
                 >
                   퀴즈를 준비하고 있어요...
@@ -157,7 +163,9 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen p-6 ${
-            isDarkMode ? "bg-gray-900" : "bg-gray-50"
+            theme === 'high-contrast'
+              ? "bg-black"
+              : (isDarkMode ? "bg-gray-900" : "bg-gray-50")
           }`}
         >
           <div className="flex flex-col items-center justify-center min-h-screen px-4">
@@ -165,9 +173,11 @@ function StudyWord() {
               className={`
               rounded-3xl p-12 shadow-2xl text-center max-w-md border
               ${
-                isDarkMode
-                  ? "bg-gray-800 border-gray-700"
-                  : "bg-white border-gray-200"
+                theme === 'high-contrast'
+                  ? "bg-black border-2 border-yellow-400"
+                  : (isDarkMode
+                    ? "bg-gray-800 border-gray-700"
+                    : "bg-white border-gray-200")
               }
             `}
             >
@@ -176,14 +186,18 @@ function StudyWord() {
               </div>
               <h3
                 className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-800"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-white" : "text-gray-800")
                 }`}
               >
                 오늘은 여기까지!
               </h3>
               <p
                 className={`mb-6 leading-relaxed ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-gray-300" : "text-gray-600")
                 }`}
               >
                 오늘 생성할 수 있는 퀴즈가 없습니다.
@@ -219,7 +233,9 @@ function StudyWord() {
       <BasicLayout>
         <div
           className={`min-h-screen px-4 py-8 ${
-            isDarkMode ? "bg-gray-900" : "bg-gray-50"
+            theme === 'high-contrast'
+              ? "bg-black"
+              : (isDarkMode ? "bg-gray-900" : "bg-gray-50")
           }`}
         >
           <div className="max-w-4xl mx-auto">
@@ -243,7 +259,9 @@ function StudyWord() {
 
               <h2
                 className={`text-4xl font-bold mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-800"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-white" : "text-gray-800")
                 }`}
               >
                 퀴즈 완료!
@@ -255,7 +273,9 @@ function StudyWord() {
 
               <p
                 className={`text-lg mb-6 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                  theme === 'high-contrast'
+                    ? "text-yellow-400"
+                    : (isDarkMode ? "text-gray-300" : "text-gray-600")
                 }`}
               >
                 {totalCount}문제 중 {correctCount}개 맞혔어요!
@@ -273,9 +293,11 @@ function StudyWord() {
                 <div
                   key={i}
                   className={`rounded-2xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] border ${
-                    isDarkMode
-                      ? "bg-gray-800 border-gray-700 hover:bg-blue-400"
-                      : "bg-white border-gray-200"
+                    theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : (isDarkMode
+                        ? "bg-gray-800 border-gray-700 hover:bg-blue-400"
+                        : "bg-white border-gray-200")
                   } ${
                     result.isCorrect
                       ? isDarkMode
@@ -305,7 +327,9 @@ function StudyWord() {
                       <div className="flex items-center gap-2 mb-2">
                         <span
                           className={`text-sm font-bold ${
-                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                            theme === 'high-contrast'
+                              ? "text-yellow-400"
+                              : (isDarkMode ? "text-gray-300" : "text-gray-600")
                           }`}
                         >
                           문제 {i + 1}
@@ -323,7 +347,9 @@ function StudyWord() {
 
                       <h3
                         className={`font-bold text-lg mb-2 ${
-                          isDarkMode ? "text-white" : "text-gray-800"
+                          theme === 'high-contrast'
+                            ? "text-yellow-400"
+                            : (isDarkMode ? "text-white" : "text-gray-800")
                         }`}
                       >
                         {result.quiz.signDescription}
@@ -332,13 +358,17 @@ function StudyWord() {
                       <div className="flex justify-between items-center">
                         <span
                           className={`text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-600"
+                            theme === 'high-contrast'
+                              ? "text-yellow-400"
+                              : (isDarkMode ? "text-gray-300" : "text-gray-600")
                           }`}
                         >
                           정답:{" "}
                           <span
                             className={`font-semibold ${
-                              isDarkMode ? "text-white" : "text-gray-800"
+                              theme === 'high-contrast'
+                                ? "text-yellow-400"
+                                : (isDarkMode ? "text-white" : "text-gray-800")
                             }`}
                           >
                             {result.quiz.choices.find((c) => c.answer).word ||
@@ -349,9 +379,11 @@ function StudyWord() {
                         {!result.isCorrect && (
                           <span
                             className={`text-xs px-2 py-1 rounded-full border ${
-                              isDarkMode
-                                ? "text-white border-gray-500"
-                                : "text-red-700 bg-red-50 border-red-200"
+                              theme === 'high-contrast'
+                                ? "text-yellow-400 bg-black border-yellow-400"
+                                : (isDarkMode
+                                  ? "text-white border-gray-500"
+                                  : "text-red-700 bg-red-50 border-red-200")
                             }`}
                           >
                             선택:{" "}
@@ -377,9 +409,11 @@ function StudyWord() {
               </button>
               <button
                 className={`inline-flex items-center gap-3 px-8 py-4 border-2 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl ${
-                  isDarkMode
-                    ? "border-gray-600 text-white hover:border-gray-300"
-                    : "border-gray-400 text-gray-700 hover:border-gray-600 bg-white hover:bg-gray-50"
+                  theme === 'high-contrast'
+                    ? "border-4 border-yellow-400 text-yellow-400 bg-black hover:bg-yellow-400 hover:text-black"
+                    : (isDarkMode
+                      ? "border-gray-600 text-white hover:border-gray-300"
+                      : "border-gray-400 text-gray-700 hover:border-gray-600 bg-white hover:bg-gray-50")
                 }`}
                 onClick={handleRetry}
               >
@@ -400,7 +434,9 @@ function StudyWord() {
     <BasicLayout>
       <div
         className={`min-h-screen px-4 py-8 ${
-          isDarkMode ? "bg-gray-900" : "bg-gray-50]"
+          theme === 'high-contrast'
+            ? "bg-black"
+            : (isDarkMode ? "bg-gray-900" : "bg-gray-50")
         }`}
       >
         <div className="max-w-4xl mx-auto">
@@ -416,13 +452,17 @@ function StudyWord() {
               <div className="absolute top-0 right-0 -mr-20">
                 <div
                   className={`text-xl font-bold ${
-                    isDarkMode ? "text-white" : "text-gray-800"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-800")
                   }`}
                 >
                   {current + 1}{" "}
                   <span
                     className={`${
-                      isDarkMode ? "text-gray-400" : "text-gray-400"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : "text-gray-400"
                     }`}
                   >
                     / {quizList.length}
@@ -452,7 +492,9 @@ function StudyWord() {
                   </div>
                   <p
                     className={`text-2xl leading-relaxed font-semibold ${
-                      isDarkMode ? "text-gray-200" : "text-gray-700"
+                      theme === 'high-contrast'
+                        ? "text-yellow-400"
+                        : (isDarkMode ? "text-gray-200" : "text-gray-700")
                     }`}
                   >
                     {quiz.textQuiz}
@@ -465,14 +507,20 @@ function StudyWord() {
           <div className="text-center mb-8">
             <h2
               className={`text-xl font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-800"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-800")
               }`}
             >
               {quiz.videoUrl
                 ? "위 수어 동작이 의미하는 단어는 무엇인가요?"
                 : "위 설명이 의미하는 단어는 무엇인가요?"}
             </h2>
-            <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+            <p className={`${
+              theme === 'high-contrast'
+                ? "text-yellow-400"
+                : (isDarkMode ? "text-gray-300" : "text-gray-600")
+            }`}>
               정답을 선택해주세요
             </p>
           </div>
@@ -484,9 +532,11 @@ function StudyWord() {
                 key={idx}
                 className={`group relative p-6 rounded-2xl text-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-500/50 ${
                   selected === null
-                    ? isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-lg hover:shadow-xl border border-gray-600"
-                      : "bg-white hover:bg-blue-50 text-gray-800 shadow-md hover:shadow-lg border border-gray-300"
+                    ? theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 shadow-lg hover:bg-yellow-400 hover:text-black"
+                      : (isDarkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-lg hover:shadow-xl border border-gray-600"
+                        : "bg-white hover:bg-blue-50 text-gray-800 shadow-md hover:shadow-lg border border-gray-300")
                     : ""
                 } ${
                   selected !== null && idx === selected
@@ -496,9 +546,11 @@ function StudyWord() {
                     : ""
                 } ${
                   selected !== null && idx !== selected
-                    ? isDarkMode
-                      ? "bg-gray-800 text-gray-500 opacity-60"
-                      : "bg-gray-200 text-gray-500 opacity-60"
+                    ? theme === 'high-contrast'
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-60"
+                      : (isDarkMode
+                        ? "bg-gray-800 text-gray-500 opacity-60"
+                        : "bg-gray-200 text-gray-500 opacity-60")
                     : ""
                 }`}
                 onClick={() => handleChoice(idx)}
@@ -509,9 +561,11 @@ function StudyWord() {
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                         selected === null
-                          ? isDarkMode
-                            ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]"
-                            : "bg-gray-100 text-gray-700 group-hover:bg-gray-200"
+                          ? theme === 'high-contrast'
+                            ? "bg-black border-2 border-yellow-400 text-yellow-400 group-hover:bg-yellow-400 group-hover:text-black"
+                            : (isDarkMode
+                              ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]"
+                              : "bg-gray-100 text-gray-700 group-hover:bg-gray-200")
                           : ""
                       } ${
                         selected !== null && idx === selected && choice.answer

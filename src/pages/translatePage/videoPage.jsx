@@ -21,7 +21,7 @@ const VideoPage = () => {
  const [isCameraReady, setIsCameraReady] = useState(false);
  const [cameraError, setCameraError] = useState("");
  const [stream, setStream] = useState(null);
- const [isDarkMode, setIsDarkMode] = useState(true);
+ const { theme, isDarkMode } = useTheme();
  const [isFullscreen, setIsFullscreen] = useState(false);
  const [showSettings, setShowSettings] = useState(false);
  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
@@ -321,7 +321,9 @@ useEffect(() => {
  return (
    <div
      className={`min-h-screen w-full transition-colors duration-300 ${
-       isDarkMode ? "bg-gray-900" : "bg-gray-50"
+       theme === 'high-contrast' 
+        ? "bg-black text-yellow-400" 
+        : (isDarkMode ? "bg-gray-900" : "bg-gray-50")
      }`}
    >
      {/* 메인 컨테이너 */}
@@ -332,9 +334,11 @@ useEffect(() => {
            className={`
              w-full h-full rounded-3xl shadow-2xl overflow-hidden relative border
              ${
-               isDarkMode
-                 ? "bg-gray-800 border-gray-700"
-                 : "bg-white border-gray-200"
+               theme === 'high-contrast'
+                 ? "bg-black border-yellow-400 border-4"
+                 : (isDarkMode
+                   ? "bg-gray-800 border-gray-700"
+                   : "bg-white border-gray-200")
              }
            `}
          >
@@ -345,9 +349,11 @@ useEffect(() => {
                  className={`
                    flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold border
                    ${
-                     isDarkMode
-                       ? "bg-gray-700 text-gray-200"
-                       : "bg-gray-100 text-gray-700"
+                     theme === 'high-contrast'
+                       ? "bg-black text-yellow-400 border-2 border-yellow-400"
+                       : (isDarkMode
+                         ? "bg-gray-700 text-gray-200"
+                         : "bg-gray-100 text-gray-700")
                    } ${getConnectionStatusColor()}
                  `}
                >
@@ -360,9 +366,11 @@ useEffect(() => {
                    className={`
                      flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
                      ${
-                       isDarkMode
-                         ? "bg-red-500/20 text-red-300"
-                         : "bg-red-100 text-red-700"
+                       theme === 'high-contrast'
+                         ? "bg-black text-yellow-400 border-2 border-yellow-400"
+                         : (isDarkMode
+                           ? "bg-red-500/20 text-red-300"
+                           : "bg-red-100 text-red-700")
                      }
                    `}
                  >
@@ -376,9 +384,11 @@ useEffect(() => {
                    className={`
                      px-3 py-1.5 rounded-full text-sm font-semibold
                      ${
-                       isDarkMode
-                         ? "bg-blue-500/20 text-blue-300"
-                         : "bg-blue-100 text-blue-700"
+                       theme === 'high-contrast'
+                         ? "bg-black text-yellow-400 border-2 border-yellow-400"
+                         : (isDarkMode
+                           ? "bg-blue-500/20 text-blue-300"
+                           : "bg-blue-100 text-blue-700")
                      }
                    `}
                  >
@@ -393,9 +403,11 @@ useEffect(() => {
                    className={`
                      px-3 py-1.5 rounded-full text-sm font-semibold
                      ${
-                       isDarkMode
-                         ? "bg-gray-700 text-gray-300"
-                         : "bg-gray-100 text-gray-700"
+                       theme === 'high-contrast'
+                         ? "bg-black text-yellow-400 border-2 border-yellow-400"
+                         : (isDarkMode
+                           ? "bg-gray-700 text-gray-300"
+                           : "bg-gray-100 text-gray-700")
                      }
                    `}
                  >
@@ -408,9 +420,11 @@ useEffect(() => {
                  className={`
                    p-2 rounded-xl transition-all duration-200
                    ${
-                     isDarkMode
-                       ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
-                       : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                     theme === 'high-contrast'
+                       ? "bg-black text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                       : (isDarkMode
+                         ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
+                         : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900")
                    }
                  `}
                >
@@ -422,9 +436,11 @@ useEffect(() => {
                  className={`
                    p-2 rounded-xl transition-all duration-200
                    ${
-                     isDarkMode
-                       ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
-                       : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                     theme === 'high-contrast'
+                       ? "bg-black text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                       : (isDarkMode
+                         ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
+                         : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900")
                    }
                  `}
                >
@@ -442,14 +458,18 @@ useEffect(() => {
                  </div>
                  <h3
                    className={`text-xl font-bold mb-3 ${
-                     isDarkMode ? "text-white" : "text-gray-800"
+                     theme === 'high-contrast'
+                       ? "text-yellow-400"
+                       : (isDarkMode ? "text-white" : "text-gray-800")
                    }`}
                  >
                    카메라 오류
                  </h3>
                  <p
                    className={`mb-6 ${
-                     isDarkMode ? "text-gray-300" : "text-gray-600"
+                     theme === 'high-contrast'
+                       ? "text-yellow-400"
+                       : (isDarkMode ? "text-gray-300" : "text-gray-600")
                    }`}
                  >
                    {cameraError}
@@ -488,15 +508,19 @@ useEffect(() => {
                className={`
                  absolute top-16 right-4 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px] border
                  ${
-                   isDarkMode
-                     ? "bg-gray-800 border-gray-700"
-                     : "bg-white border-gray-200"
+                   theme === 'high-contrast'
+                     ? "bg-black border-yellow-400 border-4"
+                     : (isDarkMode
+                       ? "bg-gray-800 border-gray-700"
+                       : "bg-white border-gray-200")
                  }
                `}
              >
                <h4
                  className={`text-lg font-semibold mb-4 ${
-                   isDarkMode ? "text-white" : "text-gray-800"
+                   theme === 'high-contrast'
+                     ? "text-yellow-400"
+                     : (isDarkMode ? "text-white" : "text-gray-800")
                  }`}
                >
                  카메라 설정
@@ -506,7 +530,9 @@ useEffect(() => {
                  <div>
                    <label
                      className={`block text-sm font-semibold mb-2 ${
-                       isDarkMode ? "text-gray-300" : "text-gray-700"
+                       theme === 'high-contrast'
+                         ? "text-yellow-400"
+                         : (isDarkMode ? "text-gray-300" : "text-gray-700")
                      }`}
                    >
                      카메라 선택
@@ -518,9 +544,11 @@ useEffect(() => {
                        w-full rounded-lg px-3 py-2 text-sm border
                        focus:outline-none focus:ring-2 focus:ring-blue-500/50
                        ${
-                         isDarkMode
-                           ? "bg-gray-700 border-gray-600 text-white"
-                           : "bg-white border-gray-300 text-gray-900"
+                         theme === 'high-contrast'
+                           ? "bg-black border-yellow-400 border-2 text-yellow-400 focus:ring-yellow-400/50"
+                           : (isDarkMode
+                             ? "bg-gray-700 border-gray-600 text-white"
+                             : "bg-white border-gray-300 text-gray-900")
                        }
                      `}
                    >
@@ -535,7 +563,9 @@ useEffect(() => {
                  <div>
                    <label
                      className={`block text-sm font-semibold mb-2 ${
-                       isDarkMode ? "text-gray-300" : "text-gray-700"
+                       theme === 'high-contrast'
+                         ? "text-yellow-400"
+                         : (isDarkMode ? "text-gray-300" : "text-gray-700")
                      }`}
                    >
                      다크 모드
@@ -545,9 +575,11 @@ useEffect(() => {
                      className={`
                        w-full rounded-lg px-3 py-2 text-sm border transition-colors
                        ${
-                         isDarkMode
-                           ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
-                           : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+                         theme === 'high-contrast'
+                           ? "bg-black border-yellow-400 border-2 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                           : (isDarkMode
+                             ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                             : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50")
                        }
                      `}
                    >
@@ -567,15 +599,19 @@ useEffect(() => {
            className={`
              rounded-2xl p-6 shadow-xl border
              ${
-               isDarkMode
-                 ? "bg-gray-800 border-gray-700"
-                 : "bg-white border-gray-200"
+               theme === 'high-contrast'
+                 ? "bg-black border-yellow-400 border-4"
+                 : (isDarkMode
+                   ? "bg-gray-800 border-gray-700"
+                   : "bg-white border-gray-200")
              }
            `}
          >
            <h3
              className={`text-lg font-semibold mb-4 ${
-               isDarkMode ? "text-white" : "text-gray-800"
+               theme === 'high-contrast'
+                 ? "text-yellow-400"
+                 : (isDarkMode ? "text-white" : "text-gray-800")
              }`}
            >
              번역 결과

@@ -15,7 +15,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const CustomerSupport = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("");
