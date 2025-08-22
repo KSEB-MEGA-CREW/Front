@@ -68,6 +68,14 @@ function StudyWord() {
       }
     });
     try {
+      console.log("백으로 보내는 response - 유저아이디", user.id);
+      console.log("백으로 보내는 response - 맞춘 개수", correctAnswers);
+      console.log(
+        "백으로 보내는 response - 카테고리 개수??",
+        categoryCorrectCounts
+      );
+      console.log("백으로 보내는 response - 틀린 정답", wrongAnswers);
+
       await quizApi.saveQuizResult({
         userId: user.id,
         correctCount: correctAnswers,
@@ -94,6 +102,7 @@ function StudyWord() {
           videoUrl: q.subDescription || null,
           textQuiz: q.signDescription,
         }));
+        console.log("BE에서 받은 응답 데이터", response.data);
         setQuizList(processedQuizzes.slice(0, 5));
       } else {
         console.error(
