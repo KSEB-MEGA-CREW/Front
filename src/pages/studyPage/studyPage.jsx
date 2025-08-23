@@ -156,16 +156,16 @@ function StudyWord() {
         >
           <div className="flex justify-center items-center min-h-screen">
             <div
-              className={`
-              p-8 rounded-3xl shadow-2xl border
-              ${
-                theme === "high-contrast"
-                  ? "bg-black border-2 border-yellow-400"
-                  : isDarkMode
-                  ? "bg-gray-800 border-gray-700"
-                  : "bg-white border-gray-200"
-              }
-            `}
+            //   className={`
+            //   p-8 rounded-3xl shadow-2xl border
+            //   ${
+            //     theme === "high-contrast"
+            //       ? "bg-black border-2 border-yellow-400"
+            //       : isDarkMode
+            //       ? "bg-gray-800 border-gray-700"
+            //       : "bg-white border-gray-200"
+            //   }
+            // `}
             >
               <div className="flex flex-col items-center gap-4">
                 <div className="w-12 h-12 border-4 border-blue-500/30 border-t-blue-500 rounded-full animate-spin"></div>
