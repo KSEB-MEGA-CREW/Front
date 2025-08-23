@@ -226,7 +226,9 @@ function CalendarModel({ userId }) {
           className={`text-lg font-bold mb-6 ${
             theme === "high-contrast"
               ? "text-yellow-400"
-              : isDarkMode ? "text-white" : "text-gray-900"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
           }`}
         >
           연간 학습
@@ -244,7 +246,9 @@ function CalendarModel({ userId }) {
           className={`text-lg font-bold ${
             theme === "high-contrast"
               ? "text-yellow-400"
-              : isDarkMode ? "text-white" : "text-gray-900"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
           }`}
         >
           연간 학습
@@ -272,7 +276,9 @@ function CalendarModel({ userId }) {
             className={`text-lg font-semibold min-w-[100px] text-center ${
               theme === "high-contrast"
                 ? "text-yellow-400"
-                : isDarkMode ? "text-white" : "text-gray-900"
+                : isDarkMode
+                ? "text-white"
+                : "text-gray-900"
             }`}
           >
             {activeDate.getFullYear()}년 {activeDate.getMonth() + 1}월
@@ -316,7 +322,9 @@ function CalendarModel({ userId }) {
         className={`my-6 ${
           theme === "high-contrast"
             ? "border-yellow-400 border-2"
-            : isDarkMode ? "border-gray-700" : "border-gray-200"
+            : isDarkMode
+            ? "border-gray-700"
+            : "border-gray-200"
         }`}
       />
 
@@ -324,7 +332,9 @@ function CalendarModel({ userId }) {
         className={`text-center text-xs mb-3 ${
           theme === "high-contrast"
             ? "text-yellow-400"
-            : isDarkMode ? "text-gray-300" : "text-gray-800"
+            : isDarkMode
+            ? "text-gray-300"
+            : "text-gray-800"
         }`}
       >
         💡 아래 정답률 박스를 클릭하면 해당하는 날짜만 달력에서 확인할 수
@@ -336,7 +346,9 @@ function CalendarModel({ userId }) {
           className={`mr-2 ${
             theme === "high-contrast"
               ? "text-yellow-400"
-              : isDarkMode ? "text-gray-300" : "text-gray-800"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-800"
           }`}
         >
           정답률:
@@ -349,8 +361,10 @@ function CalendarModel({ userId }) {
               onClick={() => handleLegendToggle(level.range)}
               className={`flex items-center cursor-pointer p-2 rounded-md transition-opacity ${
                 theme === "high-contrast"
-                  ? "hover:bg-yellow-400 hover:text-black"
-                  : isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-300"
+                  ? "hover:bg-gray-600 hover:text-black"
+                  : isDarkMode
+                  ? "hover:bg-gray-700"
+                  : "hover:bg-gray-300"
               } ${isActive ? "opacity-100" : "opacity-40 hover:opacity-70"}`}
             >
               <div className={`w-3 h-3 rounded-sm mr-2 ${level.color}`}></div>
@@ -358,7 +372,9 @@ function CalendarModel({ userId }) {
                 className={`${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-300" : "text-gray-800"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-800"
                 }`}
               >
                 {level.label}
@@ -388,12 +404,14 @@ function CalendarModel({ userId }) {
           className={`text-xs ${
             theme === "high-contrast"
               ? "text-yellow-400"
-              : isDarkMode ? "text-gray-300" : "text-gray-800"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-800"
           }`}
         >
           색상 테마:
         </span>
-        {Object.entries(COLOR_THEMES).map(([themeKey, theme]) => (
+        {Object.entries(COLOR_THEMES).map(([themeKey, themeinfo]) => (
           <button
             key={themeKey}
             onClick={() => setColorTheme(themeKey)}
@@ -405,13 +423,13 @@ function CalendarModel({ userId }) {
                   ? " bg-gray-600 text-gray-300"
                   : "text-gray-800 bg-gray-300"
                 : theme === "high-contrast"
-                ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border border-yellow-400"
+                ? "text-yellow-400 hover:bg-gray-600 border border-yellow-400"
                 : isDarkMode
                 ? "text-gray-300 hover:bg-gray-600"
                 : "text-gray-800 hover:bg-gray-300"
             }`}
           >
-            {theme.name}
+            {themeinfo.name}
           </button>
         ))}
       </div>
