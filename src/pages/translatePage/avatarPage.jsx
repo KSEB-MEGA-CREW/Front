@@ -105,16 +105,16 @@ const AvatarPage = () => {
 
   
 
-  // 미리 정의된 수어 구문들
+  // 미리 정의된 수어 구문들 (표시용 텍스트와 파일명 매핑)
   const predefinedPhrases = [
-    "안녕하세요",
-    "감사합니다",
-    "죄송합니다",
-    "네, 알겠습니다",
-    "아니요",
-    "도움이 필요합니다",
-    "괜찮습니다",
-    "잘 부탁드립니다",
+    { display: "안녕하세요", filename: "안녕하세요" },
+    { display: "감사합니다", filename: "감사합니다" },
+    { display: "알겠습니다", filename: "알겠습니다" },
+    { display: "죄송합니다", filename: "죄송합니다" },
+    { display: "괜찮아요", filename: "괜찮아요" },
+    { display: "좋아요", filename: "좋아요" },
+    { display: "싫어요", filename: "싫어요" },
+    { display: "도움이 필요하신가요", filename: "help_needed" },
   ];
 
   // Unity 초기화
@@ -125,19 +125,26 @@ const AvatarPage = () => {
   }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity]);
 
   // 텍스트를 수어로 변환하고 아바타에 전송
-  const handleConvertToSignLanguage = async (text) => {
+  const handleConvertToSignLanguage = async (text, customFilename = null) => {
     if (!text.trim() || isPlaying) return;
 
-    // 입력된 텍스트의 띄어쓰기를 '_'로 변환
-    const processedText = text.replace(/ /g, '_');
-    const animationFileUrl = `/${processedText}.glb`;
+     // customFilename이 없으면 predefinedPhrases에서 해당하는 filename 찾기
+  let processedText = customFilename;
+  if (!processedText) {
+    const predefined = predefinedPhrases.find(p => p.display === text);
+    processedText = predefined ? predefined.filename : text.replace(/ /g, '_');
+  }
+  
+  const animationFileUrl = `/${processedText}.glb`;
 
     try {
       // GET 요청으로 파일 존재 여부 및 Content-Type 확인
       const response = await fetch(animationFileUrl);
 
       // SPA의 404 fallback (index.html 반환)을 피하기 위해 Content-Type 확인
-      if (response.ok && response.headers.get("Content-Type") === "model/gltf-binary") {
+      // 304 Not Modified 응답에서는 Content-Type이 없을 수 있으므로 추가 조건 포함
+      const contentType = response.headers.get("Content-Type");
+      if (response.ok && (contentType === "model/gltf-binary" || response.status === 304)) {
         // 파일이 존재하고 GLB 타입이 맞으면 애니메이션 재생
         setAnimationUrl(animationFileUrl);
         
@@ -152,7 +159,7 @@ const AvatarPage = () => {
           timestamp: new Date(),
           requestId: `local-${Date.now()}`,
           status: "COMPLETED",
-          confidence: 1.0,
+          // confidence: 1.0,  // 신뢰도 주석 처리
           duration: 3,
         };
 
@@ -182,9 +189,11 @@ const AvatarPage = () => {
   };
 
   // 미리 정의된 구문 선택
-  const handlePredefinedSelect = (phrase) => {
-    setInputText(phrase);
-    setSelectedPredefined(phrase);
+  const handlePredefinedSelect = (phraseObj) => {
+    setInputText(phraseObj.display);
+    setSelectedPredefined(phraseObj.display);
+    // 미리 정의된 구문은 바로 변환 실행
+    // handleConvertToSignLanguage(phraseObj.display, phraseObj.filename);
   };
 
   // 입력 초기화
@@ -282,6 +291,7 @@ const AvatarPage = () => {
               </div>
 
               <div className="flex items-center gap-2">
+                {/* 신뢰도 배지 주석 처리
                 {currentTranslation && (
                   <div
                     className={`px-3 py-1.5 rounded-full text-sm font-semibold ${
@@ -295,6 +305,7 @@ const AvatarPage = () => {
                     신뢰도: {Math.round(currentTranslation.confidence * 100)}%
                   </div>
                 )}
+                */}
 
                 <button
                   onClick={() => setShowSettings(!showSettings)}
@@ -589,12 +600,12 @@ const AvatarPage = () => {
               자주 사용하는 구문
             </h3>
             <div className="grid grid-cols-2 gap-2">
-              {predefinedPhrases.map((phrase) => (
+              {predefinedPhrases.map((phraseObj) => (
                 <button
-                  key={phrase}
-                  onClick={() => handlePredefinedSelect(phrase)}
+                  key={phraseObj.display}
+                  onClick={() => handlePredefinedSelect(phraseObj)}
                   className={`p-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                    selectedPredefined === phrase
+                    selectedPredefined === phraseObj.display
                       ? theme === 'high-contrast'
                         ? "bg-yellow-400 text-black border-2 border-yellow-400"
                         : "bg-blue-500 text-white shadow-lg"
@@ -605,7 +616,7 @@ const AvatarPage = () => {
                         : "bg-gray-100 hover:bg-gray-200 text-gray-700")
                   }`}
                 >
-                  {phrase}
+                  {phraseObj.display}
                 </button>
               ))}
             </div>
@@ -694,6 +705,7 @@ const AvatarPage = () => {
                       }`}
                     >
                       <span>{item.timestamp.toLocaleTimeString()}</span>
+                      {/* 신뢰도 부분 주석 처리
                       <div className="flex items-center gap-2">
                         <span>신뢰도 {Math.round(item.confidence * 100)}%</span>
                         <div
@@ -706,6 +718,7 @@ const AvatarPage = () => {
                           }`}
                         />
                       </div>
+                      */}
                     </div>
                   </div>
                 ))
