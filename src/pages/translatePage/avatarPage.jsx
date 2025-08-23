@@ -1,6 +1,7 @@
-import GLBAvatarPlayer from "./GLBAvatarPlayer.jsx";
+// /src/pages/avatarPage.jsx
+import GLBAvatarPlayerRaw from "./GLBAvatarPlayer.jsx";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, memo } from "react";
 import {
   Square,
   RotateCcw,
@@ -18,6 +19,9 @@ import {
 } from "lucide-react";
 
 import { useTheme } from "../../Context/themeContext";
+
+/** GLBAvatarPlayer 메모이즈: 설정 토글 등 부모 리렌더 시 재마운트로 멈추는 현상 방지 */
+const GLBAvatarPlayer = memo(GLBAvatarPlayerRaw);
 
 /** =============== Mock: useUnityAvatar =============== */
 const useUnityAvatar = () => {
@@ -127,6 +131,7 @@ const AvatarPage = () => {
       if (response.ok && (contentType === "model/gltf-binary" || response.status === 304)) {
         setAnimationUrl(animationFileUrl);
 
+        // 기존 로직 유지: 안전하게 멈췄다가 재생 시작
         stopAnimation();
         setTimeout(() => {
           sendAnimationData();
@@ -163,11 +168,15 @@ const AvatarPage = () => {
     }
   };
 
+  /** 프리셋 클릭: 재생 중이면 바로 취소(정지) + 입력만 채우고 '대기' */
   const handlePredefinedSelect = (phraseObj) => {
-    setInputText(phraseObj.display);
+    if (isPlaying) {
+      stopAnimation();           // 이전 재생 취소
+      setCurrentTranslation(null);
+    }
+    setInputText(phraseObj.display);     // 대기 상태로 입력만 채움
     setSelectedPredefined(phraseObj.display);
-    // 필요 시 즉시 변환 실행 가능:
-    // handleConvertToSignLanguage(phraseObj.display, phraseObj.filename);
+    // 자동 실행(변환 호출) 없음 — 사용자가 '수어 변환'을 눌러야 실행
   };
 
   const clearInput = () => {
@@ -266,7 +275,10 @@ const AvatarPage = () => {
 
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setShowSettings(!showSettings)}
+                  onClick={(e) => {
+                    e.stopPropagation();           // 설정 클릭이 다른 곳에 전파되어 재생에 영향 주지 않도록
+                    setShowSettings((v) => !v);    // 재생 상태(isPlaying)는 그대로 유지
+                  }}
                   className={`p-2 rounded-xl transition-all duration-200 ${
                     theme === "high-contrast"
                       ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
