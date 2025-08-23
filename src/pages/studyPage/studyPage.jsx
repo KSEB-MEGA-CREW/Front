@@ -333,7 +333,7 @@ function StudyWord() {
                   key={i}
                   className={`rounded-2xl p-6 shadow-lg transition-all duration-300 hover:scale-[1.02] border ${
                     theme === "high-contrast"
-                      ? "bg-black border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      ? "bg-black border-2 border-yellow-400 hover:text-black"
                       : isDarkMode
                       ? "bg-gray-800 border-gray-700 hover:bg-blue-400"
                       : "bg-white border-gray-200"
@@ -592,7 +592,7 @@ function StudyWord() {
                 className={`group relative p-6 rounded-2xl text-lg font-semibold transition-all duration-300 transform hover:scale-[1.02] focus:outline-none focus:ring-4 focus:ring-blue-500/50 ${
                   selected === null
                     ? theme === "high-contrast"
-                      ? "bg-black border-2 border-yellow-400 text-yellow-400 shadow-lg hover:bg-yellow-400 hover:text-black"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 shadow-lg"
                       : isDarkMode
                       ? "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-lg hover:shadow-xl border border-gray-600"
                       : "bg-white hover:bg-blue-50 text-gray-800 shadow-md hover:shadow-lg border border-gray-300"
