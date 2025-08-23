@@ -306,7 +306,13 @@ const AvatarPage = () => {
             {/* avatar panel */}
             <div className="w-full h-full flex items-center justify-center relative">
               <div
-                className="w-full max-w-4xl h-full max-h-[600px] bg-gray-900/10 rounded-2xl border border-white/10 relative"
+                className={`w-full max-w-4xl h-full max-h-[600px] rounded-2xl border relative ${
+                  theme === "high-contrast"
+                    ? "bg-gray-900 border-yellow-400"
+                    : isDarkMode 
+                    ? "bg-gray-900/10 border-white/10"
+                    : "bg-gray-900/10 border-white/10"
+                }`}
                 style={{ minHeight: "400px" }}
               >
                 <GLBAvatarPlayer

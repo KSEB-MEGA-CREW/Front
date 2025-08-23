@@ -669,7 +669,9 @@ const VideoPage = () => {
               className={`
                min-h-[120px] rounded-xl p-4 border
                ${
-                 isDarkMode
+                 theme === "high-contrast"
+                   ? ""
+                   : isDarkMode
                    ? "bg-gray-700 border-gray-600"
                    : "bg-gray-50 border-gray-200"
                }

@@ -7,16 +7,24 @@ import { useNavigate } from "react-router-dom";
 
 export default function PrivacyPage() {
   const { user } = useAuth();
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen text-gray-900 dark:text-white relative flex flex-col">
+    <div className={`min-h-screen relative flex flex-col ${
+      theme === "high-contrast"
+        ? "bg-black text-yellow-400"
+        : isDarkMode
+        ? "bg-gray-900 text-white"
+        : "bg-white text-gray-900"
+    }`}>
       {/* 상단 네비게이션 (로그인하지 않은 사용자용) */}
       {!user && (
         <header
           className={`w-full py-4 px-6 border-b ${
-            isDarkMode
+            theme === "high-contrast"
+              ? "bg-black border-yellow-400 border-b-2"
+              : isDarkMode
               ? "bg-gray-900 border-gray-800"
               : "bg-white border-gray-200"
           }`}
@@ -32,7 +40,11 @@ export default function PrivacyPage() {
               </div>
               <span
                 className={`font-bold text-lg ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode 
+                    ? "text-white" 
+                    : "text-gray-900"
                 }`}
               >
                 수담
@@ -41,8 +53,8 @@ export default function PrivacyPage() {
             <Link
               to="/auth/signup"
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                isDarkMode
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                theme === "high-contrast"
+                  ? "bg-yellow-400 text-black hover:bg-yellow-300 hover:text-black"
                   : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
@@ -62,7 +74,9 @@ export default function PrivacyPage() {
               className={`
                 p-2 rounded-lg transition-colors
                 ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "hover:bg-yellow-400 hover:text-black text-yellow-400"
+                    : isDarkMode
                     ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                     : "hover:bg-white text-gray-600 hover:text-gray-900"
                 }
@@ -72,12 +86,24 @@ export default function PrivacyPage() {
             </button>
           </div>
         )}
-        <h1 className="text-4xl font-bold mb-8 drop-shadow-lg">
+        <h1 className={`text-4xl font-bold mb-8 drop-shadow-lg ${
+          theme === "high-contrast"
+            ? "text-yellow-400"
+            : isDarkMode
+            ? "text-white"
+            : "text-gray-900"
+        }`}>
           개인정보처리방침
         </h1>
 
         <section className="mb-8">
-          <p className="leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-line">
+          <p className={`leading-relaxed whitespace-pre-line ${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-700"
+          }`}>
             {`수담(이하 '회사'라 합니다)은 이용자의 개인정보를 중요시하며, 관련 법령을 준수하여 개인정보처리방침을 수립 및 시행하고 있습니다.
 
 1. 개인정보의 처리 목적
@@ -111,7 +137,13 @@ export default function PrivacyPage() {
       </main>
 
       {/* 푸터 */}
-      <footer className="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 py-8 text-center text-sm border-t border-gray-200 dark:border-gray-700">
+      <footer className={`py-8 text-center text-sm border-t ${
+        theme === "high-contrast"
+          ? "bg-black text-yellow-400 border-yellow-400 border-t-2"
+          : isDarkMode
+          ? "bg-gray-900 text-gray-400 border-gray-700"
+          : "bg-gray-100 text-gray-600 border-gray-200"
+      }`}>
         © {new Date().getFullYear()} 수담. All rights reserved.
       </footer>
     </div>

@@ -7,16 +7,24 @@ import { useNavigate } from "react-router-dom";
 
 export default function AboutPage() {
   const { user } = useAuth();
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen text-gray-900 dark:text-white relative flex flex-col">
+    <div className={`min-h-screen relative flex flex-col ${
+      theme === "high-contrast"
+        ? "bg-black text-yellow-400"
+        : isDarkMode
+        ? "bg-gray-900 text-white"
+        : "bg-white text-gray-900"
+    }`}>
       {/* 상단 네비게이션 (로그인하지 않은 사용자용) */}
       {!user && (
         <header
           className={`w-full py-4 px-6 border-b ${
-            isDarkMode
+            theme === "high-contrast"
+              ? "bg-black border-yellow-400 border-b-2"
+              : isDarkMode
               ? "bg-gray-900 border-gray-800"
               : "bg-white border-gray-200"
           }`}
@@ -32,7 +40,11 @@ export default function AboutPage() {
               </div>
               <span
                 className={`font-bold text-lg ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode 
+                    ? "text-white" 
+                    : "text-gray-900"
                 }`}
               >
                 수담
@@ -41,8 +53,8 @@ export default function AboutPage() {
             <Link
               to="/auth/signup"
               className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                isDarkMode
-                  ? "bg-blue-600 hover:bg-blue-700 text-white"
+                theme === "high-contrast"
+                  ? "bg-yellow-400 text-black hover:bg-yellow-300 hover:text-black"
                   : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
@@ -62,7 +74,9 @@ export default function AboutPage() {
               className={`
                 p-2 rounded-lg transition-colors
                 ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "hover:bg-yellow-400 hover:text-black text-yellow-400"
+                    : isDarkMode
                     ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                     : "hover:bg-white text-gray-600 hover:text-gray-900"
                 }
@@ -72,11 +86,29 @@ export default function AboutPage() {
             </button>
           </div>
         )}
-        <h1 className="text-4xl font-bold mb-8 drop-shadow-lg">서비스 소개</h1>
+        <h1 className={`text-4xl font-bold mb-8 drop-shadow-lg ${
+          theme === "high-contrast"
+            ? "text-yellow-400"
+            : isDarkMode
+            ? "text-white"
+            : "text-gray-900"
+        }`}>서비스 소개</h1>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">수담 서비스란?</h2>
-          <p className="leading-relaxed text-gray-700 dark:text-gray-300 whitespace-pre-line">
+          <h2 className={`text-2xl font-semibold mb-4 ${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
+          }`}>수담 서비스란?</h2>
+          <p className={`leading-relaxed whitespace-pre-line ${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-700"
+          }`}>
             {`수담은 인공지능(AI)을 활용한 실시간 수어 통역 서비스입니다.\n
 - 수어와 일반 음성/텍스트 간 자연스러운 양방향 번역 지원\n
 - 청각장애인과 청인 간의 원활한 소통 환경 제공\n
@@ -86,8 +118,20 @@ export default function AboutPage() {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">주요 기능</h2>
-          <ul className="list-disc list-inside space-y-2 text-gray-700 dark:text-gray-300">
+          <h2 className={`text-2xl font-semibold mb-4 ${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
+          }`}>주요 기능</h2>
+          <ul className={`list-disc list-inside space-y-2 ${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-700"
+          }`}>
             <li>실시간 수어-음성/텍스트 양방향 번역</li>
             <li>사용자 맞춤 수어 학습 콘텐츠</li>
             <li>소셜 및 커뮤니티 기능 연동 예정</li>
@@ -96,14 +140,30 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-semibold mb-4">문의 및 지원</h2>
-          <p className="text-gray-700 dark:text-gray-300">
+          <h2 className={`text-2xl font-semibold mb-4 ${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
+          }`}>문의 및 지원</h2>
+          <p className={`${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-700"
+          }`}>
             서비스 이용 중 궁금한 점이나 문제가 발생하면 아래 이메일로 문의해
             주세요.
           </p>
           <a
             href="mailto:dissolve1882@naver.com"
-            className="text-cyan-400 hover:underline"
+            className={`hover:underline transition-colors ${
+              theme === "high-contrast"
+                ? "text-yellow-300 hover:text-yellow-200"
+                : "text-cyan-400"
+            }`}
           >
             dissolve1882@naver.com
           </a>
@@ -111,7 +171,13 @@ export default function AboutPage() {
       </main>
 
       {/* 푸터 */}
-      <footer className="bg-gray-100 dark:bg-gray-900 text-gray-600 dark:text-gray-400 py-8 text-center text-sm border-t border-gray-200 dark:border-gray-700">
+      <footer className={`py-8 text-center text-sm border-t ${
+        theme === "high-contrast"
+          ? "bg-black text-yellow-400 border-yellow-400 border-t-2"
+          : isDarkMode
+          ? "bg-gray-900 text-gray-400 border-gray-700"
+          : "bg-gray-100 text-gray-600 border-gray-200"
+      }`}>
         © {new Date().getFullYear()} 수담. All rights reserved.
       </footer>
     </div>
