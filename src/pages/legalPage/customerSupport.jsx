@@ -127,7 +127,9 @@ const CustomerSupport = () => {
               className={`text-4xl font-bold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-white" : "text-gray-900"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               고객 지원
@@ -155,7 +157,9 @@ const CustomerSupport = () => {
               ${
                 theme === "high-contrast"
                   ? "bg-black border-2 border-yellow-400"
-                  : isDarkMode ? "bg-blue-500/20" : "bg-blue-100"
+                  : isDarkMode
+                  ? "bg-blue-500/20"
+                  : "bg-blue-100"
               }
             `}
             >
@@ -164,7 +168,9 @@ const CustomerSupport = () => {
                 className={`${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-blue-400" : "text-blue-600"
+                    : isDarkMode
+                    ? "text-blue-400"
+                    : "text-blue-600"
                 }`}
               />
             </div>
@@ -172,7 +178,9 @@ const CustomerSupport = () => {
               className={`text-lg font-semibold mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-white" : "text-gray-900"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               이메일
@@ -181,7 +189,9 @@ const CustomerSupport = () => {
               className={`text-sm mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-600"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               24시간 이내 답변
@@ -190,12 +200,18 @@ const CustomerSupport = () => {
               className={`font-medium ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-blue-400" : "text-blue-600"
+                  : isDarkMode
+                  ? "text-blue-400"
+                  : "text-blue-600"
               }`}
             >
               <a
                 href="mailto:dissolve1882@naver.com"
-                className={`hover:text-blue-500 transition-colors`}
+                className={`transition-colors ${
+                  theme === "high-contrast"
+                    ? "hover:text-yellow-300"
+                    : "hover:text-blue-500"
+                }`}
               >
                 dissolve1882@naver.com
               </a>
@@ -220,7 +236,9 @@ const CustomerSupport = () => {
               ${
                 theme === "high-contrast"
                   ? "bg-black border-2 border-yellow-400"
-                  : isDarkMode ? "bg-green-500/20" : "bg-green-100"
+                  : isDarkMode
+                  ? "bg-green-500/20"
+                  : "bg-green-100"
               }
             `}
             >
@@ -229,7 +247,9 @@ const CustomerSupport = () => {
                 className={`${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-green-500" : "text-green-700"
+                    : isDarkMode
+                    ? "text-green-500"
+                    : "text-green-700"
                 }`}
               />
             </div>
@@ -237,7 +257,9 @@ const CustomerSupport = () => {
               className={`text-lg font-semibold mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-white" : "text-gray-900"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               전화 상담
@@ -246,7 +268,9 @@ const CustomerSupport = () => {
               className={`text-sm mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-600"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               평일 09:00~18:00
@@ -255,7 +279,9 @@ const CustomerSupport = () => {
               className={`font-medium ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-green-500" : "text-green-700"
+                  : isDarkMode
+                  ? "text-green-500"
+                  : "text-green-700"
               }`}
             >
               010-3738-1882
@@ -280,7 +306,9 @@ const CustomerSupport = () => {
               ${
                 theme === "high-contrast"
                   ? "bg-black border-2 border-yellow-400"
-                  : isDarkMode ? "bg-purple-500/20" : "bg-purple-100"
+                  : isDarkMode
+                  ? "bg-purple-500/20"
+                  : "bg-purple-100"
               }
             `}
             >
@@ -289,7 +317,9 @@ const CustomerSupport = () => {
                 className={`${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-purple-400" : "text-purple-600"
+                    : isDarkMode
+                    ? "text-purple-400"
+                    : "text-purple-600"
                 }`}
               />
             </div>
@@ -297,7 +327,9 @@ const CustomerSupport = () => {
               className={`text-lg font-semibold mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-white" : "text-gray-900"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               라이브 채팅
@@ -306,7 +338,9 @@ const CustomerSupport = () => {
               className={`text-sm mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-600"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               평일 09:00~18:00
@@ -315,13 +349,20 @@ const CustomerSupport = () => {
               className={`font-medium ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-purple-400" : "text-purple-600"
+                  : isDarkMode
+                  ? "text-purple-400"
+                  : "text-purple-600"
               }`}
             >
               <a
                 href="https://open.kakao.com/o/sKrWTeNh"
                 target="_blank"
                 rel="noopener noreferrer"
+                className={`transition-colors ${
+                  theme === "high-contrast"
+                    ? "hover:text-yellow-300"
+                    : "hover:text-purple-500"
+                }`}
               >
                 오픈채팅 바로가기
               </a>
@@ -346,7 +387,9 @@ const CustomerSupport = () => {
             className={`text-2xl font-bold mb-6 ${
               theme === "high-contrast"
                 ? "text-yellow-400"
-                : isDarkMode ? "text-white" : "text-gray-900"
+                : isDarkMode
+                ? "text-white"
+                : "text-gray-900"
             }`}
           >
             문의하기
@@ -360,21 +403,28 @@ const CustomerSupport = () => {
                 ${
                   theme === "high-contrast"
                     ? "bg-black border-2 border-yellow-400"
-                    : isDarkMode ? "bg-green-500/20" : "bg-green-100"
+                    : isDarkMode
+                    ? "bg-green-500/20"
+                    : "bg-green-100"
                 }
               `}
               >
-                <CheckCircle size={32} className={`${
-                  theme === "high-contrast"
-                    ? "text-yellow-400"
-                    : "text-green-500"
-                }`} />
+                <CheckCircle
+                  size={32}
+                  className={`${
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : "text-green-500"
+                  }`}
+                />
               </div>
               <h3
                 className={`text-xl font-semibold mb-4 ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-white" : "text-gray-900"
+                    : isDarkMode
+                    ? "text-white"
+                    : "text-gray-900"
                 }`}
               >
                 문의가 성공적으로 전송되었습니다!
@@ -383,21 +433,31 @@ const CustomerSupport = () => {
                 className={`mb-6 ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-300" : "text-gray-600"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-600"
                 }`}
               >
                 24시간 이내에 답변드리겠습니다.
               </p>
               <button
                 onClick={() => setIsSubmitted(false)}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+                className={`px-6 py-3 font-semibold rounded-lg transition-colors ${
+                  theme === "high-contrast"
+                    ? "bg-yellow-400 text-black hover:bg-yellow-300 hover:text-black"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                }`}
               >
                 새로운 문의하기
               </button>
               <div className="text-center pt-4">
                 <button
                   onClick={() => navigate("/inquiry-board")}
-                  className="text-blue-400 hover:text-blue-300 text-sm transition-colors"
+                  className={`text-sm transition-colors ${
+                    theme === "high-contrast"
+                      ? "text-yellow-400 hover:text-yellow-300"
+                      : "text-blue-400 hover:text-blue-300"
+                  }`}
                 >
                   QnA 게시판에서 답변 확인하기
                 </button>
@@ -411,7 +471,9 @@ const CustomerSupport = () => {
                   className={`block text-sm font-semibold mb-3 ${
                     theme === "high-contrast"
                       ? "text-yellow-400"
-                      : isDarkMode ? "text-gray-300" : "text-gray-700"
+                      : isDarkMode
+                      ? "text-gray-300"
+                      : "text-gray-700"
                   }`}
                 >
                   문의 카테고리
@@ -461,7 +523,9 @@ const CustomerSupport = () => {
                   className={`block text-sm font-semibold mb-2 ${
                     theme === "high-contrast"
                       ? "text-yellow-400"
-                      : isDarkMode ? "text-gray-300" : "text-gray-700"
+                      : isDarkMode
+                      ? "text-gray-300"
+                      : "text-gray-700"
                   }`}
                 >
                   제목 *
@@ -492,7 +556,9 @@ const CustomerSupport = () => {
                   className={`block text-sm font-semibold mb-2 ${
                     theme === "high-contrast"
                       ? "text-yellow-400"
-                      : isDarkMode ? "text-gray-300" : "text-gray-700"
+                      : isDarkMode
+                      ? "text-gray-300"
+                      : "text-gray-700"
                   }`}
                 >
                   문의 내용 *
@@ -523,7 +589,9 @@ const CustomerSupport = () => {
                   className={`block text-sm font-semibold mb-3 ${
                     theme === "high-contrast"
                       ? "text-yellow-400"
-                      : isDarkMode ? "text-gray-300" : "text-gray-700"
+                      : isDarkMode
+                      ? "text-gray-300"
+                      : "text-gray-700"
                   }`}
                 >
                   공개 설정
@@ -542,7 +610,9 @@ const CustomerSupport = () => {
                         className={`text-sx font-semibold ${
                           theme === "high-contrast"
                             ? "text-yellow-400"
-                            : isDarkMode ? "text-white" : "text-gray-900"
+                            : isDarkMode
+                            ? "text-white"
+                            : "text-gray-900"
                         }`}
                       >
                         🔒 비공개 문의
@@ -551,7 +621,9 @@ const CustomerSupport = () => {
                         className={`text-xs ${
                           theme === "high-contrast"
                             ? "text-yellow-400"
-                            : isDarkMode ? "text-gray-400" : "text-gray-600"
+                            : isDarkMode
+                            ? "text-gray-400"
+                            : "text-gray-600"
                         }`}
                       >
                         본인과 관리자만 볼 수 있습니다
@@ -571,7 +643,9 @@ const CustomerSupport = () => {
                         className={`text-sx font-semibold ${
                           theme === "high-contrast"
                             ? "text-yellow-400"
-                            : isDarkMode ? "text-white" : "text-gray-900"
+                            : isDarkMode
+                            ? "text-white"
+                            : "text-gray-900"
                         }`}
                       >
                         🌐 공개 문의
@@ -580,7 +654,9 @@ const CustomerSupport = () => {
                         className={`text-xs ${
                           theme === "high-contrast"
                             ? "text-yellow-400"
-                            : isDarkMode ? "text-gray-400" : "text-gray-600"
+                            : isDarkMode
+                            ? "text-gray-400"
+                            : "text-gray-600"
                         }`}
                       >
                         모든 사용자가 볼 수 있습니다 (FAQ 효과)
@@ -634,7 +710,8 @@ const CustomerSupport = () => {
                   ${
                     theme === "high-contrast"
                       ? "border-yellow-400 bg-black"
-                      : "border-blue-500 " + (isDarkMode ? "bg-blue-900/20" : "bg-blue-50")
+                      : "border-blue-500 " +
+                        (isDarkMode ? "bg-blue-900/20" : "bg-blue-50")
                   }
                 `}
                 >
@@ -647,7 +724,9 @@ const CustomerSupport = () => {
                       className={`text-sm ${
                         theme === "high-contrast"
                           ? "text-yellow-400"
-                          : isDarkMode ? "text-blue-200" : "text-blue-600"
+                          : isDarkMode
+                          ? "text-blue-200"
+                          : "text-blue-600"
                       }`}
                     >
                       <p className="font-semibold mb-1">문의 전 확인사항</p>
@@ -709,7 +788,9 @@ const CustomerSupport = () => {
             className={`text-2xl font-bold mb-6 ${
               theme === "high-contrast"
                 ? "text-yellow-400"
-                : isDarkMode ? "text-white" : "text-gray-900"
+                : isDarkMode
+                ? "text-white"
+                : "text-gray-900"
             }`}
           >
             자주 묻는 질문
@@ -720,7 +801,7 @@ const CustomerSupport = () => {
               p-4 rounded-lg border
               ${
                 theme === "high-contrast"
-                  ? "border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                  ? "border-2 border-yellow-400 hover:bg-gray-900"
                   : isDarkMode
                   ? "border-gray-600 hover:bg-gray-700"
                   : "border-gray-200 hover:bg-gray-100"
@@ -728,10 +809,12 @@ const CustomerSupport = () => {
             `}
             >
               <summary
-                className={`font-semibold cursor-pointer ${
+                className={`font-semibold cursor-pointer transition-colors ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-white " : "text-gray-900"
+                    : isDarkMode
+                    ? "text-white hover:text-gray-200"
+                    : "text-gray-900 hover:text-gray-700"
                 }`}
               >
                 비밀번호를 잊어버렸어요
@@ -740,7 +823,9 @@ const CustomerSupport = () => {
                 className={`mt-3 text-sm ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-300" : "text-gray-600"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-600"
                 }`}
               >
                 로그인 페이지에서 "비밀번호 찾기"를 클릭하시고, 가입한 이메일
@@ -753,7 +838,7 @@ const CustomerSupport = () => {
               p-4 rounded-lg border
                             ${
                               theme === "high-contrast"
-                                ? "border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                                ? "border-2 border-yellow-400 hover:bg-gray-900"
                                 : isDarkMode
                                 ? "border-gray-600 hover:bg-gray-700"
                                 : "border-gray-200 hover:bg-gray-100"
@@ -761,10 +846,12 @@ const CustomerSupport = () => {
             `}
             >
               <summary
-                className={`font-semibold cursor-pointer ${
+                className={`font-semibold cursor-pointer transition-colors ${
                   theme === "high-contrast"
-                    ? "text-yellow-400"
-                    : isDarkMode ? "text-white" : "text-gray-900"
+                    ? "text-yellow-400 "
+                    : isDarkMode
+                    ? "text-white hover:text-gray-200"
+                    : "text-gray-900 hover:text-gray-700"
                 }`}
               >
                 카메라가 작동하지 않아요
@@ -773,7 +860,9 @@ const CustomerSupport = () => {
                 className={`mt-3 text-sm ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-300" : "text-gray-600"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-600"
                 }`}
               >
                 브라우저에서 카메라 접근 권한을 허용했는지 확인해주세요. 설정
@@ -787,7 +876,7 @@ const CustomerSupport = () => {
               p-4 rounded-lg border
                            ${
                              theme === "high-contrast"
-                               ? "border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                               ? "border-2 border-yellow-400 hover:bg-gray-900"
                                : isDarkMode
                                ? "border-gray-600 hover:bg-gray-700"
                                : "border-gray-200 hover:bg-gray-100"
@@ -795,10 +884,12 @@ const CustomerSupport = () => {
             `}
             >
               <summary
-                className={`font-semibold cursor-pointer ${
+                className={`font-semibold cursor-pointer transition-colors ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-white" : "text-gray-900"
+                    : isDarkMode
+                    ? "text-white hover:text-gray-200"
+                    : "text-gray-900 hover:text-gray-700"
                 }`}
               >
                 학습 진도가 저장되지 않아요
@@ -807,7 +898,9 @@ const CustomerSupport = () => {
                 className={`mt-3 text-sm ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-300" : "text-gray-600"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-600"
                 }`}
               >
                 로그인 상태를 확인해주세요. 로그아웃 상태에서는 학습 진도가

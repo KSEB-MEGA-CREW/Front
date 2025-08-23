@@ -150,7 +150,9 @@ const StasticComponent = () => {
           className={`text-lg font-bold mb-6 ${
             theme === "high-contrast"
               ? "text-yellow-400"
-              : isDarkMode ? "text-white" : "text-gray-900"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
           }`}
         >
           주간 학습
@@ -162,7 +164,9 @@ const StasticComponent = () => {
               className={`text-sm ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-500"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-500"
               }`}
             >
               데이터를 불러오는 중...
@@ -189,7 +193,9 @@ const StasticComponent = () => {
           className={`text-lg font-bold mb-6 ${
             theme === "high-contrast"
               ? "text-yellow-400"
-              : isDarkMode ? "text-white" : "text-gray-900"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
           }`}
         >
           주간 학습
@@ -198,7 +204,9 @@ const StasticComponent = () => {
           className={`flex justify-center items-center h-48 rounded-xl ${
             theme === "high-contrast"
               ? "bg-red-500 border-2 border-yellow-400"
-              : isDarkMode ? "bg-red-900/20" : "bg-red-50"
+              : isDarkMode
+              ? "bg-red-900/20"
+              : "bg-red-50"
           }`}
         >
           <div className="text-center">
@@ -220,7 +228,9 @@ const StasticComponent = () => {
       className={`rounded-2xl shadow-sm border p-6 ${
         theme === "high-contrast"
           ? "bg-black border-2 border-yellow-400"
-          : isDarkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-100"
+          : isDarkMode
+          ? "bg-gray-800 border-gray-700"
+          : "bg-white border-gray-100"
       }`}
     >
       {/* 헤더 */}
@@ -230,7 +240,9 @@ const StasticComponent = () => {
             className={`text-lg font-bold flex items-center gap-2 ${
               theme === "high-contrast"
                 ? "text-yellow-400"
-                : isDarkMode ? "text-white" : "text-gray-900"
+                : isDarkMode
+                ? "text-white"
+                : "text-gray-900"
             }`}
           >
             주간 학습 성취도
@@ -239,7 +251,9 @@ const StasticComponent = () => {
             className={`text-sm mt-1 ${
               theme === "high-contrast"
                 ? "text-yellow-400"
-                : isDarkMode ? "text-gray-400" : "text-gray-500"
+                : isDarkMode
+                ? "text-gray-400"
+                : "text-gray-500"
             }`}
           >
             최근 7일간의 학습 기록을 확인해보세요
@@ -296,10 +310,6 @@ const StasticComponent = () => {
                     >
                       {item.accuracy === -1 ? "―" : `${item.accuracy}%`}
                     </span>
-                    {/* 호버 효과 - 빛나는 효과 */}
-                    <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/30 to-white/0 opacity-0 group-hover:opacity-100 transition-all duration-500 rounded-full transform rotate-45"></div>
-                    {/* 펄스 효과 */}
-                    <div className="absolute inset-0 rounded-full animate-pulse opacity-0 group-hover:opacity-20 bg-white transition-all duration-300"></div>
                   </div>
 
                   {/* 호버 툴팁 */}
@@ -405,14 +415,18 @@ const StasticComponent = () => {
         className={`rounded-xl p-4 ${
           theme === "high-contrast"
             ? "bg-gray-900 border-2 border-yellow-400"
-            : isDarkMode ? "bg-gray-700/30" : "bg-gray-50"
+            : isDarkMode
+            ? "bg-gray-700/30"
+            : "bg-gray-50"
         }`}
       >
         <h3
           className={`text-sm font-semibold text-center mb-3 ${
             theme === "high-contrast"
               ? "text-yellow-400"
-              : isDarkMode ? "text-gray-300" : "text-gray-700"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-700"
           }`}
         >
           성취도 가이드
@@ -422,7 +436,9 @@ const StasticComponent = () => {
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
               theme === "high-contrast"
                 ? "bg-gray-900 border border-yellow-400"
-                : isDarkMode ? "bg-gray-700" : "bg-white"
+                : isDarkMode
+                ? "bg-gray-700"
+                : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#004D40] rounded-full shadow-sm"></div>
@@ -430,7 +446,9 @@ const StasticComponent = () => {
               className={`font-semibold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-300" : "text-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300"
+                  : "text-gray-700"
               }`}
             >
               80% 이상
@@ -440,7 +458,9 @@ const StasticComponent = () => {
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
               theme === "high-contrast"
                 ? "bg-gray-900 border border-yellow-400"
-                : isDarkMode ? "bg-gray-700" : "bg-white"
+                : isDarkMode
+                ? "bg-gray-700"
+                : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#00838F] rounded-full shadow-sm"></div>
@@ -448,7 +468,9 @@ const StasticComponent = () => {
               className={`font-semibold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-300" : "text-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300"
+                  : "text-gray-700"
               }`}
             >
               60-79%
@@ -458,7 +480,9 @@ const StasticComponent = () => {
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
               theme === "high-contrast"
                 ? "bg-gray-900 border border-yellow-400"
-                : isDarkMode ? "bg-gray-700" : "bg-white"
+                : isDarkMode
+                ? "bg-gray-700"
+                : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#00ACC1] rounded-full shadow-sm"></div>
@@ -466,7 +490,9 @@ const StasticComponent = () => {
               className={`font-semibold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-300" : "text-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300"
+                  : "text-gray-700"
               }`}
             >
               40-59%
@@ -476,7 +502,9 @@ const StasticComponent = () => {
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
               theme === "high-contrast"
                 ? "bg-gray-900 border border-yellow-400"
-                : isDarkMode ? "bg-gray-700" : "bg-white"
+                : isDarkMode
+                ? "bg-gray-700"
+                : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#26C6DA] rounded-full shadow-sm"></div>
@@ -484,7 +512,9 @@ const StasticComponent = () => {
               className={`font-semibold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-300" : "text-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300"
+                  : "text-gray-700"
               }`}
             >
               20-39%
@@ -494,7 +524,9 @@ const StasticComponent = () => {
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
               theme === "high-contrast"
                 ? "bg-gray-900 border border-yellow-400"
-                : isDarkMode ? "bg-gray-700" : "bg-white"
+                : isDarkMode
+                ? "bg-gray-700"
+                : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-[#80DEEA] rounded-full shadow-sm"></div>
@@ -502,7 +534,9 @@ const StasticComponent = () => {
               className={`font-semibold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-300" : "text-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300"
+                  : "text-gray-700"
               }`}
             >
               20% 미만
@@ -512,7 +546,9 @@ const StasticComponent = () => {
             className={`flex items-center space-x-2 p-2 rounded-lg shadow-sm ${
               theme === "high-contrast"
                 ? "bg-gray-900 border border-yellow-400"
-                : isDarkMode ? "bg-gray-700" : "bg-white"
+                : isDarkMode
+                ? "bg-gray-700"
+                : "bg-white"
             }`}
           >
             <div className="w-4 h-4 bg-gray-300 rounded-full shadow-sm"></div>
@@ -520,7 +556,9 @@ const StasticComponent = () => {
               className={`font-semibold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-300" : "text-gray-700"
+                  : isDarkMode
+                  ? "text-gray-300"
+                  : "text-gray-700"
               }`}
             >
               기록 없음

@@ -94,7 +94,6 @@ const InquiryBoard = () => {
             response = await authApi.getPublicSupportTickets(page, size);
         }
 
-
         if (response.success && response.data) {
           let ticketData;
           let currentPageInfo;
@@ -118,7 +117,6 @@ const InquiryBoard = () => {
               number: 0,
             };
           }
-
 
           setTickets(ticketData);
           setPageInfo((prev) => ({
@@ -261,7 +259,9 @@ const InquiryBoard = () => {
         className={`min-h-screen p-6 ${
           theme === "high-contrast"
             ? "bg-black"
-            : isDarkMode ? "bg-gray-900" : "bg-gray-50"
+            : isDarkMode
+            ? "bg-gray-900"
+            : "bg-gray-50"
         }`}
       >
         <div className="max-w-4xl mx-auto">
@@ -272,7 +272,9 @@ const InquiryBoard = () => {
                 className={`${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-white" : "text-gray-900"
+                    : isDarkMode
+                    ? "text-white"
+                    : "text-gray-900"
                 }`}
               >
                 문의 목록을 불러오는 중...
@@ -289,7 +291,9 @@ const InquiryBoard = () => {
       className={`min-h-screen p-6 ${
         theme === "high-contrast"
           ? "bg-black"
-          : isDarkMode ? "bg-gray-900" : "bg-gray-50"
+          : isDarkMode
+          ? "bg-gray-900"
+          : "bg-gray-50"
       }`}
     >
       <div className="max-w-4xl mx-auto space-y-8">
@@ -325,7 +329,9 @@ const InquiryBoard = () => {
                 className={`text-4xl font-bold ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-white" : "text-gray-900"
+                    : isDarkMode
+                    ? "text-white"
+                    : "text-gray-900"
                 }`}
               >
                 문의 게시판
@@ -376,14 +382,18 @@ const InquiryBoard = () => {
                 className={
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-blue-400" : "text-blue-600"
+                    : isDarkMode
+                    ? "text-blue-400"
+                    : "text-blue-600"
                 }
               />
               <span
                 className={`text-sm font-medium ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-blue-400" : "text-blue-600"
+                    : isDarkMode
+                    ? "text-blue-400"
+                    : "text-blue-600"
                 }`}
               >
                 내 문의만 표시 중 ({pageInfo[viewMode]?.totalElements || 0}개)
@@ -415,7 +425,9 @@ const InquiryBoard = () => {
               className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-500"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-500"
               }`}
             />
             <input
@@ -476,7 +488,9 @@ const InquiryBoard = () => {
                 className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-400" : "text-gray-500"
+                    : isDarkMode
+                    ? "text-gray-400"
+                    : "text-gray-500"
                 }`}
               />
               <select
@@ -531,7 +545,9 @@ const InquiryBoard = () => {
                 className={`mx-auto ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-600" : "text-gray-400"
+                    : isDarkMode
+                    ? "text-gray-600"
+                    : "text-gray-400"
                 }`}
               />
             </div>
@@ -539,16 +555,22 @@ const InquiryBoard = () => {
               className={`text-lg font-semibold mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-white" : "text-gray-900"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               오류가 발생했습니다
             </h3>
-            <p className={`${
-              theme === "high-contrast"
-                ? "text-yellow-400"
-                : isDarkMode ? "text-gray-400" : "text-gray-600"
-            }`}>
+            <p
+              className={`${
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
+              }`}
+            >
               {error}
             </p>
           </div>
@@ -571,7 +593,9 @@ const InquiryBoard = () => {
                 className={`mx-auto ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-600" : "text-gray-400"
+                    : isDarkMode
+                    ? "text-gray-600"
+                    : "text-gray-400"
                 }`}
               />
             </div>
@@ -579,7 +603,9 @@ const InquiryBoard = () => {
               className={`text-lg font-semibold mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-white" : "text-gray-900"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               아직 문의가 없습니다
@@ -588,7 +614,9 @@ const InquiryBoard = () => {
               className={`mb-4 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-600"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               궁금한 점이 있으시면 언제든지 문의해주세요.
@@ -597,7 +625,7 @@ const InquiryBoard = () => {
               onClick={() => navigate("/customer-support")}
               className={`px-6 py-3 font-semibold rounded-lg transition-colors ${
                 theme === "high-contrast"
-                  ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                  ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-gray-900"
                   : "bg-blue-500 hover:bg-blue-700 text-white"
               }`}
             >
@@ -623,7 +651,9 @@ const InquiryBoard = () => {
                 className={`mx-auto ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-600" : "text-gray-400"
+                    : isDarkMode
+                    ? "text-gray-600"
+                    : "text-gray-400"
                 }`}
               />
             </div>
@@ -631,7 +661,9 @@ const InquiryBoard = () => {
               className={`text-lg font-semibold mb-2 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-white" : "text-gray-900"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               검색 결과가 없습니다
@@ -640,7 +672,9 @@ const InquiryBoard = () => {
               className={`mb-4 ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-600"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               다른 검색 조건으로 시도해보세요.
@@ -667,7 +701,7 @@ const InquiryBoard = () => {
                           ? "bg-gray-800 border-gray-700 opacity-75"
                           : "bg-gray-100 border-gray-200 opacity-75"
                         : theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                        ? "bg-black border-2 border-yellow-400 hover:bg-gray-900"
                         : isDarkMode
                         ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
                         : "bg-white border-gray-200 hover:bg-gray-50"
@@ -736,7 +770,9 @@ const InquiryBoard = () => {
                         className={`${
                           theme === "high-contrast"
                             ? "text-yellow-400"
-                            : isDarkMode ? "text-gray-400" : "text-gray-500"
+                            : isDarkMode
+                            ? "text-gray-400"
+                            : "text-gray-500"
                         }`}
                       >
                         {ticket.createdDate
@@ -795,7 +831,9 @@ const InquiryBoard = () => {
                         className={`text-sm ${
                           theme === "high-contrast"
                             ? "text-yellow-400"
-                            : isDarkMode ? "text-gray-400" : "text-gray-500"
+                            : isDarkMode
+                            ? "text-gray-400"
+                            : "text-gray-500"
                         }`}
                       >
                         {ticket.userName || "익명"}
