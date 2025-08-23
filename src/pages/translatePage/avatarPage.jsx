@@ -276,7 +276,7 @@ const AvatarPage = () => {
 
                 {isPlaying && currentTranslation && (
                   <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
                       theme === 'high-contrast'
                         ? "bg-black border-2 border-yellow-400 text-yellow-400"
                         : (isDarkMode
@@ -284,7 +284,7 @@ const AvatarPage = () => {
                           : "bg-gray-100 text-[#ff4444]")
                     }`}
                   >
-                    <div className="w-2 h-2 bg-[#ff4444] rounded-full animate-pulse font-medium" />
+                    <div className="w-2 h-2 bg-[#ff4444] rounded-full animate-pulse font-semibold" />
                     재생 중: {currentTranslation.text}
                   </div>
                 )}
