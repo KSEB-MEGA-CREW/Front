@@ -34,8 +34,6 @@ const VideoPage = () => {
     isProcessing,
     result,
     error: frameError,
-    status,
-    isConnected,
     connectionState,
     sessionStats,
     startFrameExtraction,
@@ -114,7 +112,7 @@ const VideoPage = () => {
         } else {
           setCameraError("사용 가능한 카메라가 없습니다.");
         }
-      } catch (err) {
+      } catch {
         setCameraError("카메라 장치를 조회하는 데 실패했습니다.");
       }
     };
@@ -123,14 +121,106 @@ const VideoPage = () => {
 
     return () => {
       console.log("VideoPage unmount: 스트림과 웹소켓 연결을 정리합니다.");
+      
+      // 현재 스트림 정리
       if (currentStream) {
-        currentStream.getTracks().forEach((track) => track.stop());
+        console.log("currentStream 정리 중...");
+        currentStream.getTracks().forEach((track) => {
+          track.stop();
+          console.log(`Track stopped: ${track.kind}`);
+        });
       }
+      
+      // 상태로 관리되는 stream도 정리
+      if (stream) {
+        console.log("state stream 정리 중...");
+        stream.getTracks().forEach((track) => {
+          track.stop();
+          console.log(`State track stopped: ${track.kind}`);
+        });
+        setStream(null);
+      }
+      
+      // video element 정리
+      if (videoRef.current) {
+        console.log("video element 정리 중...");
+        videoRef.current.srcObject = null;
+        videoRef.current.pause();
+      }
+      
+      // useFrameExtraction cleanup
+      if (typeof cleanup === "function") {
+        console.log("useFrameExtraction cleanup 실행 중...");
+        cleanup();
+      }
+      
+      console.log("VideoPage cleanup 완료");
+    };
+  }, [selectedDeviceId]); // cleanup과 stream을 의존성에 추가하면 무한 루프 발생 가능
+
+  // 페이지 이동 시 즉시 cleanup을 위한 이벤트들
+  useEffect(() => {
+    const cleanupCamera = () => {
+      console.log("즉시 카메라 정리 실행");
+      
+      // 현재 stream과 video element 즉시 정리
+      if (stream) {
+        stream.getTracks().forEach((track) => {
+          track.stop();
+          console.log(`즉시 정리: ${track.kind} track stopped`);
+        });
+      }
+      
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
+        videoRef.current.pause();
+      }
+      
+      // useFrameExtraction cleanup
       if (typeof cleanup === "function") {
         cleanup();
       }
     };
-  }, [selectedDeviceId]);
+
+    const handleBeforeUnload = () => {
+      console.log("beforeunload 이벤트 발생");
+      cleanupCamera();
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log("페이지가 숨겨짐: 카메라 정리");
+        cleanupCamera();
+      }
+    };
+
+    const handlePageHide = () => {
+      console.log("pagehide 이벤트 발생");
+      cleanupCamera();
+    };
+
+    // 다양한 이벤트 등록
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handlePageHide);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handlePageHide);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const speakText = useCallback((text) => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "ko-KR";
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
+    }
+  }, []);
 
   useEffect(() => {
     if (result?.label) {
@@ -148,17 +238,7 @@ const VideoPage = () => {
         speakText(newTranslation);
       }
     }
-  }, [result, isSpeechEnabled]);
-
-  const speakText = useCallback((text) => {
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "ko-KR";
-      utterance.rate = 0.9;
-      window.speechSynthesis.speak(utterance);
-    }
-  }, []);
+  }, [result, isSpeechEnabled, speakText]);
 
   const getConnectionStatusIcon = () => {
     switch (connectionState) {
