@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 
-function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd }) {
+function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd, zoom = 1 }) {
   const groupRef = useRef();
   const mixerRef = useRef();
   const actionRef = useRef();
@@ -74,6 +74,13 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd }) {
     }
   }, [play]);
 
+  // 줌 효과 적용 (새로 추가된 부분)
+  useEffect(() => {
+    if (groupRef.current) {
+      groupRef.current.scale.setScalar(zoom);
+    }
+  }, [zoom]);
+
   // 매 프레임 mixer 업데이트
   useFrame((_, delta) => {
     if (mixerRef.current) mixerRef.current.update(delta);
@@ -88,11 +95,28 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd }) {
   );
 }
 
+// 카메라 줌 컨트롤러 (새로 추가된 컴포넌트)
+function CameraController({ zoom }) {
+  const { camera } = useThree();
+  const basePosition = useRef([0, 1.5, 2.5]);
+
+  useEffect(() => {
+    // 줌에 따라 카메라 거리 조절 (줌 인하면 가까이, 줌 아웃하면 멀리)
+    const [x, y, z] = basePosition.current;
+    const distance = 1 / zoom; // 역수로 거리 계산
+    camera.position.set(x * distance, y, z * distance);
+    camera.updateProjectionMatrix();
+  }, [zoom, camera]);
+
+  return null;
+}
+
 export default function GLBAvatarPlayer({
   avatarUrl = "/avatar.glb",
   animationUrl = "/만나서_반갑습니다.glb",
   play = false,
   dark = false,
+  zoom = 1, // 새로 추가된 prop
   onEnd,
 }) {
   // Canvas를 부모 컨테이너에 딱 맞추도록 100% 레이아웃
@@ -153,9 +177,13 @@ export default function GLBAvatarPlayer({
             avatarUrl={avatarUrl}
             animationUrl={animationUrl}
             play={play}
+            zoom={zoom} // 새로 추가된 prop 전달
             onEnd={onEnd}
           />
         </React.Suspense>
+
+        {/* 새로 추가된 카메라 컨트롤러 */}
+        <CameraController zoom={zoom} />
 
         <OrbitControls
           enableDamping
