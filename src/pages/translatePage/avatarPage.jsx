@@ -122,7 +122,9 @@ const AvatarPage = () => {
     let processedText = customFilename;
     if (!processedText) {
       const predefined = predefinedPhrases.find((p) => p.display === text);
-      processedText = predefined ? predefined.filename : text.replace(/ /g, "_");
+      processedText = predefined
+        ? predefined.filename
+        : text.replace(/ /g, "_");
     }
     const animationFileUrl = `/${processedText}.glb`;
 
@@ -130,7 +132,10 @@ const AvatarPage = () => {
       const response = await fetch(animationFileUrl);
       const contentType = response.headers.get("Content-Type");
 
-      if (response.ok && (contentType === "model/gltf-binary" || response.status === 304)) {
+      if (
+        response.ok &&
+        (contentType === "model/gltf-binary" || response.status === 304)
+      ) {
         setAnimationUrl(animationFileUrl);
 
         // 기존 로직 유지: 안전하게 멈췄다가 재생 시작
@@ -173,10 +178,10 @@ const AvatarPage = () => {
   /** 프리셋 클릭: 재생 중이면 바로 취소(정지) + 입력만 채우고 '대기' */
   const handlePredefinedSelect = (phraseObj) => {
     if (isPlaying) {
-      stopAnimation();           // 이전 재생 취소
+      stopAnimation(); // 이전 재생 취소
       setCurrentTranslation(null);
     }
-    setInputText(phraseObj.display);     // 대기 상태로 입력만 채움
+    setInputText(phraseObj.display); // 대기 상태로 입력만 채움
     setSelectedPredefined(phraseObj.display);
     // 자동 실행(변환 호출) 없음 — 사용자가 '수어 변환'을 눌러야 실행
   };
@@ -205,7 +210,8 @@ const AvatarPage = () => {
 
   // Zoom handlers
   const handleZoomIn = () => setCameraZoom((prev) => Math.min(prev + 0.1, 3));
-  const handleZoomOut = () => setCameraZoom((prev) => Math.max(prev - 0.1, 0.5));
+  const handleZoomOut = () =>
+    setCameraZoom((prev) => Math.max(prev - 0.1, 0.5));
   const handleZoomReset = () => setCameraZoom(1);
 
   const getStatusColor = () => {
@@ -229,7 +235,11 @@ const AvatarPage = () => {
   return (
     <div
       className={`min-h-screen relative overflow-hidden ${
-        theme === "high-contrast" ? "bg-black" : isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        theme === "high-contrast"
+          ? "bg-black"
+          : isDarkMode
+          ? "bg-gray-900"
+          : "bg-gray-50"
       }`}
     >
       <div className="relative w-full h-screen flex flex-col xl:flex-row">
@@ -287,8 +297,8 @@ const AvatarPage = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={(e) => {
-                    e.stopPropagation();           // 설정 클릭이 다른 곳에 전파되어 재생에 영향 주지 않도록
-                    setShowSettings((v) => !v);    // 재생 상태(isPlaying)는 그대로 유지
+                    e.stopPropagation(); // 설정 클릭이 다른 곳에 전파되어 재생에 영향 주지 않도록
+                    setShowSettings((v) => !v); // 재생 상태(isPlaying)는 그대로 유지
                   }}
                   className={`p-2 rounded-xl transition-all duration-200 ${
                     theme === "high-contrast"
@@ -309,7 +319,7 @@ const AvatarPage = () => {
                 className={`w-full max-w-4xl h-full max-h-[600px] rounded-2xl border relative ${
                   theme === "high-contrast"
                     ? "bg-gray-900 border-yellow-400"
-                    : isDarkMode 
+                    : isDarkMode
                     ? "bg-gray-900/10 border-white/10"
                     : "bg-gray-900/10 border-white/10"
                 }`}
@@ -370,7 +380,7 @@ const AvatarPage = () => {
                 </div>
               </div>
 
-              {(isUnityLoading || isConversionLoading) && (
+              {/* {(isUnityLoading || isConversionLoading) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
                   <div
                     className={`text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 ${
@@ -382,10 +392,12 @@ const AvatarPage = () => {
                     }`}
                   >
                     <Loader size={24} className="animate-spin text-blue-500" />
-                    {isUnityLoading ? "Unity 아바타 로딩 중..." : "AI가 수어를 생성하고 있습니다..."}
+                    {isUnityLoading
+                      ? "Unity 아바타 로딩 중..."
+                      : "AI가 수어를 생성하고 있습니다..."}
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
 
             {/* settings panel */}
@@ -401,7 +413,11 @@ const AvatarPage = () => {
               >
                 <h4
                   className={`text-lg font-semibold mb-4 ${
-                    theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-white" : "text-gray-800"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-white"
+                      : "text-gray-800"
                   }`}
                 >
                   아바타 설정
@@ -411,7 +427,11 @@ const AvatarPage = () => {
                   <div className="flex items-center justify-between">
                     <span
                       className={`text-sm font-semibold ${
-                        theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-300" : "text-gray-700"
+                        theme === "high-contrast"
+                          ? "text-yellow-400"
+                          : isDarkMode
+                          ? "text-gray-300"
+                          : "text-gray-700"
                       }`}
                     >
                       음성 출력
@@ -430,13 +450,21 @@ const AvatarPage = () => {
                           : "border border-gray-400 hover:bg-gray-500 text-gray-600"
                       }`}
                     >
-                      {isSpeechEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                      {isSpeechEnabled ? (
+                        <Volume2 size={16} />
+                      ) : (
+                        <VolumeX size={16} />
+                      )}
                     </button>
                   </div>
 
                   <div
                     className={`pt-2 border-t ${
-                      theme === "high-contrast" ? "border-yellow-400" : isDarkMode ? "border-gray-700" : "border-gray-200"
+                      theme === "high-contrast"
+                        ? "border-yellow-400"
+                        : isDarkMode
+                        ? "border-gray-700"
+                        : "border-gray-200"
                     }`}
                   >
                     <div className="flex items-center gap-2">
@@ -486,25 +514,39 @@ const AvatarPage = () => {
         </div>
 
         {/* ===== Right: Controls ===== */}
-        <div className="w-full xl:w-96 p-4 flex flex-col max-h-[50vh] xl:max-h-none">
+        <div
+          className={`w-full xl:w-96 p-4 flex flex-col max-h-[50vh] xl:max-h-none ${
+            theme === "high-contrast" ? "overflow-y-auto" : ""
+          }`}
+        >
           {/* 입력 */}
           <div
-            className={`rounded-2xl shadow-lg p-6 mb-4 border ${
+            className={`rounded-2xl shadow-lg mb-4 border ${
               theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400"
+                ? "bg-black border-2 border-yellow-400 p-4"
                 : isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+                ? "bg-gray-800 border-gray-700 p-6"
+                : "bg-white border-gray-200 p-6"
             }`}
           >
             <div className="flex items-center gap-2 mb-4">
               <MessageSquare
                 size={20}
-                className={`${theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-300" : "text-gray-700"}`}
+                className={`${
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-700"
+                }`}
               />
               <h3
                 className={`text-lg font-semibold ${
-                  theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-white" : "text-gray-800"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-white"
+                    : "text-gray-800"
                 }`}
               >
                 텍스트 입력
@@ -528,9 +570,17 @@ const AvatarPage = () => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleConvertToSignLanguage(inputText)}
-                  disabled={!inputText.trim() || !isUnityLoaded || isConversionLoading || isPlaying}
+                  disabled={
+                    !inputText.trim() ||
+                    !isUnityLoaded ||
+                    isConversionLoading ||
+                    isPlaying
+                  }
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 font-semibold rounded-xl transition-all duration-300 transform shadow-lg ${
-                    !inputText.trim() || !isUnityLoaded || isConversionLoading || isPlaying
+                    !inputText.trim() ||
+                    !isUnityLoaded ||
+                    isConversionLoading ||
+                    isPlaying
                       ? theme === "high-contrast"
                         ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
                         : isDarkMode
@@ -562,17 +612,21 @@ const AvatarPage = () => {
 
           {/* 프리셋 */}
           <div
-            className={`rounded-2xl shadow-lg p-6 mb-4 border ${
+            className={`rounded-2xl shadow-lg mb-4 border ${
               theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400"
+                ? "bg-black border-2 border-yellow-400 p-4"
                 : isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+                ? "bg-gray-800 border-gray-700 p-6"
+                : "bg-white border-gray-200 p-6"
             }`}
           >
             <h3
               className={`text-lg font-semibold mb-4 ${
-                theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-white" : "text-gray-800"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-800"
               }`}
             >
               자주 사용하는 구문
@@ -603,40 +657,53 @@ const AvatarPage = () => {
 
           {/* 변환 기록 보기 버튼 */}
           <div
-            className={`rounded-2xl shadow-lg p-6 border ${
+            className={`rounded-2xl shadow-lg border ${
               theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400"
+                ? "bg-black border-2 border-yellow-400 p-4"
                 : isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+                ? "bg-gray-800 border-gray-700 p-6"
+                : "bg-white border-gray-200 p-6"
             }`}
           >
             <div className="text-center space-y-4">
               <div className="flex items-center justify-center gap-2">
                 <Clock
                   size={20}
-                  className={`${theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-300" : "text-gray-700"}`}
+                  className={`${
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-gray-300"
+                      : "text-gray-700"
+                  }`}
                 />
                 <h3
                   className={`text-lg font-semibold ${
-                    theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-white" : "text-gray-800"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-white"
+                      : "text-gray-800"
                   }`}
                 >
                   변환 기록
                 </h3>
               </div>
-              
+
               <div
                 className={`text-sm mb-4 ${
-                  theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-400" : "text-gray-600"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-gray-400"
+                    : "text-gray-600"
                 }`}
               >
-                {translationHistory.length > 0 
+                {translationHistory.length > 0
                   ? `${translationHistory.length}개의 변환 기록이 있습니다`
-                  : "아직 변환 기록이 없습니다"
-                }
+                  : "아직 변환 기록이 없습니다"}
               </div>
-              
+
               <button
                 onClick={() => setShowHistoryModal(true)}
                 className={`w-full flex items-center justify-center gap-2 py-3 px-4 font-semibold rounded-xl transition-all duration-200 ${
@@ -656,7 +723,7 @@ const AvatarPage = () => {
       </div>
 
       {/* 변환 기록 모달 */}
-      <TransHistoryModal 
+      <TransHistoryModal
         isOpen={showHistoryModal}
         onClose={() => setShowHistoryModal(false)}
         translationHistory={translationHistory}

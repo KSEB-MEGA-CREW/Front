@@ -10,6 +10,7 @@ import {
   Award,
   Star,
   BarChart3,
+  FileText,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { quizApi } from "../../api/authApi";
@@ -17,6 +18,7 @@ import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
 import CalendarModal from "../../components/calendarModel";
 import BasicLayout from "../../layouts/basicLayout";
+import IncorrectAnswerPage from "./incorrectAnswer";
 
 function StudyWord() {
   const { user } = useAuth();
@@ -28,6 +30,7 @@ function StudyWord() {
   const [isFinished, setIsFinished] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isIncorrectAnswerOpen, setIsIncorrectAnswerOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -498,7 +501,7 @@ function StudyWord() {
     "
             >
               {/* 문제 번호 - 비디오 오른쪽 끝 */}
-              <div className="absolute top-0 right-0 -mr-20">
+              <div className="absolute top-0 right-0 -mr-20 flex items-center gap-3">
                 <div
                   className={`text-xl font-bold ${
                     theme === "high-contrast"
@@ -519,6 +522,21 @@ function StudyWord() {
                     / {quizList.length}
                   </span>
                 </div>
+                
+                {/* 오답 노트 버튼 */}
+                <button
+                  onClick={() => setIsIncorrectAnswerOpen(true)}
+                  className={`p-2 rounded-lg transition-all duration-200 ${
+                    theme === "high-contrast"
+                      ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                      : isDarkMode
+                      ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                  title="오답 노트 보기"
+                >
+                  <FileText size={20} />
+                </button>
               </div>
               {quiz.videoUrl ? (
                 // 비디오가 있을 경우
@@ -657,6 +675,22 @@ function StudyWord() {
             ))}
           </div>
         </div>
+
+        {/* 오답 노트 모달 */}
+        {isIncorrectAnswerOpen && (
+          <div className="fixed inset-0 z-50">
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setIsIncorrectAnswerOpen(false)}
+            />
+            <div className="relative h-full">
+              <IncorrectAnswerPage 
+                isModal={true}
+                onClose={() => setIsIncorrectAnswerOpen(false)}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </BasicLayout>
   );
