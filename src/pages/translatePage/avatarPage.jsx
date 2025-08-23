@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 
 import { useTheme } from "../../Context/themeContext";
+import TransHistoryModal from "../../components/modals/TransHistoryModal";
 
 /** GLBAvatarPlayer 메모이즈: 설정 토글 등 부모 리렌더 시 재마운트로 멈추는 현상 방지 */
 const GLBAvatarPlayer = memo(GLBAvatarPlayerRaw);
@@ -78,6 +79,7 @@ const AvatarPage = () => {
   const [currentTranslation, setCurrentTranslation] = useState(null);
   const [animationUrl, setAnimationUrl] = useState("/만나서_반갑습니다.glb");
   const [cameraZoom, setCameraZoom] = useState(1);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
 
   const {
     isLoaded: isUnityLoaded,
@@ -185,7 +187,16 @@ const AvatarPage = () => {
     setCurrentTranslation(null);
   };
 
-  const clearHistory = () => setTranslationHistory([]);
+  const clearHistory = () => {
+    setTranslationHistory([]);
+    setShowHistoryModal(false);
+  };
+
+  const handleReplayTranslation = (text) => {
+    setInputText(text);
+    setShowHistoryModal(false);
+    handleConvertToSignLanguage(text);
+  };
 
   const handleStopAnimation = () => {
     stopAnimation();
@@ -584,9 +595,9 @@ const AvatarPage = () => {
             </div>
           </div>
 
-          {/* 히스토리 */}
+          {/* 변환 기록 보기 버튼 */}
           <div
-            className={`rounded-2xl shadow-lg p-6 flex-1 border ${
+            className={`rounded-2xl shadow-lg p-6 border ${
               theme === "high-contrast"
                 ? "bg-black border-2 border-yellow-400"
                 : isDarkMode
@@ -594,8 +605,8 @@ const AvatarPage = () => {
                 : "bg-white border-gray-200"
             }`}
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center gap-2">
                 <Clock
                   size={20}
                   className={`${theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-300" : "text-gray-700"}`}
@@ -608,64 +619,44 @@ const AvatarPage = () => {
                   변환 기록
                 </h3>
               </div>
-
-              <button
-                onClick={clearHistory}
-                title="기록 지우기"
-                className={`p-2 rounded-lg transition-all duration-200 ${
-                  theme === "high-contrast"
-                    ? "hover:bg-yellow-400 text-yellow-400 hover:text-black border-2 border-yellow-400"
-                    : isDarkMode
-                    ? "hover:bg-gray-700 text-gray-400 hover:text-gray-200"
-                    : "hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+              
+              <div
+                className={`text-sm mb-4 ${
+                  theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-400" : "text-gray-600"
                 }`}
               >
-                <RotateCcw size={16} />
+                {translationHistory.length > 0 
+                  ? `${translationHistory.length}개의 변환 기록이 있습니다`
+                  : "아직 변환 기록이 없습니다"
+                }
+              </div>
+              
+              <button
+                onClick={() => setShowHistoryModal(true)}
+                className={`w-full flex items-center justify-center gap-2 py-3 px-4 font-semibold rounded-xl transition-all duration-200 ${
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : isDarkMode
+                    ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
+                    : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                }`}
+              >
+                <MessageSquare size={18} />
+                변환 기록 보기
               </button>
-            </div>
-
-            <div className="space-y-3 max-h-[300px] overflow-y-auto">
-              {translationHistory.length === 0 ? (
-                <p
-                  className={`text-center py-8 italic ${
-                    theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-400" : "text-gray-500"
-                  }`}
-                >
-                  변환 기록이 없습니다
-                </p>
-              ) : (
-                translationHistory.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`rounded-lg p-3 border ${
-                      theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400"
-                        : isDarkMode
-                        ? "bg-gray-700 border-gray-600"
-                        : "bg-gray-50 border-gray-200"
-                    }`}
-                  >
-                    <p
-                      className={`text-sm leading-relaxed mb-2 ${
-                        theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-200" : "text-gray-800"
-                      }`}
-                    >
-                      {item.text}
-                    </p>
-                    <div
-                      className={`flex items-center justify-between text-xs ${
-                        theme === "high-contrast" ? "text-yellow-400" : isDarkMode ? "text-gray-400" : "text-gray-500"
-                      }`}
-                    >
-                      <span>{item.timestamp.toLocaleTimeString()}</span>
-                    </div>
-                  </div>
-                ))
-              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* 변환 기록 모달 */}
+      <TransHistoryModal 
+        isOpen={showHistoryModal}
+        onClose={() => setShowHistoryModal(false)}
+        translationHistory={translationHistory}
+        onClearHistory={clearHistory}
+        onReplayTranslation={handleReplayTranslation}
+      />
     </div>
   );
 };
