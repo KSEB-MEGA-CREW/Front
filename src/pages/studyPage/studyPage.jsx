@@ -18,7 +18,7 @@ import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
 import CalendarModal from "../../components/calendarModel";
 import BasicLayout from "../../layouts/basicLayout";
-import IncorrectAnswerPage from "./incorrectAnswer";
+import IncorrectAnswerModal from "../../components/modals/incorrectAnswerModal";
 
 function StudyWord() {
   const { user } = useAuth();
@@ -522,7 +522,7 @@ function StudyWord() {
                     / {quizList.length}
                   </span>
                 </div>
-                
+
                 {/* 오답 노트 버튼 */}
                 <button
                   onClick={() => setIsIncorrectAnswerOpen(true)}
@@ -612,7 +612,7 @@ function StudyWord() {
                     ? theme === "high-contrast"
                       ? "bg-black border-2 border-yellow-400 text-yellow-400 shadow-lg"
                       : isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-lg hover:shadow-xl border border-gray-600"
+                      ? "bg-gray-700 hover:bg-gray-600 text-gray-200 shadow-lg border border-gray-600"
                       : "bg-white hover:bg-blue-50 text-gray-800 shadow-md hover:shadow-lg border border-gray-300"
                     : ""
                 } ${
@@ -641,7 +641,7 @@ function StudyWord() {
                           ? theme === "high-contrast"
                             ? "bg-black border-2 border-yellow-400 text-yellow-400 group-hover:bg-yellow-400 group-hover:text-black"
                             : isDarkMode
-                            ? "bg-gray-600 text-gray-200 group-hover:bg-[#f6f6f6]"
+                            ? "bg-gray-600 text-gray-200 group-hover:bg-gray-500"
                             : "bg-gray-100 text-gray-700 group-hover:bg-gray-200"
                           : ""
                       } ${
@@ -677,20 +677,10 @@ function StudyWord() {
         </div>
 
         {/* 오답 노트 모달 */}
-        {isIncorrectAnswerOpen && (
-          <div className="fixed inset-0 z-50">
-            <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-              onClick={() => setIsIncorrectAnswerOpen(false)}
-            />
-            <div className="relative h-full">
-              <IncorrectAnswerPage 
-                isModal={true}
-                onClose={() => setIsIncorrectAnswerOpen(false)}
-              />
-            </div>
-          </div>
-        )}
+        <IncorrectAnswerModal
+          isOpen={isIncorrectAnswerOpen}
+          onClose={() => setIsIncorrectAnswerOpen(false)}
+        />
       </div>
     </BasicLayout>
   );
