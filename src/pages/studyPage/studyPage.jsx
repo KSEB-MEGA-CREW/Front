@@ -522,7 +522,7 @@ function StudyWord() {
                     / {quizList.length}
                   </span>
                 </div>
-                
+
                 {/* 오답 노트 버튼 */}
                 <button
                   onClick={() => setIsIncorrectAnswerOpen(true)}
