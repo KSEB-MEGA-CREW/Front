@@ -9,12 +9,12 @@ import {
 } from "lucide-react";
 import { useTheme } from "../../Context/themeContext";
 
-const TransHistoryModal = ({ 
-  isOpen, 
-  onClose, 
-  translationHistory, 
-  onClearHistory, 
-  onReplayTranslation 
+const TransHistoryModal = ({
+  isOpen,
+  onClose,
+  translationHistory,
+  onClearHistory,
+  onReplayTranslation,
 }) => {
   const { theme, isDarkMode } = useTheme();
 
@@ -133,17 +133,24 @@ const TransHistoryModal = ({
                 }
               `}
               >
-                <MessageSquare size={32} className={`${
-                  theme === "high-contrast"
-                    ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-400" : "text-gray-500"
-                }`} />
+                <MessageSquare
+                  size={32}
+                  className={`${
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-gray-400"
+                      : "text-gray-500"
+                  }`}
+                />
               </div>
               <h3
                 className={`text-xl font-semibold mb-4 ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-white" : "text-gray-900"
+                    : isDarkMode
+                    ? "text-white"
+                    : "text-gray-900"
                 }`}
               >
                 아직 변환 기록이 없습니다
@@ -152,7 +159,9 @@ const TransHistoryModal = ({
                 className={`mb-6 ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-300" : "text-gray-600"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-600"
                 }`}
               >
                 텍스트를 수어로 변환하면 기록이 여기에 표시됩니다.
@@ -164,13 +173,15 @@ const TransHistoryModal = ({
                 className={`text-sm mb-4 flex items-center gap-2 ${
                   theme === "high-contrast"
                     ? "text-yellow-400"
-                    : isDarkMode ? "text-gray-400" : "text-gray-600"
+                    : isDarkMode
+                    ? "text-gray-400"
+                    : "text-gray-600"
                 }`}
               >
                 <Calendar size={16} />
                 <span>총 {translationHistory.length}개의 변환 기록</span>
               </div>
-              
+
               {translationHistory.map((item, index) => (
                 <div
                   key={item.id}
@@ -178,38 +189,42 @@ const TransHistoryModal = ({
                     rounded-lg p-4 border transition-all duration-200 cursor-pointer hover:shadow-md
                     ${
                       theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                        ? "bg-black border-2 border-yellow-400 hover:bg-gray-900"
                         : isDarkMode
                         ? "bg-gray-700 border-gray-600 hover:bg-gray-600"
                         : "bg-gray-50 border-gray-200 hover:bg-gray-100"
                     }
                   `}
-                  onClick={() => onReplayTranslation && onReplayTranslation(item.text)}
+                  onClick={() =>
+                    onReplayTranslation && onReplayTranslation(item.text)
+                  }
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <span
                         className={`
-                        px-2 py-1 rounded-full text-xs font-medium
+                        text-xl font-semibold
                         ${
                           theme === "high-contrast"
-                            ? "bg-black border-1 border-yellow-400 text-yellow-400"
+                            ? " text-yellow-400"
                             : isDarkMode
-                            ? "bg-blue-500/20 text-blue-400"
-                            : "bg-blue-100 text-blue-600"
+                            ? "  text-blue-500"
+                            : " text-blue-800"
                         }
                       `}
                       >
-                        #{translationHistory.length - index}
+                        #
+                        {translationHistory.length -
+                          (translationHistory.length - index - 1)}
                       </span>
                       {item.status === "COMPLETED" && (
-                        <CheckCircle 
-                          size={14} 
+                        <CheckCircle
+                          size={14}
                           className={
                             theme === "high-contrast"
                               ? "text-yellow-400"
                               : "text-green-500"
-                          } 
+                          }
                         />
                       )}
                     </div>
@@ -217,23 +232,29 @@ const TransHistoryModal = ({
                       className={`flex items-center gap-1 text-xs ${
                         theme === "high-contrast"
                           ? "text-yellow-400"
-                          : isDarkMode ? "text-gray-400" : "text-gray-500"
+                          : isDarkMode
+                          ? "text-gray-400"
+                          : "text-gray-500"
                       }`}
                     >
                       <Clock size={12} />
                       <span>{item.timestamp.toLocaleDateString("ko-KR")}</span>
-                      <span>{item.timestamp.toLocaleTimeString("ko-KR", { 
-                        hour: "2-digit", 
-                        minute: "2-digit" 
-                      })}</span>
+                      <span>
+                        {item.timestamp.toLocaleTimeString("ko-KR", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
                     </div>
                   </div>
 
                   <p
                     className={`text-sm leading-relaxed mb-2 ${
-                      theme === "high-contrast" 
-                        ? "text-yellow-400" 
-                        : isDarkMode ? "text-gray-200" : "text-gray-800"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode
+                        ? "text-gray-200"
+                        : "text-gray-800"
                     }`}
                   >
                     {item.text}
@@ -244,7 +265,9 @@ const TransHistoryModal = ({
                       className={`text-xs ${
                         theme === "high-contrast"
                           ? "text-yellow-400"
-                          : isDarkMode ? "text-gray-400" : "text-gray-500"
+                          : isDarkMode
+                          ? "text-gray-400"
+                          : "text-gray-500"
                       }`}
                     >
                       재생 시간: {item.duration}초
@@ -274,7 +297,9 @@ const TransHistoryModal = ({
               className={`text-sm ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
-                  : isDarkMode ? "text-gray-400" : "text-gray-600"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               기록을 클릭하면 해당 텍스트를 다시 변환할 수 있습니다

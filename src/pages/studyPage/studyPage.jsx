@@ -18,7 +18,7 @@ import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
 import CalendarModal from "../../components/calendarModel";
 import BasicLayout from "../../layouts/basicLayout";
-import IncorrectAnswerPage from "./incorrectAnswer";
+import IncorrectAnswerModal from "../../components/modals/incorrectAnswerModal";
 
 function StudyWord() {
   const { user } = useAuth();
@@ -677,20 +677,10 @@ function StudyWord() {
         </div>
 
         {/* 오답 노트 모달 */}
-        {isIncorrectAnswerOpen && (
-          <div className="fixed inset-0 z-50">
-            <div
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-              onClick={() => setIsIncorrectAnswerOpen(false)}
-            />
-            <div className="relative h-full">
-              <IncorrectAnswerPage 
-                isModal={true}
-                onClose={() => setIsIncorrectAnswerOpen(false)}
-              />
-            </div>
-          </div>
-        )}
+        <IncorrectAnswerModal
+          isOpen={isIncorrectAnswerOpen}
+          onClose={() => setIsIncorrectAnswerOpen(false)}
+        />
       </div>
     </BasicLayout>
   );
