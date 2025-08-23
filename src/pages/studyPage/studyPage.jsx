@@ -80,7 +80,7 @@ function StudyWord() {
         userId: user.id,
         correctCount: correctAnswers,
         categoryCorrectCounts: categoryCorrectCounts,
-        wrong: wrongAnswers,
+        incorrectAnswers: wrongAnswers,
       });
     } catch (error) {
       console.error("퀴즈 결과 저장 실패:", error);
