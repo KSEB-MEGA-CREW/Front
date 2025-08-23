@@ -296,7 +296,7 @@ const AvatarPage = () => {
                 />
 
                 {/* === Zoom controls INSIDE the panel (right-top) === */}
-                <div className="absolute top-2 right-3 md:top-2 md:right-3 z-20 flex items-center gap-1">
+                <div className="absolute top-2 right-2 md:top-2 md:right-2 z-20 flex items-center gap-1">
                   <button
                     onClick={handleZoomOut}
                     className={`p-2 rounded-lg transition-all duration-200 shadow-lg ${
