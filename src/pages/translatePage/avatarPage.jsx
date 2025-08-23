@@ -380,7 +380,7 @@ const AvatarPage = () => {
                 </div>
               </div>
 
-              {/* {(isUnityLoading || isConversionLoading) && (
+              {(isUnityLoading || isConversionLoading) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
                   <div
                     className={`text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 ${
@@ -397,7 +397,7 @@ const AvatarPage = () => {
                       : "AI가 수어를 생성하고 있습니다..."}
                   </div>
                 </div>
-              )} */}
+              )}
             </div>
 
             {/* settings panel */}

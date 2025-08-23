@@ -4,7 +4,13 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Html } from "@react-three/drei";
 import { SkeletonUtils } from "three-stdlib";
 
-function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd, zoom = 1 }) {
+function AvatarWithAnimation({
+  avatarUrl,
+  animationUrl,
+  play,
+  onEnd,
+  zoom = 1,
+}) {
   const groupRef = useRef();
   const mixerRef = useRef();
   const actionRef = useRef();
@@ -12,7 +18,10 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd, zoom = 1 })
   const { scene: avatarSceneRaw } = useGLTF(avatarUrl);
   const animGltf = useGLTF(animationUrl);
 
-  const avatarScene = useMemo(() => SkeletonUtils.clone(avatarSceneRaw), [avatarSceneRaw]);
+  const avatarScene = useMemo(
+    () => SkeletonUtils.clone(avatarSceneRaw),
+    [avatarSceneRaw]
+  );
 
   useEffect(() => {
     avatarScene.traverse((obj) => {
@@ -32,18 +41,25 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd, zoom = 1 })
         onEnd?.();
       }
     };
-    mixer.addEventListener('finished', onFinished);
+    mixer.addEventListener("finished", onFinished);
 
     let action;
-    const srcClips = (animGltf && animGltf.animations) ? animGltf.animations : [];
+    const srcClips = animGltf && animGltf.animations ? animGltf.animations : [];
     const clip = srcClips[0];
 
     if (clip) {
       let retargeted;
       try {
-        retargeted = SkeletonUtils.retargetClip(avatarScene, animGltf.scene || avatarScene, clip);
+        retargeted = SkeletonUtils.retargetClip(
+          avatarScene,
+          animGltf.scene || avatarScene,
+          clip
+        );
       } catch (error) {
-        console.error("Failed to retarget animation, using original clip.", error);
+        console.error(
+          "Failed to retarget animation, using original clip.",
+          error
+        );
         retargeted = clip;
       }
 
@@ -55,7 +71,7 @@ function AvatarWithAnimation({ avatarUrl, animationUrl, play, onEnd, zoom = 1 })
     }
 
     return () => {
-      mixer.removeEventListener('finished', onFinished);
+      mixer.removeEventListener("finished", onFinished);
       mixer.stopAllAction();
       actionRef.current = null;
       mixerRef.current = null;
@@ -156,22 +172,22 @@ export default function GLBAvatarPlayer({
         </mesh>
 
         <React.Suspense
-          fallback={
-            <Html center>
-              <div
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: 12,
-                  border: "1px solid rgba(0,0,0,0.12)",
-                  background: dark ? "rgba(30,41,59,0.9)" : "rgba(255,255,255,0.9)",
-                  backdropFilter: "blur(8px)",
-                  fontWeight: 700,
-                }}
-              >
-                GLB 로딩 중…
-              </div>
-            </Html>
-          }
+        // fallback={
+        //   <Html center>
+        //     <div
+        //       style={{
+        //         padding: "12px 16px",
+        //         borderRadius: 12,
+        //         border: "1px solid rgba(0,0,0,0.12)",
+        //         background: dark ? "rgba(30,41,59,0.9)" : "rgba(255,255,255,0.9)",
+        //         backdropFilter: "blur(8px)",
+        //         fontWeight: 700,
+        //       }}
+        //     >
+        //       GLB 로딩 중…
+        //     </div>
+        //   </Html>
+        // }
         >
           <AvatarWithAnimation
             avatarUrl={avatarUrl}
@@ -185,11 +201,7 @@ export default function GLBAvatarPlayer({
         {/* 새로 추가된 카메라 컨트롤러 */}
         <CameraController zoom={zoom} />
 
-        <OrbitControls
-          enableDamping
-          dampingFactor={0.08}
-          target={[0, 1, 0]}
-        />
+        <OrbitControls enableDamping dampingFactor={0.08} target={[0, 1, 0]} />
       </Canvas>
     </div>
   );
