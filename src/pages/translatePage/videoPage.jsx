@@ -59,7 +59,7 @@ const VideoPage = () => {
       // 권한 상태 변경 리스너 추가
       permission.addEventListener('change', () => {
         setPermissionState(permission.state);
-        console.log('🔄 카메라 권한 상태 변경:', permission.state);
+        console.log(' 카메라 권한 상태 변경:', permission.state);
       });
       
       return permission.state;
@@ -71,7 +71,7 @@ const VideoPage = () => {
 
   // 권한 요청 함수
   const requestCameraPermission = useCallback(async () => {
-    console.log("🔐 카메라 권한 요청 시작");
+    console.log(" 카메라 권한 요청 시작");
     
     try {
       // 먼저 현재 권한 상태를 다시 확인
@@ -111,12 +111,12 @@ const VideoPage = () => {
       setShowPermissionDialog(false);
       setPermissionState("granted");
       setCameraError(""); // 에러 메시지 초기화
-      console.log("✅ 카메라 권한 승인됨");
+      console.log(" 카메라 권한 승인됨");
       return true;
       
     } catch (error) {
       setShowPermissionDialog(false);
-      console.error("❌ 카메라 권한 거부됨:", error);
+      console.error(" 카메라 권한 거부됨:", error);
       
       if (error.name === 'NotAllowedError') {
         setPermissionState("denied");
@@ -142,7 +142,7 @@ const VideoPage = () => {
 
   // 강제 즉시 정리 함수
   const forceCleanup = useCallback(() => {
-    console.log("🔥 강제 즉시 정리 시작");
+    console.log(" 강제 즉시 정리 시작");
     
     // 모든 타이머 정리
     if (initTimeoutRef.current) {
@@ -157,12 +157,12 @@ const VideoPage = () => {
     
     // 스트림 즉시 정리
     if (streamRef.current) {
-      console.log("📹 streamRef 강제 정리");
+      console.log(" streamRef 강제 정리");
       try {
         streamRef.current.getTracks().forEach((track) => {
           if (track.readyState !== 'ended') {
             track.stop();
-            console.log(`⚡ Track force stopped: ${track.kind}`);
+            console.log(` Track force stopped: ${track.kind}`);
           }
         });
       } catch (error) {
@@ -173,7 +173,7 @@ const VideoPage = () => {
     
     // video element 강제 정리
     if (videoRef.current) {
-      console.log("📺 video element 강제 정리");
+      console.log(" video element 강제 정리");
       try {
         videoRef.current.srcObject = null;
         videoRef.current.load();
@@ -203,14 +203,14 @@ const VideoPage = () => {
     setCameraInfo(null);
     setShowPermissionDialog(false);
     
-    console.log("✅ 강제 정리 완료");
+    console.log(" 강제 정리 완료");
   }, [cleanup]);
 
   // 카메라 초기화 함수 (권한 체크 포함)
   const initializeCamera = useCallback(async (deviceId) => {
     // 이미 정리된 상태거나 초기화 중이면 건너뛰기
     if (cleanupExecutedRef.current || isInitializingRef.current || !isMountedRef.current) {
-      console.log("🚫 초기화 건너뛰기:", { 
+      console.log(" 초기화 건너뛰기:", { 
         cleanupExecuted: cleanupExecutedRef.current, 
         isInitializing: isInitializingRef.current, 
         isMounted: isMountedRef.current 
@@ -219,7 +219,7 @@ const VideoPage = () => {
     }
 
     isInitializingRef.current = true;
-    console.log("🎥 카메라 초기화 시작:", deviceId);
+    console.log(" 카메라 초기화 시작:", deviceId);
     
     try {
       // 권한 상태 확인
@@ -232,14 +232,14 @@ const VideoPage = () => {
       
       // 기존 스트림 정리
       if (streamRef.current) {
-        console.log("🗑️ 기존 스트림 정리");
+        console.log(" 기존 스트림 정리");
         streamRef.current.getTracks().forEach(track => track.stop());
         streamRef.current = null;
       }
 
       // 컴포넌트가 언마운트되었는지 다시 체크
       if (!isMountedRef.current || cleanupExecutedRef.current) {
-        console.log("🚫 초기화 중 언마운트 감지");
+        console.log(" 초기화 중 언마운트 감지");
         return;
       }
 
@@ -257,7 +257,7 @@ const VideoPage = () => {
       
       // 스트림 획득 후 다시 마운트 상태 확인
       if (!isMountedRef.current || cleanupExecutedRef.current) {
-        console.log("🚫 스트림 획득 후 언마운트 감지, 스트림 정리");
+        console.log(" 스트림 획득 후 언마운트 감지, 스트림 정리");
         newStream.getTracks().forEach(track => track.stop());
         return;
       }
@@ -275,7 +275,7 @@ const VideoPage = () => {
             .then(() => {
               if (!isMountedRef.current || cleanupExecutedRef.current) return;
               
-              console.log("▶️ 비디오 재생 시작!");
+              console.log(" 비디오 재생 시작!");
               setIsCameraReady(true);
               setCameraError("");
               
@@ -290,7 +290,7 @@ const VideoPage = () => {
               }
             })
             .catch((playErr) => {
-              console.error("⌐ 비디오 재생 실패:", playErr);
+              console.error(" 비디오 재생 실패:", playErr);
               if (isMountedRef.current && !cleanupExecutedRef.current) {
                 setCameraError("비디오 재생에 실패했습니다.");
               }
@@ -300,7 +300,7 @@ const VideoPage = () => {
         videoRef.current.onloadedmetadata = handleLoadedMetadata;
       }
     } catch (err) {
-      console.error("⌐ 카메라 접근 실패:", err);
+      console.error(" 카메라 접근 실패:", err);
       if (isMountedRef.current && !cleanupExecutedRef.current) {
         if (err.name === 'NotAllowedError') {
           setCameraError("카메라 접근 권한이 거부되었습니다. 브라우저 설정에서 권한을 허용해 주세요.");
@@ -345,7 +345,7 @@ const VideoPage = () => {
 
   // 컴포넌트 마운트 시 한 번만 실행
   useEffect(() => {
-    console.log("🚀 VideoPage 마운트");
+    console.log(" VideoPage 마운트");
     isMountedRef.current = true;
     cleanupExecutedRef.current = false;
     
@@ -354,7 +354,7 @@ const VideoPage = () => {
       if (!isMountedRef.current || cleanupExecutedRef.current) return;
       
       const permissionStatus = await checkCameraPermission();
-      console.log("🔍 초기 권한 상태:", permissionStatus);
+      console.log(" 초기 권한 상태:", permissionStatus);
       
       // 권한이 명시적으로 거부된 경우가 아니라면 디바이스 조회 시도
       if (permissionStatus !== 'denied') {
@@ -376,7 +376,7 @@ const VideoPage = () => {
 
     // cleanup 함수 - 컴포넌트 언마운트 시에만 실행
     return () => {
-      console.log("🔥 VideoPage 언마운트");
+      console.log(" VideoPage 언마운트");
       forceCleanup();
     };
   }, []); // 빈 의존성 배열
@@ -385,7 +385,7 @@ const VideoPage = () => {
   useEffect(() => {
     if (!selectedDeviceId || !isMountedRef.current || cleanupExecutedRef.current) return;
     
-    console.log("📷 카메라 디바이스 변경:", selectedDeviceId);
+    console.log(" 카메라 디바이스 변경:", selectedDeviceId);
     
     // 기존 스트림 정리 후 새 디바이스로 초기화
     if (streamRef.current) {
@@ -410,25 +410,25 @@ const VideoPage = () => {
   // 페이지 이탈 감지 - 최우선 정리
   useEffect(() => {
     const handleBeforeUnload = (e) => {
-      console.log("🚪 beforeunload 감지");
+      console.log(" beforeunload 감지");
       forceCleanup();
     };
 
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        console.log("👁️ 페이지 숨김 감지");
+        console.log(" 페이지 숨김 감지");
         forceCleanup();
       }
     };
 
     const handlePageHide = () => {
-      console.log("🔥 pagehide 감지");
+      console.log(" pagehide 감지");
       forceCleanup();
     };
 
     const handleFocus = () => {
       if (document.hidden) {
-        console.log("🔍 포커스 이동 감지");
+        console.log(" 포커스 이동 감지");
         forceCleanup();
       }
     };
@@ -531,7 +531,7 @@ const VideoPage = () => {
   const restartCamera = useCallback(async () => {
     if (!isMountedRef.current) return;
     
-    console.log("🔄 페이지 새로고침");
+    console.log(" 페이지 새로고침");
     
     // 페이지 새로고침
     window.location.reload();
@@ -539,7 +539,7 @@ const VideoPage = () => {
 
   const switchDevice = useCallback((deviceId) => {
     if (!isMountedRef.current || cleanupExecutedRef.current) return;
-    console.log("🔄 디바이스 변경:", deviceId);
+    console.log(" 디바이스 변경:", deviceId);
     setSelectedDeviceId(deviceId);
   }, []);
 
