@@ -32,7 +32,7 @@ const IncorrectAnswerPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 5;
 
   // 페이지 로드 시 데이터 가져오기
   useEffect(() => {

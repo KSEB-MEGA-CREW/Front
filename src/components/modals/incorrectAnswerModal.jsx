@@ -29,7 +29,7 @@ const IncorrectAnswerModal = ({ isOpen, onClose }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 4;
 
   // 컴포넌트가 열릴 때만 데이터 가져오기
   useEffect(() => {
