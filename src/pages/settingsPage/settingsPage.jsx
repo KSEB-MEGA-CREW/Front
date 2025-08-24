@@ -144,7 +144,7 @@ const SettingsPage = () => {
                     }`}
                   />
                   <div className="flex items-center gap-2 -ml-0.5">
-                    <Sun
+                    {/* <Sun
                       size={18}
                       className={
                         theme === "high-contrast"
@@ -153,7 +153,7 @@ const SettingsPage = () => {
                           ? "text-white"
                           : "text-gray-900"
                       }
-                    />
+                    /> */}
                     <span
                       className={` ${
                         theme === "high-contrast"
@@ -183,7 +183,7 @@ const SettingsPage = () => {
                     }`}
                   />
                   <div className="flex items-center gap-2 -ml-0.5">
-                    <Moon
+                    {/* <Moon
                       size={18}
                       className={
                         theme === "high-contrast"
@@ -192,7 +192,7 @@ const SettingsPage = () => {
                           ? "text-white"
                           : "text-gray-900"
                       }
-                    />
+                    /> */}
                     <span
                       className={` ${
                         theme === "high-contrast"
@@ -222,7 +222,7 @@ const SettingsPage = () => {
                     }`}
                   />
                   <div className="flex items-center gap-2 -ml-0.5">
-                    <Eye
+                    {/* <Eye
                       size={18}
                       className={
                         theme === "high-contrast"
@@ -231,7 +231,7 @@ const SettingsPage = () => {
                           ? "text-white"
                           : "text-gray-900"
                       }
-                    />
+                    /> */}
                     <div>
                       <span
                         className={` ${
