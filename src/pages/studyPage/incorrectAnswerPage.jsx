@@ -250,6 +250,8 @@ const IncorrectAnswerPage = () => {
           <video
             src={selectedAnswer.subDescription}
             controls
+            autoPlay
+            muted
             className="w-full h-full object-cover bg-black"
             onError={(e) => {
               console.error("비디오 로드 실패:", e);
