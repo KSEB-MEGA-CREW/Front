@@ -165,16 +165,7 @@ const IncorrectAnswerPage = () => {
             >
               <ChevronLeft size={24} />
             </button>
-            <div className="flex items-center gap-3">
-              <div
-                className={`p-3 rounded-xl ${
-                  theme === "high-contrast"
-                    ? "bg-yellow-400 text-black"
-                    : "bg-blue-500 text-white"
-                }`}
-              >
-                <Video size={28} />
-              </div>
+            <div className="flex items-center gap-3 -ml-2">
               <div>
                 <h1
                   className={`text-3xl font-bold ${
@@ -309,7 +300,7 @@ const IncorrectAnswerPage = () => {
               단어 뜻
             </h3>
             <p
-              className={`text-2xl font-bold ${
+              className={`text-2xl font-semibold ${
                 theme === "high-contrast"
                   ? "text-yellow-400"
                   : isDarkMode
@@ -422,7 +413,7 @@ const IncorrectAnswerPage = () => {
             >
               <ArrowLeft size={24} />
             </button>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 -ml-2">
               <div
                 className={`p-3 rounded-xl ${
                   theme === "high-contrast"
