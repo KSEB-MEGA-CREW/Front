@@ -18,6 +18,7 @@ import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
 import CalendarModal from "../../components/calendarModel";
 import BasicLayout from "../../layouts/basicLayout";
+import IncorrectAnswerModal from "../../components/modals/incorrectAnswerModal";
 
 function StudyWord() {
   const { user } = useAuth();
@@ -29,6 +30,7 @@ function StudyWord() {
   const [isFinished, setIsFinished] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isIncorrectAnswerOpen, setIsIncorrectAnswerOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -446,7 +448,7 @@ function StudyWord() {
               ))}
             </div>
 
-            {/* 버튼들 */}
+            {/* 버튼들 (이 부분은 수정하지 않음) */}
             <div className="flex justify-center gap-4">
               <button
                 className="inline-flex items-center gap-3 px-8 py-4 bg-blue-500 hover:from-green-600 hover:to-teal-600 rounded-2xl font-bold text-white text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl"
@@ -467,19 +469,6 @@ function StudyWord() {
               >
                 <RotateCcw size={20} />
                 다시 도전하기
-              </button>
-              <button
-                className={`inline-flex items-center gap-3 px-8 py-4 border-2 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-2xl ${
-                  theme === "high-contrast"
-                    ? "border-4 border-yellow-400 text-yellow-400 bg-black hover:bg-yellow-400 hover:text-black"
-                    : isDarkMode
-                    ? "border-orange-600 text-orange-400 hover:border-orange-400"
-                    : "border-orange-400 text-orange-600 hover:border-orange-600 bg-white hover:bg-orange-50"
-                }`}
-                onClick={() => navigate("/incorrect-answer")}
-              >
-                <FileText size={20} />
-                오답 노트
               </button>
             </div>
           </div>
@@ -534,6 +523,20 @@ function StudyWord() {
                   </span>
                 </div>
 
+                {/* 오답 노트 버튼 */}
+                <button
+                  onClick={() => setIsIncorrectAnswerOpen(true)}
+                  className={`p-2 rounded-lg transition-all duration-200 ${
+                    theme === "high-contrast"
+                      ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                      : isDarkMode
+                      ? "text-gray-300 hover:bg-gray-700 hover:text-white"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                  title="오답 노트 보기"
+                >
+                  <FileText size={20} />
+                </button>
               </div>
               {quiz.videoUrl ? (
                 // 비디오가 있을 경우
@@ -673,6 +676,11 @@ function StudyWord() {
           </div>
         </div>
 
+        {/* 오답 노트 모달 */}
+        <IncorrectAnswerModal
+          isOpen={isIncorrectAnswerOpen}
+          onClose={() => setIsIncorrectAnswerOpen(false)}
+        />
       </div>
     </BasicLayout>
   );
