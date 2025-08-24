@@ -10,6 +10,7 @@ function AvatarWithAnimation({
   play,
   onEnd,
   zoom = 1,
+  autoPlay = false,
 }) {
   const groupRef = useRef();
   const mixerRef = useRef();
@@ -37,6 +38,15 @@ function AvatarWithAnimation({
   useEffect(() => {
     if (!avatarScene || !animGltf) return;
 
+    // 이전 애니메이션 정리
+    if (mixerRef.current) {
+      mixerRef.current.stopAllAction();
+      mixerRef.current = null;
+    }
+    if (actionRef.current) {
+      actionRef.current = null;
+    }
+
     const mixer = new THREE.AnimationMixer(avatarScene);
     mixerRef.current = mixer;
 
@@ -52,47 +62,31 @@ function AvatarWithAnimation({
     const clip = srcClips[0];
 
     if (clip) {
-      let retargeted;
+      // 화면에 렌더링되는 아바타 씬에 애니메이션 적용
       try {
-        // 안전한 retargeting을 위한 검증 추가
-        const targetSkeleton = avatarScene;
-        const sourceSkeleton = animGltf.scene;
-        
-        // 스켈레톤 구조 검증
-        if (targetSkeleton && sourceSkeleton) {
-          // bones 속성이 존재하는지 확인
-          let hasValidBones = false;
-          targetSkeleton.traverse((obj) => {
-            if (obj.isSkinnedMesh && obj.skeleton && obj.skeleton.bones) {
-              hasValidBones = true;
-            }
-          });
-
-          if (hasValidBones) {
-            retargeted = SkeletonUtils.retargetClip(
-              targetSkeleton,
-              sourceSkeleton,
-              clip
-            );
-          } else {
-            console.warn("스켈레톤 구조를 찾을 수 없어 원본 클립 사용");
-            retargeted = clip;
-          }
-        } else {
-          console.warn("아바타 또는 애니메이션 씬을 찾을 수 없음");
-          retargeted = clip;
+        action = mixer.clipAction(clip, avatarScene);
+      } catch (avatarError) {
+        try {
+          action = mixer.clipAction(clip, animGltf.scene);
+        } catch (sceneError) {
+          action = mixer.clipAction(clip);
         }
-      } catch (error) {
-        console.warn("애니메이션 리타겟팅 실패, 원본 클립 사용:", error.message);
-        retargeted = clip;
       }
-
-      if (retargeted) {
-        action = mixer.clipAction(retargeted, avatarScene);
+      
+      if (action) {
         action.clampWhenFinished = true;
         action.loop = THREE.LoopOnce;
         action.enabled = true;
         actionRef.current = action;
+        
+        // 애니메이션 액션이 설정되었고 play가 true이거나 autoPlay가 true이면 즉시 재생
+        if (play || autoPlay) {
+          setTimeout(() => {
+            if (action && !action.isRunning()) {
+              action.reset().play();
+            }
+          }, 100);
+        }
       }
     }
 
@@ -109,9 +103,16 @@ function AvatarWithAnimation({
   // 외부에서 넘어오는 play 신호로 재생/정지
   useEffect(() => {
     const action = actionRef.current;
-    if (!action) return;
+    if (!action) {
+      return;
+    }
 
     if (play) {
+      // 이미 재생 중인 경우 중복 실행 방지
+      if (action.isRunning() && action.time > 0.1) {
+        return;
+      }
+      
       action.reset().play();
     } else {
       action.stop();
@@ -197,25 +198,7 @@ export default function GLBAvatarPlayer({
           <shadowMaterial opacity={dark ? 0.24 : 0.16} />
         </mesh>
 
-        <React.Suspense
-          fallback={
-            <Html center>
-              {/* <div
-                style={{
-                  padding: "12px 16px",
-                  borderRadius: 12,
-                  border: "1px solid rgba(0,0,0,0.12)",
-                  background: dark ? "rgba(30,41,59,0.9)" : "rgba(255,255,255,0.9)",
-                  backdropFilter: "blur(8px)",
-                  fontWeight: 700,
-                  color: dark ? "#e2e8f0" : "#1e293b",
-                }}
-              >
-                아바타 로딩 중…
-              </div> */}
-            </Html>
-          }
-        >
+        <React.Suspense fallback={<Html center />}>
           <AvatarWithAnimation
             avatarUrl={avatarUrl}
             animationUrl={animationUrl}
@@ -232,10 +215,10 @@ export default function GLBAvatarPlayer({
   );
 }
 
-// GLB 파일 preloading (에러 처리 추가)
+// GLB 파일 preloading
 try {
   useGLTF.preload("/avatar.glb");
   useGLTF.preload("/만나서_반갑습니다.glb");
 } catch (error) {
-  console.warn("GLB 파일 프리로딩 실패:", error);
+  // 프리로딩 실패 시 무시
 }

@@ -29,7 +29,7 @@ const IncorrectAnswerModal = ({ isOpen, onClose }) => {
   const [selectedAnswer, setSelectedAnswer] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 4;
 
   // 컴포넌트가 열릴 때만 데이터 가져오기
   useEffect(() => {
@@ -266,6 +266,8 @@ const IncorrectAnswerModal = ({ isOpen, onClose }) => {
           <video
             src={selectedAnswer.subDescription}
             controls
+            autoPlay // 자동 재생 속성
+            muted
             className="w-full h-full object-cover bg-black"
             onError={(e) => {
               console.error("비디오 로드 실패:", e);
@@ -484,7 +486,7 @@ const IncorrectAnswerModal = ({ isOpen, onClose }) => {
                     onClick={() => handleAnswerClick(answer, index)}
                     className={`p-4 rounded-lg border cursor-pointer transition-all hover:shadow-md ${
                       theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-gray-900"
                         : isDarkMode
                         ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
                         : "bg-white border-gray-200 hover:bg-gray-50"

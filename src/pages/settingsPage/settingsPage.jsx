@@ -130,33 +130,27 @@ const SettingsPage = () => {
               {/* 테마 선택 라디오 버튼 */}
               <div className="space-y-3">
                 {/* 라이트 모드 */}
-                <label className="flex items-center space-x-3 cursor-pointer">
+                <label className="flex items-center space-x-3 cursor-pointer ">
                   <input
                     type="radio"
                     name="theme"
                     value="light"
                     checked={theme === "light"}
                     onChange={() => setTheme("light")}
-                    className={`w-5 h-5 ${
+                    className={`w-4 h-4 ${
                       theme === "high-contrast"
                         ? "accent-yellow-400 border-3 border-yellow-400"
                         : "text-blue-600"
                     }`}
                   />
-                  <div className="flex items-center gap-2">
-                    <Sun
-                      size={18}
-                      className={
-                        theme === "high-contrast" ? "text-yellow-400" : ""
-                      }
-                    />
+                  <div className="flex items-center gap-2 -ml-0.5">
                     <span
-                      className={`text-sm font-medium ${
+                      className={` ${
                         theme === "high-contrast"
                           ? "text-yellow-400"
                           : isDarkMode
                           ? "text-white"
-                          : "text-gray-900"
+                          : "text-gray-700"
                       }`}
                     >
                       라이트 모드
@@ -172,26 +166,20 @@ const SettingsPage = () => {
                     value="dark"
                     checked={theme === "dark"}
                     onChange={() => setTheme("dark")}
-                    className={`w-5 h-5 ${
+                    className={`w-4 h-4 ${
                       theme === "high-contrast"
                         ? "accent-yellow-400 border-3 border-yellow-400"
                         : "text-blue-600"
                     }`}
                   />
-                  <div className="flex items-center gap-2">
-                    <Moon
-                      size={18}
-                      className={
-                        theme === "high-contrast" ? "text-yellow-400" : ""
-                      }
-                    />
+                  <div className="flex items-center gap-2 -ml-0.5">
                     <span
-                      className={`text-sm font-medium ${
+                      className={` ${
                         theme === "high-contrast"
                           ? "text-yellow-400"
                           : isDarkMode
                           ? "text-white"
-                          : "text-gray-900"
+                          : "text-gray-700"
                       }`}
                     >
                       다크 모드
@@ -207,27 +195,21 @@ const SettingsPage = () => {
                     value="high-contrast"
                     checked={theme === "high-contrast"}
                     onChange={() => setTheme("high-contrast")}
-                    className={`w-5 h-5 ${
+                    className={`w-4 h-4 ${
                       theme === "high-contrast"
                         ? "accent-yellow-400 border-3 border-yellow-400"
                         : "text-blue-600"
                     }`}
                   />
-                  <div className="flex items-center gap-2">
-                    <Eye
-                      size={18}
-                      className={
-                        theme === "high-contrast" ? "text-yellow-400" : ""
-                      }
-                    />
+                  <div className="flex items-center gap-2 -ml-0.5">
                     <div>
                       <span
-                        className={`text-sm font-medium ${
+                        className={` ${
                           theme === "high-contrast"
                             ? "text-yellow-400"
                             : isDarkMode
                             ? "text-white"
-                            : "text-gray-900"
+                            : "text-gray-700"
                         }`}
                       >
                         고대비 모드
@@ -403,7 +385,7 @@ const SettingsPage = () => {
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center px-3">
                 <span
                   className={`${
                     theme === "high-contrast"
@@ -430,15 +412,15 @@ const SettingsPage = () => {
               <button
                 onClick={() => navigate("/terms-of-service")}
                 className={`
-                  w-full text-left p-3 rounded-lg transition-colors flex items-center justify-between group
-                  ${
-                    theme === "high-contrast"
-                      ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
-                      : isDarkMode
-                      ? "hover:bg-gray-700 text-gray-300"
-                      : "hover:bg-gray-100 text-gray-700"
-                  }
-                `}
+                    w-full text-left p-3 rounded-lg transition-colors flex items-center justify-between group
+                    ${
+                      theme === "high-contrast"
+                        ? "text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                        : isDarkMode
+                        ? "hover:bg-gray-700 text-gray-300"
+                        : "hover:bg-gray-100 text-gray-700"
+                    }
+                  `}
               >
                 <span>이용약관</span>
                 <ChevronRight

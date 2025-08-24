@@ -214,9 +214,13 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       translationDemo
-                        ? isDarkMode
+                        ? theme === "high-contrast"
+                          ? "bg-yellow-400"
+                          : isDarkMode
                           ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
                           : "border-1 border-blue-500 text-gray-700 bg-blue-50 shadow-lg shadow-blue-500/30"
+                        : theme === "high-contrast"
+                        ? "bg-[#212121]"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"
@@ -261,9 +265,13 @@ function MainPage() {
                   <div
                     className={`p-6 rounded-2xl ${
                       !translationDemo
-                        ? isDarkMode
+                        ? theme === "high-contrast"
+                          ? "bg-yellow-400"
+                          : isDarkMode
                           ? "border-1 border-blue-500 text-white shadow-lg shadow-blue-500/30"
                           : "border-1 border-blue-500 text-gray-700 bg-blue-50 shadow-lg shadow-blue-500/30"
+                        : theme === "high-contrast"
+                        ? "bg-[#212121]"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-400"
                         : "bg-white text-gray-500 shadow-md"

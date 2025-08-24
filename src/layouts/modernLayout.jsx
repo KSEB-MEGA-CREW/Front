@@ -48,6 +48,14 @@ const ModernLayout = ({ children, showMyPage }) => {
     }
   };
 
+  const handleShowIncorrectAnswer = () => {
+    navigate('/incorrect-answer');
+    // 모바일에서는 메뉴 닫기
+    if (window.innerWidth < 768) {
+      setIsSideMenuOpen(false);
+    }
+  };
+
   return (
     <div className={`flex h-screen ${
       theme === 'dark' ? 'dark' : (theme === 'high-contrast' ? 'high-contrast' : '')
@@ -61,6 +69,7 @@ const ModernLayout = ({ children, showMyPage }) => {
         onShowStats={handleShowStats}
         onShowSettings={handleShowSettings}
         onShowQuiz={handleShowQuiz}
+        onShowIncorrectAnswer={handleShowIncorrectAnswer}
       />
 
       {/* 메인 콘텐츠 영역 */}

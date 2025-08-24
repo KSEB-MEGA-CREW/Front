@@ -13,6 +13,7 @@ import {
   Brain,
   Shield,
   HelpCircle,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../../Context/authContext";
 import { useTheme } from "../../Context/themeContext";
@@ -27,6 +28,7 @@ const SideMenu = ({
   onShowStats,
   onShowSettings,
   onShowQuiz,
+  onShowIncorrectAnswer,
 }) => {
   const { user, isAdmin } = useAuth();
   const { theme, isDarkMode } = useTheme();
@@ -56,6 +58,12 @@ const SideMenu = ({
       label: "퀴즈",
       onClick: onShowQuiz,
       id: "quiz", // 모달/해시 기반 네비게이션을 위한 ID
+    },
+    {
+      icon: <FileText size={20} />,
+      label: "오답 노트",
+      path: "/incorrect-answer",
+      onClick: onShowIncorrectAnswer,
     },
     {
       icon: <BarChart3 size={20} />,
@@ -316,7 +324,7 @@ const SideMenu = ({
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
                   : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
-              ${isOpen ? "" : "border"}
+            
             `}
           >
             <div className="flex-shrink-0">

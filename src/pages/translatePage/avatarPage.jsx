@@ -29,8 +29,12 @@ const useUnityAvatar = () => {
   const containerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const sendAnimationData = () => setIsPlaying(true);
-  const stopAnimation = () => setIsPlaying(false);
+  const sendAnimationData = () => {
+    setIsPlaying(true);
+  };
+  const stopAnimation = () => {
+    setIsPlaying(false);
+  };
 
   return {
     isLoaded: true,
@@ -49,7 +53,7 @@ const useUnityAvatar = () => {
 const useTextToSignAPI = () => {
   const [isLoading, setIsLoading] = useState(false);
 
-  const convertTextToSignLanguage = async (text) => {
+  const convertTextToSignLanguage = async (_text) => {
     setIsLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
     setIsLoading(false);
@@ -98,6 +102,18 @@ const AvatarPage = () => {
     convertTextToSignLanguage,
   } = useTextToSignAPI();
 
+  // 자주 사용하는 구문 상수 정의
+  const FREQUENT_PHRASES = {
+    "안녕하세요": "안녕하세요",
+    "감사합니다": "감사합니다",
+    "알겠습니다": "알겠습니다",
+    "죄송합니다": "죄송합니다",
+    "괜찮아요": "괜찮아요",
+    "좋아요": "좋아요",
+    "싫어요": "싫어요",
+    "도움이 필요하신가요": "help_needed"
+  };
+
   const predefinedPhrases = [
     { display: "안녕하세요", filename: "안녕하세요" },
     { display: "감사합니다", filename: "감사합니다" },
@@ -109,11 +125,17 @@ const AvatarPage = () => {
     { display: "도움이 필요하신가요", filename: "help_needed" },
   ];
 
+  // 자주 사용하는 구문인지 판별하는 함수
+  const isFrequentlyUsedPhrase = (text) => {
+    return Object.prototype.hasOwnProperty.call(FREQUENT_PHRASES, text.trim());
+  };
+
   useEffect(() => {
     if (!isUnityLoaded && !isUnityLoading && !unityError) {
       initializeUnity();
     }
   }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity]);
+
 
   const handleConvertToSignLanguage = async (text, customFilename = null) => {
     if (!text.trim() || isPlaying) return;
@@ -132,24 +154,32 @@ const AvatarPage = () => {
       const response = await fetch(animationFileUrl);
       const contentType = response.headers.get("Content-Type");
 
+
       if (
         response.ok &&
         (contentType === "model/gltf-binary" || response.status === 304)
       ) {
-        setAnimationUrl(animationFileUrl);
-
-        // 기존 로직 유지: 안전하게 멈췄다가 재생 시작
+        
+        // 먼저 애니메이션을 완전히 멈춤
         stopAnimation();
+        
+        // 캐시 우회를 위해 타임스탬프를 추가한 URL 생성
+        const urlWithTimestamp = `${animationFileUrl}?t=${Date.now()}`;
+        
+        // 애니메이션 URL 변경 (캐시 우회)
+        setAnimationUrl(urlWithTimestamp);
+        
+        // GLB 로딩 완료를 더 오래 기다린 후 재생 시작
         setTimeout(() => {
           sendAnimationData();
-        }, 10);
+        }, 500);
 
         const newTranslation = {
           id: Date.now(),
           text,
           timestamp: new Date(),
           requestId: `local-${Date.now()}`,
-          status: "COMPLETED",
+          status: false, // 평가되지 않은 상태
           duration: 3,
         };
 
@@ -158,7 +188,12 @@ const AvatarPage = () => {
 
         if (isSpeechEnabled) speakText(text);
       } else {
-        // 파일이 없거나 타입이 다르면 아무것도 하지 않음
+        console.error('GLB 파일 조건 불일치:', {
+          ok: response.ok,
+          status: response.status,
+          contentType,
+          animationFileUrl
+        });
       }
     } catch (error) {
       console.error("애니메이션 파일 확인 중 오류 발생:", error);
@@ -200,7 +235,25 @@ const AvatarPage = () => {
   const handleReplayTranslation = (text) => {
     setInputText(text);
     setShowHistoryModal(false);
-    handleConvertToSignLanguage(text);
+    
+    // 자주 사용하는 구문인지 확인하여 분기 처리
+    if (isFrequentlyUsedPhrase(text)) {
+      // 자주 사용하는 구문의 경우 해당 파일명으로 직접 변환 호출
+      const filename = FREQUENT_PHRASES[text.trim()];
+      handleConvertToSignLanguage(text, filename);
+    } else {
+      // 일반 텍스트는 기존 방식대로 처리 (AI 서버 연동)
+      handleConvertToSignLanguage(text);
+    }
+  };
+
+  // 번역 기록 상태 업데이트 핸들러
+  const handleUpdateHistory = (historyId, updates) => {
+    setTranslationHistory(prev => 
+      prev.map(item => 
+        item.id === historyId ? { ...item, ...updates } : item
+      )
+    );
   };
 
   const handleStopAnimation = () => {
@@ -316,7 +369,7 @@ const AvatarPage = () => {
             {/* avatar panel */}
             <div className="w-full h-full flex items-center justify-center relative">
               <div
-                className={`w-full max-w-4xl h-full max-h-[600px] rounded-2xl border relative ${
+                className={`w-full max-w-4xl h-full max-h-[600px]  border relative ${
                   theme === "high-contrast"
                     ? "bg-gray-900 border-yellow-400"
                     : isDarkMode
@@ -329,7 +382,7 @@ const AvatarPage = () => {
                   avatarUrl="/avatar.glb"
                   animationUrl={animationUrl}
                   play={isPlaying}
-                  dark={isDarkMode}
+                  dark={isDarkMode || theme === "high-contrast"}
                   zoom={cameraZoom}
                   onEnd={stopAnimation}
                 />
@@ -441,13 +494,9 @@ const AvatarPage = () => {
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         theme === "high-contrast"
                           ? "border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                          : isSpeechEnabled
-                          ? isDarkMode
-                            ? "border border-gray-400 hover:bg-gray-500 text-white"
-                            : "border border-gray-400 hover:bg-gray-500 text-gray-800"
                           : isDarkMode
-                          ? "border border-gray-400 hover:bg-gray-500 text-gray-300"
-                          : "border border-gray-400 hover:bg-gray-500 text-gray-600"
+                          ? "border border-gray-400 hover:bg-gray-500 text-white"
+                          : "border border-gray-400 hover:bg-gray-200 text-gray-800"
                       }`}
                     >
                       {isSpeechEnabled ? (
@@ -729,6 +778,7 @@ const AvatarPage = () => {
         translationHistory={translationHistory}
         onClearHistory={clearHistory}
         onReplayTranslation={handleReplayTranslation}
+        onUpdateHistory={handleUpdateHistory}
       />
     </div>
   );

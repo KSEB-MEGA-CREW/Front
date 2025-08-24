@@ -683,7 +683,7 @@ const CustomerSupport = () => {
                       !formData.subject ||
                       !formData.message ||
                       !formData.category
-                        ? "bg-gray-400 cursor-not-allowed text-white"
+                        ? "bg-gray-300 cursor-not-allowed text-white"
                         : "bg-blue-600 hover:bg-blue-700 text-white"
                     }
                   `}

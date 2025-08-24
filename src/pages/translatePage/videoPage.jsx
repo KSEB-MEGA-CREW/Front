@@ -24,7 +24,7 @@ const VideoPage = () => {
   const isMountedRef = useRef(true);
   const cleanupExecutedRef = useRef(false);
   const initTimeoutRef = useRef(null);
-  
+
   const [translationText, setTranslationText] = useState("");
   const [isCameraReady, setIsCameraReady] = useState(false);
   const [cameraError, setCameraError] = useState("");
@@ -53,32 +53,32 @@ const VideoPage = () => {
   // 권한 상태 확인 함수
   const checkCameraPermission = useCallback(async () => {
     try {
-      const permission = await navigator.permissions.query({ name: 'camera' });
+      const permission = await navigator.permissions.query({ name: "camera" });
       setPermissionState(permission.state);
-      
+
       // 권한 상태 변경 리스너 추가
-      permission.addEventListener('change', () => {
+      permission.addEventListener("change", () => {
         setPermissionState(permission.state);
-        console.log(' 카메라 권한 상태 변경:', permission.state);
+        console.log(" 카메라 권한 상태 변경:", permission.state);
       });
-      
+
       return permission.state;
     } catch (error) {
-      console.log('권한 API를 사용할 수 없습니다:', error);
-      return 'unknown';
+      console.log("권한 API를 사용할 수 없습니다:", error);
+      return "unknown";
     }
   }, []);
 
   // 권한 요청 함수
   const requestCameraPermission = useCallback(async () => {
     console.log(" 카메라 권한 요청 시작");
-    
+
     try {
       // 먼저 현재 권한 상태를 다시 확인
       const currentPermission = await checkCameraPermission();
       console.log("현재 권한 상태:", currentPermission);
-      
-      if (currentPermission === 'denied') {
+
+      if (currentPermission === "denied") {
         // 권한이 영구적으로 거부된 경우 사용자 안내
         setCameraError(`
           카메라 접근이 차단되었습니다. 
@@ -92,33 +92,32 @@ const VideoPage = () => {
         `);
         return false;
       }
-      
+
       setShowPermissionDialog(true);
-      
+
       // 임시 스트림을 통해 권한 요청
       const tempStream = await navigator.mediaDevices.getUserMedia({
-        video: { 
-          width: { ideal: 640 }, 
+        video: {
+          width: { ideal: 640 },
           height: { ideal: 480 },
-          facingMode: "user" 
+          facingMode: "user",
         },
         audio: false,
       });
-      
+
       // 임시 스트림 즉시 정리
-      tempStream.getTracks().forEach(track => track.stop());
-      
+      tempStream.getTracks().forEach((track) => track.stop());
+
       setShowPermissionDialog(false);
       setPermissionState("granted");
       setCameraError(""); // 에러 메시지 초기화
       console.log(" 카메라 권한 승인됨");
       return true;
-      
     } catch (error) {
       setShowPermissionDialog(false);
       console.error(" 카메라 권한 거부됨:", error);
-      
-      if (error.name === 'NotAllowedError') {
+
+      if (error.name === "NotAllowedError") {
         setPermissionState("denied");
         setCameraError(`
           카메라 접근 권한이 거부되었습니다.
@@ -128,14 +127,18 @@ const VideoPage = () => {
           • 카메라를 '허용'으로 변경 후 새로고침
           • 또는 브라우저 설정에서 카메라 권한 허용
         `);
-      } else if (error.name === 'NotFoundError') {
-        setCameraError("카메라를 찾을 수 없습니다. 카메라가 연결되어 있는지 확인해 주세요.");
-      } else if (error.name === 'NotReadableError') {
-        setCameraError("카메라가 다른 응용 프로그램에서 사용 중입니다. 다른 앱을 종료한 후 다시 시도해 주세요.");
+      } else if (error.name === "NotFoundError") {
+        setCameraError(
+          "카메라를 찾을 수 없습니다. 카메라가 연결되어 있는지 확인해 주세요."
+        );
+      } else if (error.name === "NotReadableError") {
+        setCameraError(
+          "카메라가 다른 응용 프로그램에서 사용 중입니다. 다른 앱을 종료한 후 다시 시도해 주세요."
+        );
       } else {
         setCameraError("카메라 접근 중 오류가 발생했습니다: " + error.message);
       }
-      
+
       return false;
     }
   }, [checkCameraPermission]);
@@ -143,24 +146,24 @@ const VideoPage = () => {
   // 강제 즉시 정리 함수
   const forceCleanup = useCallback(() => {
     console.log(" 강제 즉시 정리 시작");
-    
+
     // 모든 타이머 정리
     if (initTimeoutRef.current) {
       clearTimeout(initTimeoutRef.current);
       initTimeoutRef.current = null;
     }
-    
+
     // 초기화 상태 리셋
     isInitializingRef.current = false;
     isMountedRef.current = false;
     cleanupExecutedRef.current = true;
-    
+
     // 스트림 즉시 정리
     if (streamRef.current) {
       console.log(" streamRef 강제 정리");
       try {
         streamRef.current.getTracks().forEach((track) => {
-          if (track.readyState !== 'ended') {
+          if (track.readyState !== "ended") {
             track.stop();
             console.log(` Track force stopped: ${track.kind}`);
           }
@@ -170,7 +173,7 @@ const VideoPage = () => {
       }
       streamRef.current = null;
     }
-    
+
     // video element 강제 정리
     if (videoRef.current) {
       console.log(" video element 강제 정리");
@@ -186,7 +189,7 @@ const VideoPage = () => {
         console.error("Video element 정리 오류:", error);
       }
     }
-    
+
     // useFrameExtraction cleanup
     if (typeof cleanup === "function") {
       console.log("🔌 useFrameExtraction 강제 cleanup");
@@ -196,137 +199,153 @@ const VideoPage = () => {
         console.error("useFrameExtraction cleanup 오류:", error);
       }
     }
-    
+
     // 상태 초기화
     setIsCameraReady(false);
     setCameraError("");
     setCameraInfo(null);
     setShowPermissionDialog(false);
-    
+
     console.log(" 강제 정리 완료");
   }, [cleanup]);
 
   // 카메라 초기화 함수 (권한 체크 포함)
-  const initializeCamera = useCallback(async (deviceId) => {
-    // 이미 정리된 상태거나 초기화 중이면 건너뛰기
-    if (cleanupExecutedRef.current || isInitializingRef.current || !isMountedRef.current) {
-      console.log(" 초기화 건너뛰기:", { 
-        cleanupExecuted: cleanupExecutedRef.current, 
-        isInitializing: isInitializingRef.current, 
-        isMounted: isMountedRef.current 
-      });
-      return;
-    }
-
-    isInitializingRef.current = true;
-    console.log(" 카메라 초기화 시작:", deviceId);
-    
-    try {
-      // 권한 상태 확인
-      const permissionStatus = await checkCameraPermission();
-      
-      if (permissionStatus === 'denied') {
-        setCameraError("카메라 접근이 차단되었습니다. 브라우저 설정에서 권한을 허용해 주세요.");
-        return;
-      }
-      
-      // 기존 스트림 정리
-      if (streamRef.current) {
-        console.log(" 기존 스트림 정리");
-        streamRef.current.getTracks().forEach(track => track.stop());
-        streamRef.current = null;
-      }
-
-      // 컴포넌트가 언마운트되었는지 다시 체크
-      if (!isMountedRef.current || cleanupExecutedRef.current) {
-        console.log(" 초기화 중 언마운트 감지");
+  const initializeCamera = useCallback(
+    async (deviceId) => {
+      // 이미 정리된 상태거나 초기화 중이면 건너뛰기
+      if (
+        cleanupExecutedRef.current ||
+        isInitializingRef.current ||
+        !isMountedRef.current
+      ) {
+        console.log(" 초기화 건너뛰기:", {
+          cleanupExecuted: cleanupExecutedRef.current,
+          isInitializing: isInitializingRef.current,
+          isMounted: isMountedRef.current,
+        });
         return;
       }
 
-      const constraints = {
-        video: {
-          deviceId: deviceId ? { exact: deviceId } : undefined,
-          width: { ideal: 1280, min: 640 },
-          height: { ideal: 720, min: 480 },
-          facingMode: deviceId ? undefined : "user",
-        },
-        audio: false,
-      };
+      isInitializingRef.current = true;
+      console.log(" 카메라 초기화 시작:", deviceId);
 
-      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-      
-      // 스트림 획득 후 다시 마운트 상태 확인
-      if (!isMountedRef.current || cleanupExecutedRef.current) {
-        console.log(" 스트림 획득 후 언마운트 감지, 스트림 정리");
-        newStream.getTracks().forEach(track => track.stop());
-        return;
-      }
-      
-      streamRef.current = newStream;
+      try {
+        // 권한 상태 확인
+        const permissionStatus = await checkCameraPermission();
 
-      if (videoRef.current && isMountedRef.current) {
-        videoRef.current.srcObject = newStream;
-        
-        // 메타데이터 로드 핸들러
-        const handleLoadedMetadata = () => {
-          if (!isMountedRef.current || cleanupExecutedRef.current) return;
-          
-          videoRef.current?.play()
-            .then(() => {
-              if (!isMountedRef.current || cleanupExecutedRef.current) return;
-              
-              console.log(" 비디오 재생 시작!");
-              setIsCameraReady(true);
-              setCameraError("");
-              
-              const videoTrack = newStream.getVideoTracks()[0];
-              if (videoTrack) {
-                const settings = videoTrack.getSettings();
-                setCameraInfo({
-                  width: settings.width,
-                  height: settings.height,
-                  deviceLabel: videoTrack.label,
-                });
-              }
-            })
-            .catch((playErr) => {
-              console.error(" 비디오 재생 실패:", playErr);
-              if (isMountedRef.current && !cleanupExecutedRef.current) {
-                setCameraError("비디오 재생에 실패했습니다.");
-              }
-            });
+        if (permissionStatus === "denied") {
+          setCameraError(
+            "카메라 접근이 차단되었습니다. 브라우저 설정에서 권한을 허용해 주세요."
+          );
+          return;
+        }
+
+        // 기존 스트림 정리
+        if (streamRef.current) {
+          console.log(" 기존 스트림 정리");
+          streamRef.current.getTracks().forEach((track) => track.stop());
+          streamRef.current = null;
+        }
+
+        // 컴포넌트가 언마운트되었는지 다시 체크
+        if (!isMountedRef.current || cleanupExecutedRef.current) {
+          console.log(" 초기화 중 언마운트 감지");
+          return;
+        }
+
+        const constraints = {
+          video: {
+            deviceId: deviceId ? { exact: deviceId } : undefined,
+            width: { ideal: 1280, min: 640 },
+            height: { ideal: 720, min: 480 },
+            facingMode: deviceId ? undefined : "user",
+          },
+          audio: false,
         };
 
-        videoRef.current.onloadedmetadata = handleLoadedMetadata;
-      }
-    } catch (err) {
-      console.error(" 카메라 접근 실패:", err);
-      if (isMountedRef.current && !cleanupExecutedRef.current) {
-        if (err.name === 'NotAllowedError') {
-          setCameraError("카메라 접근 권한이 거부되었습니다. 브라우저 설정에서 권한을 허용해 주세요.");
-        } else if (err.name === 'NotFoundError') {
-          setCameraError("카메라를 찾을 수 없습니다. 카메라가 연결되어 있는지 확인해 주세요.");
-        } else {
-          setCameraError("카메라 접근에 실패했습니다: " + err.message);
+        const newStream = await navigator.mediaDevices.getUserMedia(
+          constraints
+        );
+
+        // 스트림 획득 후 다시 마운트 상태 확인
+        if (!isMountedRef.current || cleanupExecutedRef.current) {
+          console.log(" 스트림 획득 후 언마운트 감지, 스트림 정리");
+          newStream.getTracks().forEach((track) => track.stop());
+          return;
         }
-        setIsCameraReady(false);
+
+        streamRef.current = newStream;
+
+        if (videoRef.current && isMountedRef.current) {
+          videoRef.current.srcObject = newStream;
+
+          // 메타데이터 로드 핸들러
+          const handleLoadedMetadata = () => {
+            if (!isMountedRef.current || cleanupExecutedRef.current) return;
+
+            videoRef.current
+              ?.play()
+              .then(() => {
+                if (!isMountedRef.current || cleanupExecutedRef.current) return;
+
+                console.log(" 비디오 재생 시작!");
+                setIsCameraReady(true);
+                setCameraError("");
+
+                const videoTrack = newStream.getVideoTracks()[0];
+                if (videoTrack) {
+                  const settings = videoTrack.getSettings();
+                  setCameraInfo({
+                    width: settings.width,
+                    height: settings.height,
+                    deviceLabel: videoTrack.label,
+                  });
+                }
+              })
+              .catch((playErr) => {
+                console.error(" 비디오 재생 실패:", playErr);
+                if (isMountedRef.current && !cleanupExecutedRef.current) {
+                  setCameraError("비디오 재생에 실패했습니다.");
+                }
+              });
+          };
+
+          videoRef.current.onloadedmetadata = handleLoadedMetadata;
+        }
+      } catch (err) {
+        console.error(" 카메라 접근 실패:", err);
+        if (isMountedRef.current && !cleanupExecutedRef.current) {
+          if (err.name === "NotAllowedError") {
+            setCameraError(
+              "카메라 접근 권한이 거부되었습니다. 브라우저 설정에서 권한을 허용해 주세요."
+            );
+          } else if (err.name === "NotFoundError") {
+            setCameraError(
+              "카메라를 찾을 수 없습니다. 카메라가 연결되어 있는지 확인해 주세요."
+            );
+          } else {
+            setCameraError("카메라 접근에 실패했습니다: " + err.message);
+          }
+          setIsCameraReady(false);
+        }
+      } finally {
+        isInitializingRef.current = false;
       }
-    } finally {
-      isInitializingRef.current = false;
-    }
-  }, [checkCameraPermission]);
+    },
+    [checkCameraPermission]
+  );
 
   // 디바이스 목록 가져오기
   const getDevices = useCallback(async () => {
     if (!isMountedRef.current || cleanupExecutedRef.current) return;
-    
+
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const videoDevices = devices.filter((d) => d.kind === "videoinput");
-      
+
       if (isMountedRef.current && !cleanupExecutedRef.current) {
         setAvailableDevices(videoDevices);
-        
+
         if (videoDevices.length > 0 && !selectedDeviceId) {
           const firstDevice = videoDevices[0].deviceId;
           setSelectedDeviceId(firstDevice);
@@ -339,7 +358,7 @@ const VideoPage = () => {
         setCameraError("카메라 장치를 조회하는 데 실패했습니다.");
       }
     }
-    
+
     return selectedDeviceId;
   }, [selectedDeviceId]);
 
@@ -348,16 +367,16 @@ const VideoPage = () => {
     console.log(" VideoPage 마운트");
     isMountedRef.current = true;
     cleanupExecutedRef.current = false;
-    
+
     // 권한 상태 확인 및 초기화
     const initialize = async () => {
       if (!isMountedRef.current || cleanupExecutedRef.current) return;
-      
+
       const permissionStatus = await checkCameraPermission();
       console.log(" 초기 권한 상태:", permissionStatus);
-      
+
       // 권한이 명시적으로 거부된 경우가 아니라면 디바이스 조회 시도
-      if (permissionStatus !== 'denied') {
+      if (permissionStatus !== "denied") {
         const deviceId = await getDevices();
         if (deviceId && isMountedRef.current && !cleanupExecutedRef.current) {
           // React StrictMode를 고려하여 약간의 지연 후 초기화
@@ -368,7 +387,9 @@ const VideoPage = () => {
           }, 100);
         }
       } else {
-        setCameraError("카메라 접근이 차단되었습니다. 브라우저 설정에서 권한을 허용하거나 아래 버튼을 클릭해 주세요.");
+        setCameraError(
+          "카메라 접근이 차단되었습니다. 브라우저 설정에서 권한을 허용하거나 아래 버튼을 클릭해 주세요."
+        );
       }
     };
 
@@ -383,16 +404,21 @@ const VideoPage = () => {
 
   // selectedDeviceId 변경 시에만 카메라 재초기화
   useEffect(() => {
-    if (!selectedDeviceId || !isMountedRef.current || cleanupExecutedRef.current) return;
-    
+    if (
+      !selectedDeviceId ||
+      !isMountedRef.current ||
+      cleanupExecutedRef.current
+    )
+      return;
+
     console.log(" 카메라 디바이스 변경:", selectedDeviceId);
-    
+
     // 기존 스트림 정리 후 새 디바이스로 초기화
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
     }
-    
+
     // 약간의 지연 후 새 디바이스로 초기화
     initTimeoutRef.current = setTimeout(() => {
       if (isMountedRef.current && !cleanupExecutedRef.current) {
@@ -434,16 +460,16 @@ const VideoPage = () => {
     };
 
     // 여러 이벤트로 확실한 정리 보장
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('pagehide', handlePageHide);
-    window.addEventListener('blur', handleFocus);
-    
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", handlePageHide);
+    window.addEventListener("blur", handleFocus);
+
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('pagehide', handlePageHide);
-      window.removeEventListener('blur', handleFocus);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", handlePageHide);
+      window.removeEventListener("blur", handleFocus);
     };
   }, [forceCleanup]);
 
@@ -463,9 +489,11 @@ const VideoPage = () => {
       setTranslationText(newTranslation);
       setTranslationHistory((prev) => [
         {
+          id: Date.now(),
           text: newTranslation,
           confidence: result.confidence || 0,
           timestamp: new Date(),
+          status: false, // 평가되지 않은 상태
         },
         ...prev.slice(0, 9),
       ]);
@@ -530,9 +558,9 @@ const VideoPage = () => {
 
   const restartCamera = useCallback(async () => {
     if (!isMountedRef.current) return;
-    
+
     console.log(" 페이지 새로고침");
-    
+
     // 페이지 새로고침
     window.location.reload();
   }, []);
@@ -619,7 +647,8 @@ const VideoPage = () => {
                     : "text-gray-600"
                 }`}
               >
-                수어 번역 서비스를 이용하기 위해 카메라 접근 권한이 필요합니다. 브라우저에서 권한 요청이 나타나면 '허용'을 클릭해 주세요.
+                수어 번역 서비스를 이용하기 위해 카메라 접근 권한이 필요합니다.
+                브라우저에서 권한 요청이 나타나면 '허용'을 클릭해 주세요.
               </p>
               <div className="flex items-center justify-center">
                 <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
@@ -782,8 +811,16 @@ const VideoPage = () => {
             {cameraError ? (
               <div className="w-full h-full flex items-center justify-center p-8">
                 <div className="text-center max-w-md">
-                  <div className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <AlertCircle size={32} className="text-white" />
+                  <div
+                    className={`w-20 h-20 border-2 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                      theme === "high-contrast"
+                        ? "border-yellow-400 text-yellow-400"
+                        : isDarkMode
+                        ? "border-gray-200 text-gray-200"
+                        : "border-gray-800 text-gray-800"
+                    }`}
+                  >
+                    <AlertCircle size={32} />
                   </div>
                   <h3
                     className={`text-xl font-bold mb-3 ${
@@ -813,13 +850,19 @@ const VideoPage = () => {
                       className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
                     >
                       <RotateCcw size={18} />
-                       새로 고침
+                      새로 고침
                     </button>
-                    {permissionState === 'denied' && (
+                    {permissionState === "denied" && (
                       <>
                         <button
                           onClick={handleRequestPermission}
-                          className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg mb-3"
+                          className={`inline-flex items-center justify-center gap-2 px-6 py-3 font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg mb-3 ${
+                            theme === "high-contrast"
+                              ? "border-1 border-yellow-400 text-yellow-400"
+                              : isDarkMode
+                              ? "border-1 border-gray-200 text-gray-200"
+                              : "border-1 border-gray-800 text-gray-800"
+                          }`}
                         >
                           <Shield size={18} />
                           권한 다시 요청
