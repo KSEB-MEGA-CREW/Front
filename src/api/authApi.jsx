@@ -264,9 +264,12 @@ export const authApi = {
   // 게시글 삭제 (관리자)
   deleteSupportTicketByAdmin: async (ticketId) => {
     try {
-      const response = await apiRequest(`/api/support/admin/tickets/${ticketId}`, {
-        method: "DELETE",
-      });
+      const response = await apiRequest(
+        `/api/support/admin/tickets/${ticketId}`,
+        {
+          method: "DELETE",
+        }
+      );
       return response;
     } catch (error) {
       console.error("관리자 게시글 삭제 오류:", error);
@@ -350,7 +353,7 @@ export const quizApi = {
   getUserIncorrectAnswers: async (userId) => {
     try {
       const response = await apiRequest(
-        `/api/incorrect-answers/user/${userId}`,
+        `/api/quiz/incorrect-answers/user/${userId}`,
         {
           method: "GET",
         }
