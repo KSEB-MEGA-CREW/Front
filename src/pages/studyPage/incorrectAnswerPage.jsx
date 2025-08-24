@@ -166,11 +166,13 @@ const IncorrectAnswerPage = () => {
               <ChevronLeft size={24} />
             </button>
             <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-xl ${
-                theme === "high-contrast"
-                  ? "bg-yellow-400 text-black"
-                  : "bg-blue-500 text-white"
-              }`}>
+              <div
+                className={`p-3 rounded-xl ${
+                  theme === "high-contrast"
+                    ? "bg-yellow-400 text-black"
+                    : "bg-blue-500 text-white"
+                }`}
+              >
                 <Video size={28} />
               </div>
               <div>
@@ -286,13 +288,15 @@ const IncorrectAnswerPage = () => {
 
         {/* 정보 섹션 */}
         <div className="grid gap-6">
-          <div className={`p-6 rounded-2xl border ${
-            theme === "high-contrast"
-              ? "bg-black border-2 border-yellow-400"
-              : isDarkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-200 shadow-sm"
-          }`}>
+          <div
+            className={`p-6 rounded-2xl border ${
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200 shadow-sm"
+            }`}
+          >
             <h3
               className={`text-lg font-bold mb-3 ${
                 theme === "high-contrast"
@@ -317,13 +321,15 @@ const IncorrectAnswerPage = () => {
             </p>
           </div>
 
-          <div className={`p-6 rounded-2xl border ${
-            theme === "high-contrast"
-              ? "bg-black border-2 border-yellow-400"
-              : isDarkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-200 shadow-sm"
-          }`}>
+          <div
+            className={`p-6 rounded-2xl border ${
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200 shadow-sm"
+            }`}
+          >
             <h3
               className={`text-lg font-bold mb-3 ${
                 theme === "high-contrast"
@@ -348,13 +354,15 @@ const IncorrectAnswerPage = () => {
             </p>
           </div>
 
-          <div className={`p-6 rounded-2xl border ${
-            theme === "high-contrast"
-              ? "bg-black border-2 border-yellow-400"
-              : isDarkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-200 shadow-sm"
-          }`}>
+          <div
+            className={`p-6 rounded-2xl border ${
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200 shadow-sm"
+            }`}
+          >
             <h3
               className={`text-lg font-bold mb-3 ${
                 theme === "high-contrast"
@@ -415,11 +423,13 @@ const IncorrectAnswerPage = () => {
               <ArrowLeft size={24} />
             </button>
             <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-xl ${
-                theme === "high-contrast"
-                  ? "bg-yellow-400 text-black"
-                  : "bg-blue-500 text-white"
-              }`}>
+              <div
+                className={`p-3 rounded-xl ${
+                  theme === "high-contrast"
+                    ? "bg-yellow-400 text-black"
+                    : "bg-blue-500 text-white"
+                }`}
+              >
                 <BookOpen size={28} />
               </div>
               <div>
@@ -448,14 +458,18 @@ const IncorrectAnswerPage = () => {
               </div>
             </div>
           </div>
-          <div className={`px-4 py-2 rounded-lg ${
-            theme === "high-contrast"
-              ? "bg-black border-2 border-yellow-400 text-yellow-400"
-              : isDarkMode
-              ? "bg-gray-800 text-gray-300"
-              : "bg-gray-100 text-gray-600"
-          }`}>
-            <span className="text-lg font-semibold">총 {filteredAnswers.length}개</span>
+          <div
+            className={`px-4 py-2 rounded-lg ${
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                : isDarkMode
+                ? "bg-gray-800 text-gray-300"
+                : "bg-gray-100 text-gray-600"
+            }`}
+          >
+            <span className="text-lg font-semibold">
+              총 {filteredAnswers.length}개
+            </span>
           </div>
         </div>
 
@@ -496,7 +510,7 @@ const IncorrectAnswerPage = () => {
                   onClick={() => handleAnswerClick(answer, index)}
                   className={`p-6 rounded-2xl border cursor-pointer transition-all hover:shadow-lg transform hover:scale-[1.02] ${
                     theme === "high-contrast"
-                      ? "bg-black border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      ? "bg-black border-2 text-yellow-400 border-yellow-400 hover:bg-gray-900"
                       : isDarkMode
                       ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
                       : "bg-white border-gray-200 hover:bg-gray-50 shadow-sm"
@@ -607,13 +621,15 @@ const IncorrectAnswerPage = () => {
           </>
         ) : (
           <div className="text-center py-20">
-            <div className={`inline-flex p-6 rounded-2xl mb-6 ${
-              theme === "high-contrast"
-                ? "bg-yellow-400 text-black"
-                : isDarkMode
-                ? "bg-gray-800"
-                : "bg-gray-100"
-            }`}>
+            <div
+              className={`inline-flex p-6 rounded-2xl mb-6 ${
+                theme === "high-contrast"
+                  ? "bg-yellow-400 text-black"
+                  : isDarkMode
+                  ? "bg-gray-800"
+                  : "bg-gray-100"
+              }`}
+            >
               <BookOpen
                 size={64}
                 className={`${
