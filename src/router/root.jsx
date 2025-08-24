@@ -138,7 +138,7 @@ const router = createBrowserRouter([
     ),
   },
   TranslateRouter(),
-  StudyRouter(),
+  ...StudyRouter(),
   // 404 에러 페이지 - 모든 라우트의 마지막에 배치
   {
     path: "*",
