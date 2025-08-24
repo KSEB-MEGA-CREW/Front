@@ -324,7 +324,7 @@ const SideMenu = ({
                   ? "hover:bg-gray-800 text-gray-300 hover:text-white"
                   : "hover:bg-gray-300 text-gray-700 hover:text-gray-900"
               }
-              ${isOpen ? "" : "border"}
+            
             `}
           >
             <div className="flex-shrink-0">
