@@ -316,7 +316,7 @@ const AvatarPage = () => {
             {/* avatar panel */}
             <div className="w-full h-full flex items-center justify-center relative">
               <div
-                className={`w-full max-w-4xl h-full max-h-[600px] rounded-2xl border relative ${
+                className={`w-full max-w-4xl h-full max-h-[600px]  border relative ${
                   theme === "high-contrast"
                     ? "bg-gray-900 border-yellow-400"
                     : isDarkMode
@@ -329,7 +329,7 @@ const AvatarPage = () => {
                   avatarUrl="/avatar.glb"
                   animationUrl={animationUrl}
                   play={isPlaying}
-                  dark={isDarkMode}
+                  dark={isDarkMode || theme === "high-contrast"}
                   zoom={cameraZoom}
                   onEnd={stopAnimation}
                 />
