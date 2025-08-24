@@ -14,7 +14,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 
 const TicketDetail = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { ticketId } = useParams();
@@ -227,13 +227,19 @@ const TicketDetail = () => {
     return (
       <div
         className={`min-h-screen p-6 ${
-          isDarkMode ? "bg-gray-900" : "bg-gray-50"
+          theme === "high-contrast"
+            ? "bg-black"
+            : isDarkMode ? "bg-gray-900" : "bg-gray-50"
         }`}
       >
         <div className="max-w-4xl mx-auto flex items-center justify-center h-64">
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-            <span className={`${isDarkMode ? "text-white" : "text-gray-900"}`}>
+            <span className={`${
+              theme === "high-contrast"
+                ? "text-yellow-400"
+                : isDarkMode ? "text-white" : "text-gray-900"
+            }`}>
               문의 내용을 불러오는 중...
             </span>
           </div>
@@ -247,7 +253,9 @@ const TicketDetail = () => {
     return (
       <div
         className={`min-h-screen p-6 ${
-          isDarkMode ? "bg-gray-900" : "bg-gray-50"
+          theme === "high-contrast"
+            ? "bg-black"
+            : isDarkMode ? "bg-gray-900" : "bg-gray-50"
         }`}
       >
         <div className="max-w-4xl mx-auto space-y-8">
@@ -255,7 +263,9 @@ const TicketDetail = () => {
             <button
               onClick={() => navigate("/inquiry-board")}
               className={`p-2 rounded-lg transition-colors ${
-                isDarkMode
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                  : isDarkMode
                   ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                   : "hover:bg-white text-gray-600 hover:text-gray-900"
               }`}
@@ -265,19 +275,27 @@ const TicketDetail = () => {
           </div>
           <div
             className={`p-8 rounded-2xl shadow-lg border text-center ${
-              isDarkMode
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
                 ? "bg-gray-800 border-gray-700"
                 : "bg-white border-gray-200"
             }`}
           >
             <h3
               className={`text-lg font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
               {error ? "오류가 발생했습니다" : "문의를 찾을 수 없습니다"}
             </h3>
-            <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+            <p className={`${
+              theme === "high-contrast"
+                ? "text-yellow-400"
+                : isDarkMode ? "text-gray-400" : "text-gray-600"
+            }`}>
               {error || "요청하신 문의가 존재하지 않거나 접근할 수 없습니다."}
             </p>
           </div>
@@ -290,7 +308,9 @@ const TicketDetail = () => {
   return (
     <div
       className={`min-h-screen p-6 ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        theme === "high-contrast"
+          ? "bg-black"
+          : isDarkMode ? "bg-gray-900" : "bg-gray-50"
       }`}
     >
       <div className="max-w-4xl mx-auto space-y-8">
@@ -299,7 +319,9 @@ const TicketDetail = () => {
           <button
             onClick={() => navigate("/inquiry-board")}
             className={`p-2 rounded-lg transition-colors ${
-              isDarkMode
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                : isDarkMode
                 ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                 : "hover:bg-white text-gray-600 hover:text-gray-900"
             }`}
@@ -309,7 +331,9 @@ const TicketDetail = () => {
           <div className="flex items-center gap-3">
             <div
               className={`p-3 rounded-lg ${
-                isDarkMode
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                  : isDarkMode
                   ? "bg-blue-500/20 text-blue-400"
                   : "bg-blue-100 text-blue-600"
               }`}
@@ -318,7 +342,9 @@ const TicketDetail = () => {
             </div>
             <h1
               className={`text-4xl font-bold ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-white" : "text-gray-900"
               }`}
             >
               문의 상세
@@ -329,7 +355,9 @@ const TicketDetail = () => {
         {/* 문의 내용 */}
         <div
           className={`p-8 rounded-2xl shadow-lg border ${
-            isDarkMode
+            theme === "high-contrast"
+              ? "bg-black border-2 border-yellow-400"
+              : isDarkMode
               ? "bg-gray-800 border-gray-700"
               : "bg-white border-gray-200"
           }`}
@@ -342,7 +370,9 @@ const TicketDetail = () => {
               </span>
               <span
                 className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                    : isDarkMode
                     ? "border-1 border-gray-400 text-white"
                     : "border-1 border-gray-400 text-gray-800"
                 }`}
@@ -352,7 +382,9 @@ const TicketDetail = () => {
 
               <span
                 className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                    : isDarkMode
                     ? "border-1 border-gray-600 bg-gray-700 text-gray-300"
                     : "border-1 border-gray-200 bg-gray-50 text-gray-600"
                 }`}
@@ -370,9 +402,13 @@ const TicketDetail = () => {
               <span
                 className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${
                   ticket.isPublic
-                    ? isDarkMode
+                    ? theme === "high-contrast"
+                      ? ""
+                      : isDarkMode
                       ? ""
                       : ""
+                    : theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
                     : isDarkMode
                     ? "bg-orange-500/20 text-orange-400"
                     : "bg-orange-100 text-orange-600"
@@ -390,7 +426,9 @@ const TicketDetail = () => {
                   <button
                     onClick={handleEditStart}
                     className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
-                      isDarkMode
+                      theme === "high-contrast"
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                        : isDarkMode
                         ? "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
                         : "border-1 border-gray-300 hover:bg-gray-200 hover:border-0 text-gray-800"
                     }`}
@@ -403,7 +441,9 @@ const TicketDetail = () => {
                   <button
                     onClick={() => setShowDeleteModal(true)}
                     className={`p-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1 ${
-                      isDarkMode
+                      theme === "high-contrast"
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                        : isDarkMode
                         ? "border-1 border-gray-300 hover:bg-gray-600 hover:border-0 text-white"
                         : " border-1 border-gray-300 hover:bg-gray-200 text-gray-800"
                     }`}
@@ -421,7 +461,9 @@ const TicketDetail = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   카테고리
@@ -435,7 +477,9 @@ const TicketDetail = () => {
                     }))
                   }
                   className={`w-full px-3 py-2 rounded-lg border ${
-                    isDarkMode
+                    theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 focus:border-yellow-400"
+                      : isDarkMode
                       ? "bg-gray-700 border-gray-600 text-white"
                       : "bg-white border-gray-300 text-gray-900"
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
@@ -451,7 +495,9 @@ const TicketDetail = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   제목
@@ -466,7 +512,9 @@ const TicketDetail = () => {
                     }))
                   }
                   className={`w-full px-3 py-2 rounded-lg border ${
-                    isDarkMode
+                    theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 focus:border-yellow-400"
+                      : isDarkMode
                       ? "bg-gray-700 border-gray-600 text-white"
                       : "bg-white border-gray-300 text-gray-900"
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
@@ -477,7 +525,9 @@ const TicketDetail = () => {
               <div>
                 <label
                   className={`block text-sm font-medium mb-2 ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   내용
@@ -492,7 +542,9 @@ const TicketDetail = () => {
                   }
                   rows={8}
                   className={`w-full px-3 py-2 rounded-lg border resize-none ${
-                    isDarkMode
+                    theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 focus:border-yellow-400"
+                      : isDarkMode
                       ? "bg-gray-700 border-gray-600 text-white"
                       : "bg-white border-gray-300 text-gray-900"
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
@@ -503,7 +555,9 @@ const TicketDetail = () => {
               <div className="flex items-center gap-3">
                 <label
                   className={`flex items-center gap-2 cursor-pointer ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   <input
@@ -532,7 +586,9 @@ const TicketDetail = () => {
                   type="button"
                   onClick={handleEditCancel}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                    isDarkMode
+                    theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : isDarkMode
                       ? "bg-gray-600 hover:bg-gray-700 text-white"
                       : "bg-gray-300 hover:bg-gray-400 text-gray-700"
                   }`}
@@ -545,14 +601,18 @@ const TicketDetail = () => {
             <>
               <label
                 className={`block text-sm font-semibold mb-2 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 제목 *
               </label>
               <div
                 className={`p-4 rounded-lg border mb-3 ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400"
+                    : isDarkMode
                     ? "bg-gray-700 border-gray-600"
                     : "bg-gray-50 border-gray-200"
                 }`}
@@ -560,7 +620,9 @@ const TicketDetail = () => {
                 {/* 제목 */}
                 <h2
                   className={`text-sx whitespace-pre-wrap ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   {ticket.subject}
@@ -570,21 +632,27 @@ const TicketDetail = () => {
               {/* 내용 */}
               <label
                 className={`block text-sm font-semibold mb-2 mt-6 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-700"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-700"
                 }`}
               >
                 문의 내용 *
               </label>
               <div
                 className={`p-4 rounded-lg border mb-3 min-h-[155px] ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400"
+                    : isDarkMode
                     ? "bg-gray-700 border-gray-600"
                     : "bg-gray-50 border-gray-200"
                 }`}
               >
                 <p
                   className={`text-sx whitespace-pre-wrap ${
-                    isDarkMode ? "text-gray-300" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-300" : "text-gray-700"
                   }`}
                 >
                   {ticket.content}
@@ -595,13 +663,17 @@ const TicketDetail = () => {
 
           <div
             className={`flex gap-2 ${
-              isDarkMode ? "text-gray-300" : "text-gray-800"
+              theme === "high-contrast"
+                ? "text-yellow-400"
+                : isDarkMode ? "text-gray-300" : "text-gray-800"
             }`}
           >
             <User size={14} />
             <span
               className={`text-xs ${
-                isDarkMode ? "text-gray-300" : "text-gray-800"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode ? "text-gray-300" : "text-gray-800"
               }`}
             >
               {ticket.userName || "익명"}
@@ -613,14 +685,18 @@ const TicketDetail = () => {
             <div className="space-y-4 mt-8">
               <h3
                 className={`text-lg font-semibold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 관리자 답변
               </h3>
               <div
                 className={`p-4 rounded-lg min-h-[130px] ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400"
+                    : isDarkMode
                     ? "bg-blue-900/20 border-blue-700/30"
                     : "bg-blue-50 border-blue-200"
                 }`}
@@ -629,14 +705,18 @@ const TicketDetail = () => {
                   <User size={14} className="text-blue-500" />
                   <span
                     className={`text-sm font-semibold ${
-                      isDarkMode ? "text-blue-400" : "text-blue-600"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode ? "text-blue-400" : "text-blue-600"
                     }`}
                   >
                     {ticket.adminName || "관리자"}
                   </span>
                   <span
                     className={`text-xs ${
-                      isDarkMode ? "text-gray-400" : "text-gray-500"
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode ? "text-gray-400" : "text-gray-500"
                     }`}
                   >
                     {ticket.adminResponseDate
@@ -648,7 +728,9 @@ const TicketDetail = () => {
                 </div>
                 <p
                   className={`text-sx whitespace-pre-wrap ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-200" : "text-gray-700"
                   }`}
                 >
                   {ticket.adminResponse}
@@ -662,7 +744,9 @@ const TicketDetail = () => {
             <div className="mt-8 pt-8 border-t border-gray-300 dark:border-gray-600">
               <h3
                 className={`text-lg font-semibold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 답변 작성
@@ -674,7 +758,9 @@ const TicketDetail = () => {
                   rows={6}
                   placeholder="답변 내용을 입력해주세요..."
                   className={`w-full px-4 py-3 rounded-lg border transition-colors resize-none ${
-                    isDarkMode
+                    theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 focus:border-yellow-400"
+                      : isDarkMode
                       ? "bg-gray-700 border-gray-600 text-white focus:border-blue-500"
                       : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
                   } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
@@ -715,19 +801,25 @@ const TicketDetail = () => {
           >
             <div
               className={`p-6 rounded-2xl shadow-xl max-w-md w-full mx-4 ${
-                isDarkMode ? "bg-gray-800" : "bg-white"
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400"
+                  : isDarkMode ? "bg-gray-800" : "bg-white"
               }`}
             >
               <h3
                 className={`text-lg font-semibold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-white" : "text-gray-900"
                 }`}
               >
                 게시글 삭제 확인
               </h3>
               <p
                 className={`mb-6 ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode ? "text-gray-300" : "text-gray-600"
                 }`}
               >
                 정말로 이 게시글을 삭제하시겠습니까?
@@ -760,7 +852,9 @@ const TicketDetail = () => {
                   onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
                   className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
-                    isDarkMode
+                    theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : isDarkMode
                       ? "bg-gray-600 hover:bg-gray-700 text-white"
                       : "bg-gray-300 hover:bg-gray-400 text-gray-700"
                   }`}

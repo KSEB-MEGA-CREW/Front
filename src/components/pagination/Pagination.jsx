@@ -10,7 +10,7 @@ const Pagination = ({
   onPageChange,
   showInfo = true,
 }) => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
 
   // 페이지 범위 계산 (현재 페이지 주변 5개 페이지 표시)
   const getPageNumbers = () => {
@@ -72,9 +72,13 @@ const Pagination = ({
             flex items-center gap-1 px-3 py-2 rounded-lg font-semibold transition-colors
             ${
               currentPage === 1
-                ? isDarkMode
+                ? theme === "high-contrast"
+                  ? "bg-black border-2 border-gray-600 text-gray-600 cursor-not-allowed"
+                  : isDarkMode
                   ? "bg-gray-800 text-gray-600 cursor-not-allowed"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                 : isDarkMode
                 ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
@@ -92,7 +96,9 @@ const Pagination = ({
               {pageNum === "..." ? (
                 <span
                   className={`px-2 py-2 ${
-                    isDarkMode ? "text-gray-500" : "text-gray-400"
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode ? "text-gray-500" : "text-gray-400"
                   }`}
                 >
                   ...
@@ -104,7 +110,11 @@ const Pagination = ({
                     px-3 py-2 rounded-lg font-semibold transition-colors min-w-[40px]
                     ${
                       pageNum === currentPage
-                        ? "bg-blue-500 text-white"
+                        ? theme === "high-contrast"
+                          ? "bg-yellow-400 text-black border-2 border-yellow-400"
+                          : "bg-blue-500 text-white"
+                        : theme === "high-contrast"
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                         : isDarkMode
                         ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                         : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
@@ -126,9 +136,13 @@ const Pagination = ({
             flex items-center gap-1 px-3 py-2 rounded-lg font-semibold transition-colors
             ${
               currentPage === totalPages
-                ? isDarkMode
+                ? theme === "high-contrast"
+                  ? "bg-black border-2 border-gray-600 text-gray-600 cursor-not-allowed"
+                  : isDarkMode
                   ? "bg-gray-800 text-gray-600 cursor-not-allowed"
                   : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                 : isDarkMode
                 ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
@@ -150,9 +164,13 @@ const Pagination = ({
               px-2 py-1 text-xs rounded transition-colors
               ${
                 currentPage === 1
-                  ? isDarkMode
+                  ? theme === "high-contrast"
+                    ? "text-gray-600 cursor-not-allowed"
+                    : isDarkMode
                     ? "text-gray-600 cursor-not-allowed"
                     : "text-gray-400 cursor-not-allowed"
+                  : theme === "high-contrast"
+                  ? "text-yellow-400 hover:text-black"
                   : isDarkMode
                   ? "text-blue-400 hover:text-blue-300"
                   : "text-blue-600 hover:text-blue-500"
@@ -163,7 +181,9 @@ const Pagination = ({
           </button>
           <span
             className={`text-xs ${
-              isDarkMode ? "text-gray-500" : "text-gray-400"
+              theme === "high-contrast"
+                ? "text-yellow-400"
+                : isDarkMode ? "text-gray-500" : "text-gray-400"
             }`}
           >
             |
@@ -175,9 +195,13 @@ const Pagination = ({
               px-2 py-1 text-xs rounded transition-colors
               ${
                 currentPage === totalPages
-                  ? isDarkMode
+                  ? theme === "high-contrast"
+                    ? "text-gray-600 cursor-not-allowed"
+                    : isDarkMode
                     ? "text-gray-600 cursor-not-allowed"
                     : "text-gray-400 cursor-not-allowed"
+                  : theme === "high-contrast"
+                  ? "text-yellow-400 hover:text-black"
                   : isDarkMode
                   ? "text-blue-400 hover:text-blue-300"
                   : "text-blue-600 hover:text-blue-500"

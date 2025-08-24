@@ -9,7 +9,7 @@ function BasicLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading, logout } = useAuth();
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const [showMyPageModal, setShowMyPageModal] = useState(false);
   
   const isHomePage = location.pathname === "/" || location.pathname === "/main";
@@ -37,7 +37,9 @@ function BasicLayout({ children }) {
   if (loading) {
     return (
       <div className={`min-h-screen flex items-center justify-center ${
-        isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'
+        theme === 'high-contrast'
+          ? 'bg-black text-yellow-400'
+          : (isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900')
       }`}>
         <div>로딩 중...</div>
       </div>
@@ -47,9 +49,13 @@ function BasicLayout({ children }) {
   // 로그인하지 않은 상태에서 공개 페이지(약관, 개인정보처리방침)에 접근하는 경우
   if (!user && isPublicPage) {
     return (
-      <div className={`min-h-screen ${isDarkMode ? 'dark' : ''}`}>
+      <div className={`min-h-screen ${
+        theme === 'dark' ? 'dark' : (theme === 'high-contrast' ? 'high-contrast' : '')
+      }`}>
         <div className={`min-h-screen ${
-          isDarkMode ? 'bg-gray-900' : 'bg-gray-50'
+          theme === 'high-contrast'
+            ? 'bg-black text-yellow-400'
+            : (isDarkMode ? 'bg-gray-900' : 'bg-gray-50')
         }`}>
           {children}
         </div>

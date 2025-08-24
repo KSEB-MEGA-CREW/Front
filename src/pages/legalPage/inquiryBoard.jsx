@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 import Pagination from "../../components/pagination/Pagination";
 
 const InquiryBoard = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [tickets, setTickets] = useState([]);
@@ -94,7 +94,6 @@ const InquiryBoard = () => {
             response = await authApi.getPublicSupportTickets(page, size);
         }
 
-
         if (response.success && response.data) {
           let ticketData;
           let currentPageInfo;
@@ -118,7 +117,6 @@ const InquiryBoard = () => {
               number: 0,
             };
           }
-
 
           setTickets(ticketData);
           setPageInfo((prev) => ({
@@ -259,7 +257,11 @@ const InquiryBoard = () => {
     return (
       <div
         className={`min-h-screen p-6 ${
-          isDarkMode ? "bg-gray-900" : "bg-gray-50"
+          theme === "high-contrast"
+            ? "bg-black"
+            : isDarkMode
+            ? "bg-gray-900"
+            : "bg-gray-50"
         }`}
       >
         <div className="max-w-4xl mx-auto">
@@ -267,7 +269,13 @@ const InquiryBoard = () => {
             <div className="flex items-center gap-3">
               <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               <span
-                className={`${isDarkMode ? "text-white" : "text-gray-900"}`}
+                className={`${
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-white"
+                    : "text-gray-900"
+                }`}
               >
                 문의 목록을 불러오는 중...
               </span>
@@ -281,7 +289,11 @@ const InquiryBoard = () => {
   return (
     <div
       className={`min-h-screen p-6 ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        theme === "high-contrast"
+          ? "bg-black"
+          : isDarkMode
+          ? "bg-gray-900"
+          : "bg-gray-50"
       }`}
     >
       <div className="max-w-4xl mx-auto space-y-8">
@@ -292,7 +304,9 @@ const InquiryBoard = () => {
             <button
               onClick={() => navigate("/customer-support")}
               className={`p-2 rounded-lg transition-colors ${
-                isDarkMode
+                theme === "high-contrast"
+                  ? "hover:bg-yellow-400 hover:text-black text-yellow-400"
+                  : isDarkMode
                   ? "hover:bg-gray-800 text-gray-400 hover:text-white"
                   : "hover:bg-white text-gray-600 hover:text-gray-900"
               }`}
@@ -302,7 +316,9 @@ const InquiryBoard = () => {
             <div className="flex items-center gap-3">
               <div
                 className={`p-3 rounded-lg ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                    : isDarkMode
                     ? "bg-blue-500/20 text-blue-400"
                     : "bg-blue-100 text-blue-600"
                 }`}
@@ -311,7 +327,11 @@ const InquiryBoard = () => {
               </div>
               <h1
                 className={`text-4xl font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-white"
+                    : "text-gray-900"
                 }`}
               >
                 문의 게시판
@@ -326,7 +346,11 @@ const InquiryBoard = () => {
                 onClick={() => handleViewModeChange("admin")}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   viewMode === "admin"
-                    ? "bg-red-600 text-white"
+                    ? theme === "high-contrast"
+                      ? "bg-yellow-400 text-black border-2 border-yellow-400"
+                      : "bg-red-600 text-white"
+                    : theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                     : isDarkMode
                     ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                     : "bg-gray-200 text-gray-700 hover:bg-gray-300"
@@ -344,7 +368,9 @@ const InquiryBoard = () => {
             className={`
             flex items-center justify-between p-3 rounded-lg mb-4
             ${
-              isDarkMode
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
                 ? "bg-blue-500/20 border border-blue-500/30"
                 : "bg-blue-50 border border-blue-200"
             }
@@ -353,11 +379,21 @@ const InquiryBoard = () => {
             <div className="flex items-center gap-2">
               <UserCheck
                 size={16}
-                className={isDarkMode ? "text-blue-400" : "text-blue-600"}
+                className={
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-blue-400"
+                    : "text-blue-600"
+                }
               />
               <span
                 className={`text-sm font-medium ${
-                  isDarkMode ? "text-blue-400" : "text-blue-600"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-blue-400"
+                    : "text-blue-600"
                 }`}
               >
                 내 문의만 표시 중 ({pageInfo[viewMode]?.totalElements || 0}개)
@@ -368,7 +404,9 @@ const InquiryBoard = () => {
               className={`
                 p-1 rounded-md transition-colors
                 ${
-                  isDarkMode
+                  theme === "high-contrast"
+                    ? "hover:bg-yellow-400 hover:text-black text-yellow-400"
+                    : isDarkMode
                     ? "hover:bg-blue-500/30 text-blue-400"
                     : "hover:bg-blue-100 text-blue-600"
                 }
@@ -385,7 +423,11 @@ const InquiryBoard = () => {
             <Search
               size={20}
               className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                isDarkMode ? "text-gray-400" : "text-gray-500"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-500"
               }`}
             />
             <input
@@ -398,9 +440,13 @@ const InquiryBoard = () => {
                 w-full pl-10 pr-4 py-3 rounded-lg border transition-colors
                 ${
                   isMyInquiryFilter
-                    ? isDarkMode
+                    ? theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-gray-500 cursor-not-allowed"
+                      : isDarkMode
                       ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"
                       : "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed"
+                    : theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 focus:border-yellow-400"
                     : isDarkMode
                     ? "bg-gray-800 border-gray-700 text-white focus:border-blue-500"
                     : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
@@ -418,7 +464,11 @@ const InquiryBoard = () => {
                 flex items-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors whitespace-nowrap
                 ${
                   isMyInquiryFilter
-                    ? "bg-blue-500 text-white"
+                    ? theme === "high-contrast"
+                      ? "bg-yellow-400 text-black border-2 border-yellow-400"
+                      : "bg-blue-500 text-white"
+                    : theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                     : isDarkMode
                     ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
                     : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
@@ -436,7 +486,11 @@ const InquiryBoard = () => {
               <Filter
                 size={20}
                 className={`absolute left-3 top-1/2 transform -translate-y-1/2 ${
-                  isDarkMode ? "text-gray-400" : "text-gray-500"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-gray-400"
+                    : "text-gray-500"
                 }`}
               />
               <select
@@ -447,9 +501,13 @@ const InquiryBoard = () => {
                   pl-10 pr-8 py-3 rounded-lg border transition-colors appearance-none cursor-pointer
                   ${
                     isMyInquiryFilter
-                      ? isDarkMode
+                      ? theme === "high-contrast"
+                        ? "bg-black border-2 border-yellow-400 text-gray-500 cursor-not-allowed"
+                        : isDarkMode
                         ? "bg-gray-800 border-gray-700 text-gray-500 cursor-not-allowed"
                         : "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed"
+                      : theme === "high-contrast"
+                      ? "bg-black border-2 border-yellow-400 text-yellow-400 focus:border-yellow-400"
                       : isDarkMode
                       ? "bg-gray-800 border-gray-700 text-white focus:border-blue-500"
                       : "bg-white border-gray-300 text-gray-900 focus:border-blue-500"
@@ -473,7 +531,9 @@ const InquiryBoard = () => {
             className={`
             p-8 rounded-2xl shadow-lg border text-center
             ${
-              isDarkMode
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
                 ? "bg-gray-800 border-gray-700"
                 : "bg-white border-gray-200"
             }
@@ -483,18 +543,34 @@ const InquiryBoard = () => {
               <MessageSquare
                 size={48}
                 className={`mx-auto ${
-                  isDarkMode ? "text-gray-600" : "text-gray-400"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-gray-600"
+                    : "text-gray-400"
                 }`}
               />
             </div>
             <h3
               className={`text-lg font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               오류가 발생했습니다
             </h3>
-            <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+            <p
+              className={`${
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
+              }`}
+            >
               {error}
             </p>
           </div>
@@ -503,7 +579,9 @@ const InquiryBoard = () => {
             className={`
             p-8 rounded-2xl shadow-lg border text-center
             ${
-              isDarkMode
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
                 ? "bg-gray-800 border-gray-700"
                 : "bg-white border-gray-200"
             }
@@ -513,27 +591,43 @@ const InquiryBoard = () => {
               <MessageSquare
                 size={48}
                 className={`mx-auto ${
-                  isDarkMode ? "text-gray-600" : "text-gray-400"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-gray-600"
+                    : "text-gray-400"
                 }`}
               />
             </div>
             <h3
               className={`text-lg font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               아직 문의가 없습니다
             </h3>
             <p
               className={`mb-4 ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               궁금한 점이 있으시면 언제든지 문의해주세요.
             </p>
             <button
               onClick={() => navigate("/customer-support")}
-              className="px-6 py-3 bg-blue-500 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              className={`px-6 py-3 font-semibold rounded-lg transition-colors ${
+                theme === "high-contrast"
+                  ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-gray-900"
+                  : "bg-blue-500 hover:bg-blue-700 text-white"
+              }`}
             >
               문의하기
             </button>
@@ -543,7 +637,9 @@ const InquiryBoard = () => {
             className={`
             p-8 rounded-2xl shadow-lg border text-center
             ${
-              isDarkMode
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
                 ? "bg-gray-800 border-gray-700"
                 : "bg-white border-gray-200"
             }
@@ -553,20 +649,32 @@ const InquiryBoard = () => {
               <MessageSquare
                 size={48}
                 className={`mx-auto ${
-                  isDarkMode ? "text-gray-600" : "text-gray-400"
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-gray-600"
+                    : "text-gray-400"
                 }`}
               />
             </div>
             <h3
               className={`text-lg font-semibold mb-2 ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-900"
               }`}
             >
               검색 결과가 없습니다
             </h3>
             <p
               className={`mb-4 ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-gray-400"
+                  : "text-gray-600"
               }`}
             >
               다른 검색 조건으로 시도해보세요.
@@ -587,9 +695,13 @@ const InquiryBoard = () => {
                     p-6 rounded-2xl shadow-lg border transition-colors hover:shadow-xl cursor-pointer
                     ${
                       !canView
-                        ? isDarkMode
+                        ? theme === "high-contrast"
+                          ? "bg-black border-2 border-yellow-400 opacity-75"
+                          : isDarkMode
                           ? "bg-gray-800 border-gray-700 opacity-75"
                           : "bg-gray-100 border-gray-200 opacity-75"
+                        : theme === "high-contrast"
+                        ? "bg-black border-2 border-yellow-400 hover:bg-gray-900"
                         : isDarkMode
                         ? "bg-gray-800 border-gray-700 hover:bg-gray-700"
                         : "bg-white border-gray-200 hover:bg-gray-50"
@@ -605,7 +717,9 @@ const InquiryBoard = () => {
                         className={`
                       px-3 py-1 rounded-full text-xs font-medium
                       ${
-                        isDarkMode
+                        theme === "high-contrast"
+                          ? "border-1 border-yellow-400 text-yellow-400"
+                          : isDarkMode
                           ? "border-1 border-gray-300 text-gray-200"
                           : "border-1 border-gray-400 text-gray-800"
                       }
@@ -620,9 +734,9 @@ const InquiryBoard = () => {
                       px-2 py-1 rounded-full text-xs font-medium
                       ${
                         ticket.isPublic
-                          ? isDarkMode
-                            ? ""
-                            : ""
+                          ? ""
+                          : theme === "high-contrast"
+                          ? "bg-black border-1 border-yellow-400 text-yellow-400"
                           : isDarkMode
                           ? "bg-orange-500/20 text-orange-400"
                           : "bg-orange-100 text-orange-600"
@@ -638,7 +752,9 @@ const InquiryBoard = () => {
                           className={`
                         px-2 py-1 rounded-full text-xs font-medium
                         ${
-                          isDarkMode
+                          theme === "high-contrast"
+                            ? "bg-black border-1 border-yellow-400 text-yellow-400"
+                            : isDarkMode
                             ? "bg-purple-500/20 text-purple-400"
                             : "bg-purple-100 text-purple-600"
                         }
@@ -652,7 +768,11 @@ const InquiryBoard = () => {
                       <Calendar size={14} />
                       <span
                         className={`${
-                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                          theme === "high-contrast"
+                            ? "text-yellow-400"
+                            : isDarkMode
+                            ? "text-gray-400"
+                            : "text-gray-500"
                         }`}
                       >
                         {ticket.createdDate
@@ -667,9 +787,11 @@ const InquiryBoard = () => {
                   <h3
                     className={`text-lg font-semibold mb-3 ${
                       !canView
-                        ? isDarkMode
-                          ? "text-gray-500"
+                        ? theme === "high-contrast"
+                          ? "text-yellow-400"
                           : "text-gray-500"
+                        : theme === "high-contrast"
+                        ? "text-yellow-400"
                         : isDarkMode
                         ? "text-white"
                         : "text-gray-900"
@@ -681,9 +803,13 @@ const InquiryBoard = () => {
                   <p
                     className={`text-sm mb-4 ${
                       !canView
-                        ? isDarkMode
+                        ? theme === "high-contrast"
+                          ? "text-yellow-400"
+                          : isDarkMode
                           ? "text-gray-600"
                           : "text-gray-500"
+                        : theme === "high-contrast"
+                        ? "text-yellow-400"
                         : isDarkMode
                         ? "text-gray-300"
                         : "text-gray-600"
@@ -703,7 +829,11 @@ const InquiryBoard = () => {
                       <User size={14} />
                       <span
                         className={`text-sm ${
-                          isDarkMode ? "text-gray-400" : "text-gray-500"
+                          theme === "high-contrast"
+                            ? "text-yellow-400"
+                            : isDarkMode
+                            ? "text-gray-400"
+                            : "text-gray-500"
                         }`}
                       >
                         {ticket.userName || "익명"}
@@ -716,9 +846,13 @@ const InquiryBoard = () => {
                       px-2 py-1 rounded-full text-xs font-medium
                       ${
                         ticket.status === "ANSWERED"
-                          ? isDarkMode
+                          ? theme === "high-contrast"
+                            ? "bg-black border-1 border-yellow-400 text-yellow-400"
+                            : isDarkMode
                             ? "bg-green-500/20 text-green-400"
                             : "bg-green-100 text-green-600"
+                          : theme === "high-contrast"
+                          ? "bg-black border-1 border-yellow-400 text-yellow-400"
                           : isDarkMode
                           ? "bg-yellow-500/20 text-yellow-400"
                           : "bg-yellow-100 text-yellow-600"
@@ -751,7 +885,11 @@ const InquiryBoard = () => {
         <div className="text-center">
           <button
             onClick={() => navigate("/customer-support")}
-            className="px-8 py-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg transition-colors inline-flex items-center gap-2"
+            className={`px-8 py-4 font-semibold rounded-lg transition-colors inline-flex items-center gap-2 ${
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
           >
             <MessageSquare size={18} />새 문의하기
           </button>

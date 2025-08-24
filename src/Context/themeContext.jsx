@@ -3,35 +3,47 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
+    if (savedTheme && ['light', 'dark', 'high-contrast'].includes(savedTheme)) {
+      setTheme(savedTheme);
     } else {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(prefersDark);
+      setTheme(prefersDark ? 'dark' : 'light');
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-    if (isDarkMode) {
+    localStorage.setItem('theme', theme);
+    
+    // HTML 클래스 관리
+    document.documentElement.classList.remove('dark', 'high-contrast');
+    
+    if (theme === 'dark') {
       document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    } else if (theme === 'high-contrast') {
+      document.documentElement.classList.add('high-contrast');
     }
-  }, [isDarkMode]);
+  }, [theme]);
 
   const toggleTheme = () => {
-    setIsDarkMode(prev => !prev);
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
+  const setCurrentTheme = (newTheme) => {
+    if (['light', 'dark', 'high-contrast'].includes(newTheme)) {
+      setTheme(newTheme);
+    }
   };
 
   const value = {
-    isDarkMode,
+    theme,
+    setTheme: setCurrentTheme,
     toggleTheme,
-    theme: isDarkMode ? 'dark' : 'light'
+    // 기존 컴포넌트 호환성을 위한 computed 값
+    isDarkMode: theme === 'dark'
   };
 
   return (

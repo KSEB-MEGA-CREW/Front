@@ -345,6 +345,22 @@ export const quizApi = {
       throw error; // 에러가 발생하면 Promise.reject로 넘어감
     }
   },
+
+  // 사용자 오답 조회
+  getUserIncorrectAnswers: async (userId) => {
+    try {
+      const response = await apiRequest(
+        `/api/incorrect-answers/user/${userId}`,
+        {
+          method: "GET",
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("오답 조회 오류:", error);
+      throw error;
+    }
+  },
 };
 
 // 구글 OAuth2 URL - 구글 로그인 url에 맞게 수정

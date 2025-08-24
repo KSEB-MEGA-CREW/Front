@@ -6,13 +6,15 @@ import StasticComponent from "../../components/stasticComponent";
 import { Calendar, TrendingUp } from "lucide-react";
 
 const StatsPage = () => {
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const { user } = useAuth();
 
   return (
     <div
       className={`min-h-screen p-6 ${
-        isDarkMode ? "bg-gray-900" : "bg-gray-50"
+        theme === 'high-contrast'
+          ? "bg-black"
+          : (isDarkMode ? "bg-gray-900" : "bg-gray-50")
       }`}
     >
       <div className="max-w-7xl mx-auto space-y-8">
@@ -20,14 +22,18 @@ const StatsPage = () => {
         <div className="text-center space-y-3">
           <h1
             className={`text-4xl font-bold ${
-              isDarkMode ? "text-white" : "text-gray-900"
+              theme === 'high-contrast'
+                ? "text-yellow-400"
+                : (isDarkMode ? "text-white" : "text-gray-900")
             }`}
           >
             학습 통계
           </h1>
           <p
             className={`text-lg ${
-              isDarkMode ? "text-gray-300" : "text-gray-600"
+              theme === 'high-contrast'
+                ? "text-yellow-400"
+                : (isDarkMode ? "text-gray-300" : "text-gray-600")
             }`}
           >
             일일 학습 평균 정답률 현황을 확인하세요
@@ -41,9 +47,11 @@ const StatsPage = () => {
             className={`
             p-6 rounded-2xl shadow-lg border
             ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+              theme === 'high-contrast'
+                ? "bg-black border-2 border-yellow-400"
+                : (isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200")
             }
           `}
           >
@@ -52,9 +60,11 @@ const StatsPage = () => {
                 className={`
                 p-3 rounded-lg
                 ${
-                  isDarkMode
-                    ? "bg-green-500/20 text-green-400"
-                    : "bg-green-100 text-green-600"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                    : (isDarkMode
+                      ? "bg-green-500/20 text-green-400"
+                      : "bg-green-100 text-green-600")
                 }
               `}
               >
@@ -63,14 +73,18 @@ const StatsPage = () => {
               <div>
                 <h2
                   className={`text-2xl font-bold ${
-                    isDarkMode ? "text-white" : "text-gray-900"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-900")
                   }`}
                 >
                   학습 캘린더
                 </h2>
                 <p
                   className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-400" : "text-gray-600")
                   }`}
                 >
                   일별 학습 기록을 확인하세요
@@ -85,9 +99,11 @@ const StatsPage = () => {
             className={`
             p-6 rounded-2xl shadow-lg border
             ${
-              isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
+              theme === 'high-contrast'
+                ? "bg-black border-2 border-yellow-400"
+                : (isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200")
             }
           `}
           >
@@ -96,9 +112,11 @@ const StatsPage = () => {
                 className={`
                 p-3 rounded-lg
                 ${
-                  isDarkMode
-                    ? "bg-blue-500/20 text-blue-400"
-                    : "bg-blue-100 text-blue-600"
+                  theme === 'high-contrast'
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                    : (isDarkMode
+                      ? "bg-blue-500/20 text-blue-400"
+                      : "bg-blue-100 text-blue-600")
                 }
               `}
               >
@@ -107,14 +125,18 @@ const StatsPage = () => {
               <div>
                 <h2
                   className={`text-2xl font-bold ${
-                    isDarkMode ? "text-white" : "text-gray-900"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-white" : "text-gray-900")
                   }`}
                 >
                   학습 통계
                 </h2>
                 <p
                   className={`text-sm ${
-                    isDarkMode ? "text-gray-400" : "text-gray-600"
+                    theme === 'high-contrast'
+                      ? "text-yellow-400"
+                      : (isDarkMode ? "text-gray-400" : "text-gray-600")
                   }`}
                 >
                   월별 진행 상황과 성과를 분석하세요
@@ -130,21 +152,29 @@ const StatsPage = () => {
           className={`
           p-6 rounded-2xl shadow-lg border text-center
           ${
-            isDarkMode
-              ? "bg-gray-800 border-gray-700"
-              : "bg-white border-gray-200"
+            theme === 'high-contrast'
+              ? "bg-black border-2 border-yellow-400"
+              : (isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200")
           }
         `}
         >
           <div className="max-w-2xl mx-auto space-y-4">
             <h3
               className={`text-xl font-semibold ${
-                isDarkMode ? "text-white" : "text-gray-900"
+                theme === 'high-contrast'
+                  ? "text-yellow-400"
+                  : (isDarkMode ? "text-white" : "text-gray-900")
               }`}
             >
               꾸준한 학습이 성공의 열쇠입니다
             </h3>
-            <p className={`${isDarkMode ? "text-gray-300" : "text-gray-600"}`}>
+            <p className={`${
+              theme === 'high-contrast'
+                ? "text-yellow-400"
+                : (isDarkMode ? "text-gray-300" : "text-gray-600")
+            }`}>
               매일 조금씩이라도 꾸준히 학습하면 더 나은 수어 실력을 기를 수
               있습니다. 통계를 통해 자신의 학습 패턴을 파악하고 개선해보세요.
             </p>

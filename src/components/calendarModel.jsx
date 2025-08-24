@@ -89,7 +89,7 @@ function CalendarModel({ userId }) {
   const [quizHistory, setQuizHistory] = useState({});
   const [loading, setLoading] = useState(true);
   const [colorTheme, setColorTheme] = useState("green");
-  const { isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
 
   const ACCURACY_LEVELS = useMemo(
     () => createAccuracyLevels(colorTheme),
@@ -215,14 +215,20 @@ function CalendarModel({ userId }) {
     return (
       <div
         className={`rounded-2xl shadow-sm border p-6 ${
-          isDarkMode
+          theme === "high-contrast"
+            ? "bg-black border-2 border-yellow-400"
+            : isDarkMode
             ? "bg-gray-800 border-gray-700"
             : "bg-white border-gray-100"
         }`}
       >
         <h2
           className={`text-lg font-bold mb-6 ${
-            isDarkMode ? "text-white" : "text-gray-900"
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
           }`}
         >
           연간 학습
@@ -238,7 +244,11 @@ function CalendarModel({ userId }) {
       <div className="flex justify-between items-center mb-6">
         <h2
           className={`text-lg font-bold ${
-            isDarkMode ? "text-white" : "text-gray-900"
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-white"
+              : "text-gray-900"
           }`}
         >
           연간 학습
@@ -264,7 +274,11 @@ function CalendarModel({ userId }) {
           </button>
           <span
             className={`text-lg font-semibold min-w-[100px] text-center ${
-              isDarkMode ? "text-white" : "text-gray-900"
+              theme === "high-contrast"
+                ? "text-yellow-400"
+                : isDarkMode
+                ? "text-white"
+                : "text-gray-900"
             }`}
           >
             {activeDate.getFullYear()}년 {activeDate.getMonth() + 1}월
@@ -305,12 +319,22 @@ function CalendarModel({ userId }) {
       </div>
 
       <hr
-        className={`my-6 ${isDarkMode ? "border-gray-700" : "border-gray-200"}`}
+        className={`my-6 ${
+          theme === "high-contrast"
+            ? "border-yellow-400 border-2"
+            : isDarkMode
+            ? "border-gray-700"
+            : "border-gray-200"
+        }`}
       />
 
       <div
         className={`text-center text-xs mb-3 ${
-          isDarkMode ? "text-gray-300" : "text-gray-800"
+          theme === "high-contrast"
+            ? "text-yellow-400"
+            : isDarkMode
+            ? "text-gray-300"
+            : "text-gray-800"
         }`}
       >
         💡 아래 정답률 박스를 클릭하면 해당하는 날짜만 달력에서 확인할 수
@@ -319,7 +343,13 @@ function CalendarModel({ userId }) {
 
       <div className="flex justify-center items-center flex-wrap gap-2 text-xs mb-4">
         <span
-          className={`mr-2 ${isDarkMode ? "text-gray-300" : "text-gray-800"}`}
+          className={`mr-2 ${
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-800"
+          }`}
         >
           정답률:
         </span>
@@ -330,12 +360,22 @@ function CalendarModel({ userId }) {
               key={level.range}
               onClick={() => handleLegendToggle(level.range)}
               className={`flex items-center cursor-pointer p-2 rounded-md transition-opacity ${
-                isDarkMode ? "hover:bg-gray-700" : "hover:bg-gray-300"
+                theme === "high-contrast"
+                  ? "hover:bg-gray-600 hover:text-black"
+                  : isDarkMode
+                  ? "hover:bg-gray-700"
+                  : "hover:bg-gray-300"
               } ${isActive ? "opacity-100" : "opacity-40 hover:opacity-70"}`}
             >
               <div className={`w-3 h-3 rounded-sm mr-2 ${level.color}`}></div>
               <span
-                className={`${isDarkMode ? "text-gray-300" : "text-gray-800"}`}
+                className={`${
+                  theme === "high-contrast"
+                    ? "text-yellow-400"
+                    : isDarkMode
+                    ? "text-gray-300"
+                    : "text-gray-800"
+                }`}
               >
                 {level.label}
               </span>
@@ -362,26 +402,34 @@ function CalendarModel({ userId }) {
       <div className="flex justify-center items-center gap-2 mb-4">
         <span
           className={`text-xs ${
-            isDarkMode ? "text-gray-300" : "text-gray-800"
+            theme === "high-contrast"
+              ? "text-yellow-400"
+              : isDarkMode
+              ? "text-gray-300"
+              : "text-gray-800"
           }`}
         >
           색상 테마:
         </span>
-        {Object.entries(COLOR_THEMES).map(([themeKey, theme]) => (
+        {Object.entries(COLOR_THEMES).map(([themeKey, themeinfo]) => (
           <button
             key={themeKey}
             onClick={() => setColorTheme(themeKey)}
             className={`text-xs px-2 py-1 rounded-md transition-all ${
               colorTheme === themeKey
-                ? isDarkMode
+                ? theme === "high-contrast"
+                  ? "bg-yellow-400 text-black border-2 border-yellow-400"
+                  : isDarkMode
                   ? " bg-gray-600 text-gray-300"
                   : "text-gray-800 bg-gray-300"
+                : theme === "high-contrast"
+                ? "text-yellow-400 hover:bg-gray-600 border border-yellow-400"
                 : isDarkMode
                 ? "text-gray-300 hover:bg-gray-600"
                 : "text-gray-800 hover:bg-gray-300"
             }`}
           >
-            {theme.name}
+            {themeinfo.name}
           </button>
         ))}
       </div>
@@ -393,7 +441,9 @@ function CalendarModel({ userId }) {
       className={`
         rounded-2xl shadow-sm border p-6 
         ${
-          isDarkMode
+          theme === "high-contrast"
+            ? "bg-black border-2 border-yellow-400"
+            : isDarkMode
             ? "bg-gray-800 border-gray-700"
             : "bg-white border-gray-100"
         }
