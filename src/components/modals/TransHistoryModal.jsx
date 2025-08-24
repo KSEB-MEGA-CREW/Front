@@ -382,13 +382,17 @@ const TransHistoryModal = ({
                     {/* 오른쪽: 번역 재생 버튼 (좋아요/싫어요 버튼과 같은 너비) */}
                     {
                       <div className="w-[75px] flex items-center">
-                        {" "}
-                        {/* 좋아요 버튼(40px) + gap(8px) + 싫어요 버튼(40px) + padding 고려하여 112px */}
                         <button
-                          onClick={() =>
-                            onReplayTranslation &&
-                            onReplayTranslation(item.text)
-                          }
+                          onClick={() => {
+                            console.log("번역 재생 버튼 클릭:", item.text);
+                            console.log(
+                              "onReplayTranslation 함수:",
+                              onReplayTranslation
+                            );
+                            if (onReplayTranslation) {
+                              onReplayTranslation(item.text);
+                            }
+                          }}
                           className={`
                             w-full px-3 py-2 rounded-lg transition-all duration-200 hover:scale-[0.98]
                             flex items-center justify-center gap-1 text-xs font-medium
