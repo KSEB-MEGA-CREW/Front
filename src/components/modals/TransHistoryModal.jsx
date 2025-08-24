@@ -203,30 +203,18 @@ const TransHistoryModal = ({
                     <div className="flex items-center gap-2">
                       <span
                         className={`
-                        text-xl font-semibold
+                        text-xm font-semibold
                         ${
                           theme === "high-contrast"
                             ? " text-yellow-400"
                             : isDarkMode
-                            ? "  text-blue-500"
-                            : " text-blue-800"
+                            ? "  text-gray-400"
+                            : " text-gray-800"
                         }
                       `}
                       >
-                        #
-                        {translationHistory.length -
-                          (translationHistory.length - index - 1)}
+                        {index + 1}. {item.text}
                       </span>
-                      {item.status === "COMPLETED" && (
-                        <CheckCircle
-                          size={14}
-                          className={
-                            theme === "high-contrast"
-                              ? "text-yellow-400"
-                              : "text-green-500"
-                          }
-                        />
-                      )}
                     </div>
                     <div
                       className={`flex items-center gap-1 text-xs ${
@@ -248,8 +236,8 @@ const TransHistoryModal = ({
                     </div>
                   </div>
 
-                  <p
-                    className={`text-sm leading-relaxed mb-2 ${
+                  {/* <p
+                    className={`text-sx leading-relaxed mb-2 ${
                       theme === "high-contrast"
                         ? "text-yellow-400"
                         : isDarkMode
@@ -258,7 +246,7 @@ const TransHistoryModal = ({
                     }`}
                   >
                     {item.text}
-                  </p>
+                  </p> */}
 
                   {item.duration && (
                     <div
