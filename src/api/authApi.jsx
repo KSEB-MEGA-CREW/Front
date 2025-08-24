@@ -293,6 +293,25 @@ export const authApi = {
     }
   },
 
+  // postTransHistory 번역 기록에 대한 평가 전송
+  postTransHistory: async (historyId, feedback, translatedText, translatedTime) => {
+    try {
+      const response = await apiRequest("/api/transHistory", {
+        method: "POST",
+        body: JSON.stringify({
+          historyId,
+          feedback, // 'good' 또는 'bad'
+          translatedText, // 번역된 문장
+          translatedTime, // 번역된 시간 (ISO string)
+        }),
+      });
+      return response;
+    } catch (error) {
+      console.error("번역 기록 평가 오류:", error);
+      throw error;
+    }
+  },
+
   //logout
   logout: () => {
     localStorage.removeItem("token");

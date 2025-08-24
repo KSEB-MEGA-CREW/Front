@@ -149,7 +149,7 @@ const AvatarPage = () => {
           text,
           timestamp: new Date(),
           requestId: `local-${Date.now()}`,
-          status: "COMPLETED",
+          status: false, // 평가되지 않은 상태
           duration: 3,
         };
 
@@ -201,6 +201,15 @@ const AvatarPage = () => {
     setInputText(text);
     setShowHistoryModal(false);
     handleConvertToSignLanguage(text);
+  };
+
+  // 번역 기록 상태 업데이트 핸들러
+  const handleUpdateHistory = (historyId, updates) => {
+    setTranslationHistory(prev => 
+      prev.map(item => 
+        item.id === historyId ? { ...item, ...updates } : item
+      )
+    );
   };
 
   const handleStopAnimation = () => {
@@ -725,6 +734,7 @@ const AvatarPage = () => {
         translationHistory={translationHistory}
         onClearHistory={clearHistory}
         onReplayTranslation={handleReplayTranslation}
+        onUpdateHistory={handleUpdateHistory}
       />
     </div>
   );

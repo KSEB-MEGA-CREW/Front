@@ -489,9 +489,11 @@ const VideoPage = () => {
       setTranslationText(newTranslation);
       setTranslationHistory((prev) => [
         {
+          id: Date.now(),
           text: newTranslation,
           confidence: result.confidence || 0,
           timestamp: new Date(),
+          status: false, // 평가되지 않은 상태
         },
         ...prev.slice(0, 9),
       ]);
