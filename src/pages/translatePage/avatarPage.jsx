@@ -441,13 +441,9 @@ const AvatarPage = () => {
                       className={`p-2 rounded-lg transition-all duration-200 ${
                         theme === "high-contrast"
                           ? "border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                          : isSpeechEnabled
-                          ? isDarkMode
-                            ? "border border-gray-400 hover:bg-gray-500 text-white"
-                            : "border border-gray-400 hover:bg-gray-500 text-gray-800"
                           : isDarkMode
-                          ? "border border-gray-400 hover:bg-gray-500 text-gray-300"
-                          : "border border-gray-400 hover:bg-gray-500 text-gray-600"
+                          ? "border border-gray-400 hover:bg-gray-500 text-white"
+                          : "border border-gray-400 hover:bg-gray-200 text-gray-800"
                       }`}
                     >
                       {isSpeechEnabled ? (
