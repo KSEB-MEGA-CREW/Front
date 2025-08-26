@@ -11,7 +11,13 @@ export const VIDEO_CONFIG = {
 // API 설정
 export const API_CONFIG = {
     BASE_URL: import.meta.env.VITE_API_URL || 'http://43.202.38.158:8080',
-    WS_URL: import.meta.env.VITE_WS_URL || 'ws://3.34.168.10:8000'
+    WS_URL: import.meta.env.VITE_WS_URL || 'ws://3.34.168.10:8000',
+    ENDPOINTS: {
+        VERIFY_TOKEN: '/api/auth/verify-token',
+        HEALTH_CHECK: '/api/auth/health',
+        SIGNUP: '/api/auth/signup',
+        LOGIN: '/api/auth/login'
+    }
 };
 
 // export const API_CONFIG = {
