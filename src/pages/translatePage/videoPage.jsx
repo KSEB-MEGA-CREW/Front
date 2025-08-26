@@ -1,251 +1,648 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useFrameExtraction } from "../../hooks/useFrameExtraction";
-import { useAuth } from "../../Context/authContext";
-import { AlertCircle, Play, Square, Wifi, WifiOff } from "lucide-react";
+import { useTheme } from "../../Context/themeContext";
+import {
+  AlertCircle,
+  Settings,
+  Maximize,
+  Minimize,
+  Volume2,
+  VolumeX,
+  Play,
+  Square,
+  RotateCcw,
+  Wifi,
+  WifiOff,
+  Shield,
+} from "lucide-react";
 
 const VideoPage = () => {
-  const { user } = useAuth();
   const videoRef = useRef(null);
+  const { theme, isDarkMode, toggleTheme } = useTheme();
+
   const [translationText, setTranslationText] = useState("");
   const [isCameraReady, setIsCameraReady] = useState(false);
-  const [cameraError, setCameraError] = useState("");
-  const [stream, setStream] = useState(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
   const [translationHistory, setTranslationHistory] = useState([]);
 
-  // 통합 시스템 매니저 기반 훅 사용
+  // useFrameExtraction 훅에서 필요한 상태와 함수를 가져옴
   const {
     isProcessing,
     result,
     error: frameError,
-    status,
-    isConnected,
+    connectionState,
     sessionStats,
+    stream, // 훅에서 관리되는 스트림 상태
     startFrameExtraction,
     stopFrameExtraction,
     cleanup,
-    initialize
   } = useFrameExtraction();
 
-  // 카메라 스트림 초기화
-  const initializeCamera = useCallback(async () => {
-    try {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
+  // 수동 초기화 제거
 
-      const newStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          width: { ideal: 1920, min: 640 },
-          height: { ideal: 1080, min: 480 },
-          facingMode: "user"
-        },
-        audio: false
-      });
+  // 언마운트 시 정리
+  useEffect(() => {
+    return () => {
+      console.log("VideoPage 언마운트: 시스템 정리");
+      cleanup();
+    };
+  }, [cleanup]);
 
-      setStream(newStream);
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = newStream;
-        videoRef.current.onloadedmetadata = () => {
-          videoRef.current.play().then(() => {
-            setIsCameraReady(true);
-            setCameraError("");
-            console.log('✅ 카메라 스트림 준비 완료');
-          }).catch(err => {
-            console.error('비디오 재생 실패:', err);
-            setCameraError("비디오 재생에 실패했습니다.");
-          });
-        };
-      }
-
-    } catch (err) {
-      console.error('카메라 초기화 실패:', err);
-      setCameraError(`카메라 접근 실패: ${err.message}`);
-      setIsCameraReady(false);
+  // stream 상태가 변경될 때마다 비디오 요소에 연결
+  useEffect(() => {
+    if (stream && videoRef.current) {
+      console.log("스트림 연결");
+      videoRef.current.srcObject = stream;
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current.play()
+          .then(() => setIsCameraReady(true))
+          .catch(err => console.error("비디오 재생 실패:", err));
+      };
     }
   }, [stream]);
 
-  // 컴포넌트 마운트 시 카메라 초기화
-  useEffect(() => {
-    if (user?.id) {
-      initializeCamera();
+  const speakText = useCallback((text) => {
+    if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "ko-KR";
+      utterance.rate = 0.9;
+      window.speechSynthesis.speak(utterance);
     }
+  }, []);
 
-    return () => {
-      cleanup();
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [user?.id, initializeCamera, cleanup]);
-
-  // 결과 업데이트 및 히스토리 관리
+  // 번역 결과 업데이트 및 음성 출력
   useEffect(() => {
     if (result?.translatedText) {
-      setTranslationText(result.translatedText);
-      
-      // 히스토리에 추가 (중복 제거)
-      setTranslationHistory(prev => {
-        const newEntry = {
+      const newTranslation = result.translatedText;
+      setTranslationText(newTranslation);
+      setTranslationHistory((prev) => [
+        {
           id: Date.now(),
-          text: result.translatedText,
-          confidence: result.confidence,
-          timestamp: result.timestamp || Date.now()
-        };
-        
-        // 같은 텍스트가 연속으로 오면 업데이트만
-        if (prev.length > 0 && prev[prev.length - 1].text === result.translatedText) {
-          return prev;
-        }
-        
-        return [...prev.slice(-9), newEntry]; // 최근 10개만 유지
-      });
+          text: newTranslation,
+          confidence: result.confidence || 0,
+          timestamp: new Date(),
+          status: false,
+        },
+        ...prev.slice(0, 9),
+      ]);
+      if (isSpeechEnabled && newTranslation) {
+        speakText(newTranslation);
+      }
     }
-  }, [result]);
+  }, [result, isSpeechEnabled, speakText]);
 
-  // 녹화 토글
+  const getConnectionStatusIcon = () => {
+    switch (connectionState) {
+      case "OPEN":
+        return <Wifi size={16} className="text-green-500" />;
+      case "CONNECTING":
+        return (
+          <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+        );
+      default:
+        return <WifiOff size={16} className="text-red-500" />;
+    }
+  };
+
+  const getConnectionStatusText = () => {
+    switch (connectionState) {
+      case "OPEN":
+        return "WebSocket 연결됨";
+      case "CONNECTING":
+        return "연결 중...";
+      case "CLOSING":
+        return "연결 종료 중...";
+      default:
+        return "WebSocket 연결 안됨";
+    }
+  };
+
+  const getConnectionStatusColor = () => {
+    switch (connectionState) {
+      case "OPEN":
+        return "border-green-500/30 bg-green-500/10";
+      case "CONNECTING":
+        return "border-blue-500/30 bg-blue-500/10";
+      default:
+        return "border-red-500/30 bg-red-500/10";
+    }
+  };
+
   const toggleRecording = useCallback(async () => {
-    if (!isCameraReady) {
-      setCameraError("카메라가 준비되지 않았습니다.");
+    if (!videoRef.current || !isCameraReady) {
+      console.error("카메라가 준비되지 않아 녹화를 시작/중단할 수 없습니다.");
       return;
     }
-
     try {
       if (!isProcessing) {
-        console.log('🎬 분석 시작');
         await startFrameExtraction(videoRef.current);
       } else {
-        console.log('⏹️ 분석 중지');
         stopFrameExtraction();
       }
-    } catch (err) {
-      console.error('녹화 토글 오류:', err);
-      setCameraError(`분석 ${isProcessing ? '중지' : '시작'} 실패: ${err.message}`);
+    } catch (error) {
+      console.error("Recording toggle error:", error);
     }
-  }, [isCameraReady, isProcessing, startFrameExtraction, stopFrameExtraction]);
+  }, [isProcessing, isCameraReady, startFrameExtraction, stopFrameExtraction]);
 
-  // 상태에 따른 UI 텍스트
-  const getStatusText = () => {
-    switch (status) {
-      case 'initializing':
-        return '시스템 초기화 중...';
-      case 'processing':
-        return '수화 분석 중';
-      case 'error':
-        return '오류 발생';
-      default:
-        return '수화 입력 대기 중...';
+  const restartCamera = useCallback(() => {
+    console.log(" 페이지 새로고침");
+    window.location.reload();
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
     }
-  };
-
-  const getConnectionIcon = () => {
-    return isConnected ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />;
-  };
+  }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
-      <div className="relative w-full h-full">
-        {/* 비디오 스트림 */}
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="w-full h-full object-cover"
-        />
-
-        {/* 상태 표시 */}
-        <div className="absolute top-6 left-6 flex gap-4">
-          {/* 연결 상태 */}
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${
-            isConnected 
-              ? 'bg-green-500/90 text-white' 
-              : 'bg-red-500/90 text-white'
-          }`}>
-            {getConnectionIcon()}
-            {isConnected ? '연결됨' : '연결 끊김'}
-          </div>
-
-          {/* 처리 상태 */}
-          {status === 'processing' && (
-            <div className="bg-blue-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-semibold flex items-center">
-              <div className="w-3 h-3 bg-white rounded-full mr-2 animate-pulse"></div>
-              {getStatusText()}
-            </div>
-          )}
-
-          {/* 세션 통계 */}
-          {sessionStats.startTime && (
-            <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm">
-              프레임: {sessionStats.frameCount}
-            </div>
-          )}
-        </div>
-
-        {/* 에러 표시 */}
-        {(frameError || cameraError) && (
-          <div className="absolute top-20 left-6 bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm flex items-center gap-2 max-w-md">
-            <AlertCircle className="w-4 h-4" />
-            {frameError || cameraError}
-          </div>
-        )}
-      </div>
-
-      {/* 번역 결과 및 컨트롤 */}
-      <div className="absolute bottom-6 left-6 right-6 z-20 flex items-end justify-between">
-        <div className="flex-1 mr-6">
-          <div className="bg-black/50 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-            {translationText ? (
-              <p className="text-xl text-white font-medium">{translationText}</p>
-            ) : (
-              <p className="text-gray-400">{getStatusText()}</p>
-            )}
-            
-            {/* 신뢰도 표시 */}
-            {result?.confidence && (
-              <div className="mt-2 text-sm text-gray-300">
-                신뢰도: {(result.confidence * 100).toFixed(1)}%
-              </div>
-            )}
-          </div>
-
-          {/* 번역 히스토리 */}
-          {translationHistory.length > 0 && (
-            <div className="mt-4 bg-black/30 backdrop-blur-md rounded-xl p-4 border border-white/5">
-              <h3 className="text-white text-sm font-semibold mb-2">최근 번역</h3>
-              <div className="space-y-1">
-                {translationHistory.slice(-3).map((entry) => (
-                  <div key={entry.id} className="text-gray-300 text-sm">
-                    {entry.text}
+    <div
+      className={`min-h-screen w-full transition-colors duration-300 ${
+        theme === "high-contrast"
+          ? "bg-black text-yellow-400"
+          : isDarkMode
+          ? "bg-gray-900"
+          : "bg-gray-50"
+      }`}
+    >
+      <div className="relative w-full h-screen flex flex-col lg:flex-row">
+        {/* 비디오 영역 */}
+        <div className="flex-1 relative p-4">
+          <div
+            className={`
+              w-full h-full rounded-3xl shadow-2xl overflow-hidden relative border
+              ${
+                theme === "high-contrast"
+                  ? "bg-black border-yellow-400 border-4"
+                  : isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200"
+              }
+            `}
+          >
+            {/* 상단 상태 바 */}
+            <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
+              <div className="flex items-center gap-3">
+                <div
+                  className={`
+                    flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold border
+                    ${
+                      theme === "high-contrast"
+                        ? "bg-black text-yellow-400 border-2 border-yellow-400"
+                        : isDarkMode
+                        ? "bg-gray-700 text-gray-200"
+                        : "bg-gray-100 text-gray-700"
+                    } ${getConnectionStatusColor()}
+                  `}
+                >
+                  {getConnectionStatusIcon()}
+                  <span>{getConnectionStatusText()}</span>
+                </div>
+                {isProcessing && (
+                  <div
+                    className={`
+                      flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold
+                      ${
+                        theme === "high-contrast"
+                          ? "bg-black text-yellow-400 border-2 border-yellow-400"
+                          : isDarkMode
+                          ? "bg-red-500/20 text-red-300"
+                          : "bg-red-100 text-red-700"
+                      }
+                    `}
+                  >
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    수어 분석 중
                   </div>
-                ))}
+                )}
+                {sessionStats && (
+                  <div
+                    className={`
+                      px-3 py-1.5 rounded-full text-sm font-semibold
+                      ${
+                        theme === "high-contrast"
+                          ? "bg-black text-yellow-400 border-2 border-yellow-400"
+                          : isDarkMode
+                          ? "bg-blue-500/20 text-blue-300"
+                          : "bg-blue-100 text-blue-700"
+                      }
+                    `}
+                  >
+                    FPS: {sessionStats.fps || 0}
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={toggleFullscreen}
+                  className={`
+                    p-2 rounded-xl transition-all duration-200
+                    ${
+                      theme === "high-contrast"
+                        ? "bg-black text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                        : isDarkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                    }
+                  `}
+                >
+                  {isFullscreen ? (
+                    <Minimize size={18} />
+                  ) : (
+                    <Maximize size={18} />
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className={`
+                    p-2 rounded-xl transition-all duration-200
+                    ${
+                      theme === "high-contrast"
+                        ? "bg-black text-yellow-400 hover:bg-yellow-400 hover:text-black border-2 border-yellow-400"
+                        : isDarkMode
+                        ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
+                    }
+                  `}
+                >
+                  <Settings size={18} />
+                </button>
               </div>
             </div>
-          )}
+
+            {/* 비디오 또는 에러 표시 */}
+            {frameError ? (
+              <div className="w-full h-full flex items-center justify-center p-8">
+                <div className="text-center max-w-md">
+                  <div
+                    className={`w-20 h-20 border-2 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                      theme === "high-contrast"
+                        ? "border-yellow-400 text-yellow-400"
+                        : isDarkMode
+                        ? "border-gray-200 text-gray-200"
+                        : "border-gray-800 text-gray-800"
+                    }`}
+                  >
+                    <AlertCircle size={32} />
+                  </div>
+                  <h3
+                    className={`text-xl font-bold mb-3 ${
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode
+                        ? "text-white"
+                        : "text-gray-800"
+                    }`}
+                  >
+                    카메라 오류
+                  </h3>
+                  <p
+                    className={`mb-6 whitespace-pre-line text-sm leading-relaxed ${
+                      theme === "high-contrast"
+                        ? "text-yellow-400"
+                        : isDarkMode
+                        ? "text-gray-300"
+                        : "text-gray-600"
+                    }`}
+                  >
+                    {frameError}
+                  </p>
+                  <div className="flex flex-col gap-3">
+                    <button
+                      onClick={restartCamera}
+                      className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    >
+                      <RotateCcw size={18} />
+                      새로 고침
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+            )}
+
+            {frameError && (
+              <div className="absolute bottom-4 left-4 right-4 z-10">
+                <div className="bg-red-500/90 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm">
+                  {frameError}
+                </div>
+              </div>
+            )}
+
+            {showSettings && (
+              <div
+                className={`
+                  absolute top-16 right-4 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px] border
+                  ${
+                    theme === "high-contrast"
+                      ? "bg-black border-yellow-400 border-4"
+                      : isDarkMode
+                      ? "bg-gray-800 border-gray-700"
+                      : "bg-white border-gray-200"
+                  }
+                `}
+              >
+                <h4
+                  className={`text-lg font-semibold mb-4 ${
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-white"
+                      : "text-gray-800"
+                  }`}
+                >
+                  카메라 설정
+                </h4>
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      className={`block text-sm font-semibold mb-2 ${
+                        theme === "high-contrast"
+                          ? "text-yellow-400"
+                          : isDarkMode
+                          ? "text-gray-300"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      음성 출력
+                    </label>
+                    <button
+                      onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
+                      className={`
+                        w-full rounded-lg px-3 py-2 text-sm border transition-colors
+                        ${
+                          theme === "high-contrast"
+                            ? "bg-black border-yellow-400 border-2 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                            : isDarkMode
+                            ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                            : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+                        }
+                      `}
+                    >
+                      {isSpeechEnabled ? "음성 출력 켜짐" : "음성 출력 꺼짐"}
+                    </button>
+                  </div>
+                  <div>
+                    <label
+                      className={`block text-sm font-semibold mb-2 ${
+                        theme === "high-contrast"
+                          ? "text-yellow-400"
+                          : isDarkMode
+                          ? "text-gray-300"
+                          : "text-gray-700"
+                      }`}
+                    >
+                      다크 모드
+                    </label>
+                    <button
+                      onClick={toggleTheme}
+                      className={`
+                        w-full rounded-lg px-3 py-2 text-sm border transition-colors
+                        ${
+                          theme === "high-contrast"
+                            ? "bg-black border-yellow-400 border-2 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                            : isDarkMode
+                            ? "bg-gray-700 border-gray-600 text-white hover:bg-gray-600"
+                            : "bg-white border-gray-300 text-gray-900 hover:bg-gray-50"
+                        }
+                      `}
+                    >
+                      {isDarkMode ? "라이트 모드로 변경" : "다크 모드로 변경"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* 컨트롤 버튼 */}
-        <button
-          onClick={toggleRecording}
-          disabled={!isCameraReady || status === 'initializing'}
-          className={`w-36 h-16 rounded-full backdrop-blur-md transition-all duration-300 flex items-center justify-center text-base font-bold px-4 ${
-            isProcessing
-              ? "bg-red-500/30 hover:bg-red-500/40 border border-red-400/30 text-red-200"
-              : "bg-white/20 hover:bg-white/30 border border-white/20 text-white disabled:opacity-50"
-          }`}
-        >
-          {isProcessing ? (
-            <>
-              <Square className="w-4 h-4 mr-2" />
-              분석 중단
-            </>
-          ) : (
-            <>
-              <Play className="w-4 h-4 mr-2" />
-              분석 시작
-            </>
-          )}
-        </button>
+        {/* 번역 결과 및 히스토리 패널 */}
+        <div className="lg:w-96 p-4 flex flex-col gap-4">
+          <div
+            className={`
+              rounded-2xl p-6 shadow-xl border
+              ${
+                theme === "high-contrast"
+                  ? "bg-black border-yellow-400 border-4"
+                  : isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200"
+              }
+            `}
+          >
+            <h3
+              className={`text-lg font-semibold mb-4 ${
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-800"
+              }`}
+            >
+              번역 결과
+            </h3>
+            <div
+              className={`
+                min-h-[120px] rounded-xl p-4 border
+                ${
+                  theme === "high-contrast"
+                    ? "bg-black border-yellow-400 border-2"
+                    : isDarkMode
+                    ? "bg-gray-700 border-gray-600"
+                    : "bg-gray-50 border-gray-200"
+                }
+              `}
+            >
+              {translationText ? (
+                <p
+                  className={`text-lg font-medium ${
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-white"
+                      : "text-gray-800"
+                  }`}
+                >
+                  {translationText}
+                </p>
+              ) : (
+                <p
+                  className={`text-gray-400 italic ${
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-gray-400"
+                      : "text-gray-500"
+                  }`}
+                >
+                  수어를 인식하면 여기에 번역 결과가 표시됩니다.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div
+            className={`
+              flex-1 rounded-2xl p-6 shadow-xl border
+              ${
+                theme === "high-contrast"
+                  ? "bg-black border-yellow-400 border-4"
+                  : isDarkMode
+                  ? "bg-gray-800 border-gray-700"
+                  : "bg-white border-gray-200"
+              }
+            `}
+          >
+            <h3
+              className={`text-lg font-semibold mb-4 ${
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-800"
+              }`}
+            >
+              번역 히스토리
+            </h3>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {translationHistory.length === 0 ? (
+                <p
+                  className={`text-sm italic ${
+                    theme === "high-contrast"
+                      ? "text-yellow-400"
+                      : isDarkMode
+                      ? "text-gray-400"
+                      : "text-gray-500"
+                  }`}
+                >
+                  아직 번역 기록이 없습니다.
+                </p>
+              ) : (
+                translationHistory.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`
+                      p-3 rounded-lg border
+                      ${
+                        theme === "high-contrast"
+                          ? "bg-black border-yellow-400"
+                          : isDarkMode
+                          ? "bg-gray-700/50 border-gray-600"
+                          : "bg-gray-50 border-gray-200"
+                      }
+                    `}
+                  >
+                    <p
+                      className={`font-medium ${
+                        theme === "high-contrast"
+                          ? "text-yellow-400"
+                          : isDarkMode
+                          ? "text-white"
+                          : "text-gray-800"
+                      }`}
+                    >
+                      {item.text}
+                    </p>
+                    <div
+                      className={`flex justify-between items-center mt-1 text-xs ${
+                        theme === "high-contrast"
+                          ? "text-yellow-400"
+                          : isDarkMode
+                          ? "text-gray-400"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      <span>{item.timestamp.toLocaleTimeString()}</span>
+                      <div className="flex items-center gap-1">
+                        <div
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            item.confidence > 0.8
+                              ? "bg-green-500"
+                              : item.confidence > 0.6
+                              ? "bg-yellow-500"
+                              : "bg-red-500"
+                          }`}
+                        />
+                        {Math.round(item.confidence * 100)}%
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 lg:gap-3">
+            <button
+              onClick={toggleRecording}
+              disabled={!videoRef.current || !isCameraReady}
+              className={`
+                flex-1 flex items-center justify-center gap-2 lg:gap-3 py-3 lg:py-4 px-4 lg:px-6 
+                rounded-xl lg:rounded-2xl font-semibold text-base lg:text-lg 
+                transition-all duration-300 transform hover:scale-[1.02] shadow-lg 
+                disabled:opacity-50 disabled:transform-none disabled:cursor-not-allowed
+                ${
+                  isProcessing
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : theme === "high-contrast"
+                    ? "bg-black text-yellow-400 border-4 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : isDarkMode
+                    ? "bg-blue-600 hover:bg-blue-500 text-white"
+                    : "bg-blue-500 hover:bg-blue-600 text-white"
+                }
+              `}
+            >
+              {isProcessing ? (
+                <>
+                  <Square size={18} className="lg:w-5 lg:h-5" />
+                  <span className="hidden sm:inline">번역 중단</span>
+                  <span className="sm:hidden">중단</span>
+                </>
+              ) : (
+                <>
+                  <Play size={18} className="lg:w-5 lg:h-5" />
+                  <span className="hidden sm:inline">번역 시작</span>
+                  <span className="sm:hidden">시작</span>
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
+              className={`p-3 lg:p-4 rounded-xl lg:rounded-2xl transition-all duration-200 ${
+                isSpeechEnabled
+                  ? theme === "high-contrast"
+                    ? "border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : "border-2 border-blue-500 text-blue-500 hover:bg-blue-50"
+                  : theme === "high-contrast"
+                  ? "bg-black text-yellow-400 border-2 border-yellow-400 hover:bg-yellow-400 hover:text-black"
+                  : isDarkMode
+                  ? "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+              title="음성 출력 토글"
+            >
+              {isSpeechEnabled ? (
+                <Volume2 size={18} className="lg:w-5 lg:h-5" />
+              ) : (
+                <VolumeX size={18} className="lg:w-5 lg:h-5" />
+              )}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

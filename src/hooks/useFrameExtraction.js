@@ -4,103 +4,127 @@ import { getSignLanguageSystem, resetSignLanguageSystem } from '../services/Sign
 
 export const useFrameExtraction = () => {
   const { user } = useAuth();
-  const systemRef = useRef(cull);
+  const systemRef = useRef(null);
+  const isInitializedRef = useRef(false);
+  const initializingRef = useRef(false);
+  const userIdRef = useRef(null); // 사용자 ID 추적
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState(null);
-  const [status, setStatus] = useState('idle'); // idle, initializing, processing, error
-  const [isConnected, setIsConnected] = useState(false);
+  const [stream, setStream] = useState(null);
+  const [connectionState, setConnectionState] = useState('CLOSED');
   const [sessionStats, setSessionStats] = useState({
     frameCount: 0,
     startTime: null,
-    lastResultTime: null
+    lastResultTime: null,
+    fps: 0
   });
 
-  // system initialize (실제 사용자 정보 전달)
-  const initialize = useCallback(async () => {
-    try {
-      setStatus('initializing');
-      setError(null);
-
-      if (!user?.id) {
-        throw new Error('사용자 인증이 필요합니다');
-      }
-
-      // 기존 시스템 정리
-      if (systemRef.current) {
-        await systemRef.current.cleanup();
-        systemRef.current = null;
-      }
-
-      // 새 시스템 인스턴스 생성
-      systemRef.current = getSignLanguageSystem();
-
-      // system initialize with real user info
-      const { stream, isReady } = await systemRef.current.initialize(user);
-
-      if (!isReady) {
-        throw new Error('시스템 초기화에 실패했습니다');
-      }
-
-      // WebSocket 메시지 핸들러 설정
-      systemRef.current.onMessage((message) => {
-        handleWebSocketMessage(message);
-      });
-
-      setIsConnected(true);
-      setStatus('idle');
-      console.log(`✅ 사용자 ${user.name || user.id} 시스템 초기화 완료`);
-
-      return stream;
-
-    } catch (err) {
-      console.error('❌ 시스템 초기화 실패:', err);
-      setError(err.message);
-      setStatus('error');
-      setIsConnected(false);
-      throw err;
-    }
-  }, [user]); // user 의존성 추가
-
-  // Websocket message handler
   const handleWebSocketMessage = useCallback((message) => {
     try {
       switch (message.type) {
         case 'PREDICTION_RESULT':
+        case 'TRANSLATION_RESULT':
           setResult({
-            translatedText: message.label,
-            confidence: message.confidence,
-            timestamp: message.timestamp
+            translatedText: message.label || message.text,
+            confidence: message.confidence || 0,
+            timestamp: message.timestamp || Date.now()
           });
           setSessionStats(prev => ({
             ...prev,
-            lastResultTime: Date.now()
+            lastResultTime: Date.now(),
+            fps: prev.startTime ? Math.round(prev.frameCount / ((Date.now() - prev.startTime) / 1000)) : 0
           }));
           break;
-
-        case 'TRANSLATION_RESULT':
-          setResult({
-            translatedText: message.text,
-            confidence: message.confidence,
-            timestamp: message.timestamp
-          });
-          break;
-
         case 'ERROR':
           console.error('서버 오류:', message.error);
           setError(message.error);
           break;
-
-        default:
-          console.log('알 수 없는 메시지 타입:', message.type);
+        case 'CONNECTION_STATE':
+          setConnectionState(message.state);
+          break;
       }
     } catch (err) {
       console.error('메시지 처리 오류:', err);
     }
   }, []);
 
-  // frame extraction starts
+  const initializeSystem = useCallback(async () => {
+    if (initializingRef.current) {
+      console.log('초기화 진행 중 - 대기');
+      return;
+    }
+
+    const currentUserId = user?.id;
+    if (!currentUserId) {
+      throw new Error('사용자 인증이 필요합니다');
+    }
+
+    // 같은 사용자면 이미 초기화된 시스템 재사용
+    if (isInitializedRef.current &&
+      systemRef.current?.isReady() &&
+      userIdRef.current === currentUserId) {
+      console.log('이미 초기화됨 - 스킵');
+      return;
+    }
+
+    initializingRef.current = true;
+
+    try {
+      setError(null);
+      setConnectionState('CONNECTING');
+
+      console.log('시스템 초기화 시작:', currentUserId);
+
+      // 사용자가 변경된 경우에만 기존 시스템 정리
+      if (userIdRef.current !== currentUserId && systemRef.current) {
+        await systemRef.current.cleanup();
+        systemRef.current = null;
+        resetSignLanguageSystem();
+      }
+
+      // 새 시스템 생성 및 초기화
+      systemRef.current = getSignLanguageSystem();
+      systemRef.current.setUser(user);
+
+      const { stream: newStream, isReady } = await systemRef.current.initialize();
+
+      if (!isReady) {
+        throw new Error('시스템 초기화에 실패했습니다');
+      }
+
+      systemRef.current.onMessage(handleWebSocketMessage);
+
+      setStream(newStream);
+      setConnectionState('OPEN');
+      isInitializedRef.current = true;
+      userIdRef.current = currentUserId;
+
+      console.log('시스템 초기화 완료');
+
+    } catch (err) {
+      console.error('시스템 초기화 실패:', err);
+      setError(err.message);
+      setConnectionState('ERROR');
+      isInitializedRef.current = false;
+      userIdRef.current = null;
+      throw err;
+    } finally {
+      initializingRef.current = false;
+    }
+  }, []); // 의존성 완전 제거
+
+  // 사용자 변경 감지 및 자동 초기화
+  useEffect(() => {
+    if (user?.id && userIdRef.current !== user.id) {
+      initializeSystem().catch(err => {
+        console.error('자동 초기화 실패:', err);
+      });
+    }
+  }, [user?.id]); // initializeSystem 의존성 제거
+
+  // 나머지 함수들은 동일...
   const startFrameExtraction = useCallback(async (videoElement) => {
     try {
       if (isProcessing) {
@@ -112,55 +136,47 @@ export const useFrameExtraction = () => {
         throw new Error('비디오 요소가 준비되지 않았습니다');
       }
 
-      // 시스템이 준비되지 않았으면 초기화
-      if (!systemRef.current || !systemRef.current.isReady()) {
-        await initialize();
+      if (!isInitializedRef.current || !systemRef.current?.isReady()) {
+        throw new Error('시스템이 초기화되지 않았습니다. 잠시 후 다시 시도해주세요.');
       }
 
-      // 비디오 요소 설정
       systemRef.current.setupVideo(videoElement);
-
-      // 프레임 처리 시작
       await systemRef.current.startProcessing(videoElement);
 
       setIsProcessing(true);
-      setStatus('processing');
       setSessionStats({
         frameCount: 0,
         startTime: Date.now(),
-        lastResultTime: null
+        lastResultTime: null,
+        fps: 0
       });
 
-      console.log('🚀 프레임 추출 시작');
+      console.log('프레임 추출 시작');
 
     } catch (err) {
-      console.error('❌ 프레임 추출 시작 실패:', err);
+      console.error('프레임 추출 시작 실패:', err);
       setError(err.message);
-      setStatus('error');
       setIsProcessing(false);
     }
-  }, [isProcessing, initialize]);
+  }, [isProcessing]);
 
-  // 프레임 추출 중지
   const stopFrameExtraction = useCallback(() => {
     try {
-      if (systemRef.current && systemRef.current.isProcessing()) {
+      if (systemRef.current?.isProcessing()) {
         systemRef.current.stopProcessing();
       }
-
       setIsProcessing(false);
-      setStatus('idle');
-      console.log('⏹️ 프레임 추출 중지');
-
+      console.log('프레임 추출 중지');
     } catch (err) {
-      console.error('❌ 프레임 추출 중지 오류:', err);
+      console.error('프레임 추출 중지 오류:', err);
       setError(err.message);
     }
   }, []);
 
-  // 리소스 정리
   const cleanup = useCallback(async () => {
     try {
+      initializingRef.current = false;
+
       if (systemRef.current) {
         await systemRef.current.cleanup();
         systemRef.current = null;
@@ -169,35 +185,30 @@ export const useFrameExtraction = () => {
       resetSignLanguageSystem();
 
       setIsProcessing(false);
-      setIsConnected(false);
-      setStatus('idle');
+      setConnectionState('CLOSED');
       setResult(null);
       setError(null);
+      setStream(null);
+      isInitializedRef.current = false;
+      userIdRef.current = null;
 
-      console.log('🧹 리소스 정리 완료');
+      console.log('리소스 정리 완료');
 
     } catch (err) {
-      console.error('❌ 리소스 정리 오류:', err);
+      console.error('리소스 정리 오류:', err);
     }
   }, []);
-
-  // 컴포넌트 언마운트 시 정리
-  useEffect(() => {
-    return () => {
-      cleanup();
-    };
-  }, [cleanup]);
 
   return {
     isProcessing,
     result,
     error,
-    status,
-    isConnected,
+    stream,
+    connectionState,
     sessionStats,
     startFrameExtraction,
     stopFrameExtraction,
     cleanup,
-    initialize
+    initializeSystem
   };
 };

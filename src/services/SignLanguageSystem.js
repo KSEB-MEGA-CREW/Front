@@ -1,4 +1,5 @@
 // websocket 수어 번역 전체 관리 (비동기 상태 오류 방지) 시스템
+import { resolve } from '@react-three/fiber/dist/declarations/src/core/utils';
 import { MEDIAPIPE_CONFIG, VIDEO_CONFIG, MESSAGE_TYPES } from '../constants/videoConfig';
 import { keypointUtils } from '../utils/keypointUtils';
 import { performanceLogger } from '../utils/performanceUtils';
@@ -54,12 +55,6 @@ class CameraManager {
         }
     }
 
-    setupVideoElement(videoElement) {
-        this.videoElement = videoElement;
-        if (this.stream) {
-            this.videoElement.srcObject = this.stream;
-        }
-    }
 
     releaseStream() {
         if (this.stream) {
@@ -75,7 +70,37 @@ class CameraManager {
     }
 
     isReady() {
-        return this.stream !== null && this.videoElement && this.videoElement.videoWidth > 0;
+        // 더 엄격한 체크 조건 적용
+        return this.stream !== null &&
+            this.videoElement &&
+            this.videoElement.videoWidth > 0 &&
+            this.videoElement.videoHeight > 0 &&
+            this.videoElement.readyState >= 2; // HAVE_CURRENT_DATA 이상
+    }
+
+    setupVideoElement(videoElement) {
+        this.videoElement = videoElement;
+        if (this.stream && this.videoElement) {
+            this.videoElement.srcObject = this.stream;
+
+            // 비디오 준비 상태 대기
+            return new Promise((resolve) => {
+                const checkReady = () => {
+                    if (this.isReady()) {
+                        console.log('카메라 준비 완료:', {
+                            width: this.videoElement.videoWidth,
+                            height: this.videoElement.videoHeight,
+                            readyState: this.videoElement.readyState
+                        });
+                        resolve();
+                    } else {
+                        setTimeout(checkReady, 100);
+                    }
+                };
+                checkReady();
+            });
+        }
+        return Promise.resolve();
     }
 }
 
@@ -188,36 +213,71 @@ class NetworkManager {
         this.sessionId = null;
         this.retryCount = 0;
         this.maxRetries = 3;
+        this.connectionTimeout = 10000; // 10s timeout
     }
 
     async connect(token, userId) {
         console.log('🔌 WebSocket 연결 시작...');
 
+        const wsUrl = import.meta.env.VITE_WS_URL;
+        if (!wsUrl) {
+            throw new Error('VITE_WS_URL 환경변수가 설정되지 않았습니다');
+        }
+
         return new Promise((resolve, reject) => {
-            const wsUrl = `${import.meta.env.VITE_WS_URL}/ws?token=${token}`;
-            this.ws = new WebSocket(wsUrl);
+            // 타임아웃 설정
+            const timeout = setTimeout(() => {
+                console.error('❌ WebSocket 연결 타임아웃');
+                if (this.ws) {
+                    this.ws.close();
+                    this.ws = null;
+                }
+                this.connectionState = 'ERROR';
+                reject(new Error('WebSocket 연결 타임아웃 (10초)'));
+            }, this.connectionTimeout);
 
-            this.ws.onopen = () => {
-                console.log('✅ WebSocket 연결 성공');
-                this.connectionState = 'OPEN';
-                this.reconnectAttempts = 0;
-                this.sessionId = this.generateSessionId();
-                resolve(this.ws);
-            };
+            try {
+                const fullWsUrl = `${wsUrl}/ws?token=${token}`;
+                console.log('연결 시도 URL:', fullWsUrl);
 
-            this.ws.onerror = (error) => {
-                console.error('❌ WebSocket 연결 실패:', error);
+                this.ws = new WebSocket(fullWsUrl);
+
+                this.ws.onopen = () => {
+                    clearTimeout(timeout);
+                    console.log('✅ WebSocket 연결 성공');
+                    this.connectionState = 'OPEN';
+                    this.reconnectAttempts = 0;
+                    this.sessionId = this.generateSessionId();
+                    resolve(this.ws);
+                };
+
+                this.ws.onerror = (error) => {
+                    clearTimeout(timeout);
+                    console.error('❌ WebSocket 연결 실패:', error);
+                    this.connectionState = 'ERROR';
+                    reject(new Error('WebSocket 연결 실패'));
+                };
+
+                this.ws.onclose = (event) => {
+                    clearTimeout(timeout);
+                    console.log('⚠️ WebSocket 연결 종료:', event.code, event.reason);
+                    this.connectionState = 'CLOSED';
+
+                    // 정상 종료가 아닌 경우에만 재연결 시도
+                    if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+                        this.scheduleReconnect(token, userId);
+                    }
+                };
+
+            } catch (error) {
+                clearTimeout(timeout);
+                console.error('❌ WebSocket 생성 실패:', error);
                 this.connectionState = 'ERROR';
                 reject(error);
-            };
-
-            this.ws.onclose = () => {
-                console.log('⚠️ WebSocket 연결 종료');
-                this.connectionState = 'CLOSED';
-                this.scheduleReconnect(token, userId);
-            };
+            }
         });
     }
+
 
     scheduleReconnect(token, userId) {
         if (this.reconnectAttempts < this.maxReconnectAttempts) {
@@ -226,7 +286,9 @@ class NetworkManager {
 
             setTimeout(() => {
                 this.reconnectAttempts++;
-                this.connect(token, userId).catch(console.error);
+                this.connect(token, userId).catch(error => {
+                    console.error('재연결 실패:', error);
+                });
             }, delay);
         } else {
             console.error('❌ 최대 재연결 횟수 초과');
@@ -366,22 +428,14 @@ export class SignLanguageSystem {
         try {
             console.log('통합 수어 인식 시스템 시작...');
 
-            // 사용자 정보 설정
-            if (user) {
-                this.setUser(user);
-            }
-
             if (!this.currentUser?.id) {
                 throw new Error('사용자 정보가 필요합니다');
             }
 
-            // 비동기 상태 오류를 방지하기 위해 단계별 초기화
-            // 순서 중요!!!
+            // 단계별 초기화
             const systemReady = await SystemManager.initialize();
             const stream = await this.cameraManager.initializeCamera();
             await this.mediaPipeManager.initialize();
-
-            // 실제 사용자 ID 사용
             await this.networkManager.connect(systemReady.token, this.currentUser.id);
 
             this.isSystemReady = true;
