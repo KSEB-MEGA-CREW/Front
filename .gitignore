@@ -26,3 +26,7 @@ dist-ssr
 CLAUDE.md
 mockoon-complete-api.json
 mockoon-customer-support.json
+
+# Env
+.env.*
+.env
