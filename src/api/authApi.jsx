@@ -1,4 +1,6 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://43.202.38.158:8080";
+
+console.log('현재 API URL:', API_BASE_URL); // 디버깅용
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
