@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useFrameExtraction } from "../hooks/useFrameExtraction";
-import { useAuth } from "../Context/authContext";
+import { useFrameExtraction } from "../../hooks/useFrameExtraction";
+import { useAuth } from "../../Context/authContext";
 import { AlertCircle, Play, Square, Wifi, WifiOff } from "lucide-react";
 
 const VideoPage = () => {
