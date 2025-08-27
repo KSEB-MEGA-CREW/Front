@@ -21,33 +21,13 @@ import {
 import { useTheme } from "../../Context/themeContext";
 import TransHistoryModal from "../../components/modals/TransHistoryModal";
 
+// 조건에 맞는 애니메이션 출력을 위한 상태 추가
+const [animationType, setAnimationType] = useState('glb'); // 'glb' 또는 'unity'
+
+
 /** GLBAvatarPlayer 메모이즈: 설정 토글 등 부모 리렌더 시 재마운트로 멈추는 현상 방지 */
 const GLBAvatarPlayer = memo(GLBAvatarPlayerRaw);
 
-/** =============== Mock: useUnityAvatar =============== */
-const useUnityAvatar = () => {
-  const containerRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const sendAnimationData = () => {
-    setIsPlaying(true);
-  };
-  const stopAnimation = () => {
-    setIsPlaying(false);
-  };
-
-  return {
-    isLoaded: true,
-    isLoading: false,
-    error: null,
-    isPlaying,
-    containerRef,
-    initializeUnity: () => {},
-    sendAnimationData,
-    stopAnimation,
-    resetAvatar: () => {},
-  };
-};
 
 /** =============== Mock: useTextToSignAPI =============== */
 const useTextToSignAPI = () => {
@@ -135,9 +115,23 @@ const AvatarPage = () => {
       initializeUnity();
     }
   }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity]);
+  //-------------unity 실제 구현------------//
+  // 메인 수어 변환 함수 - 자주 사용하는 구문인지 판별하여 분기
+const handleConvertToSignLanguage = async (text, customFilename = null) => {
+    if (!text.trim() || isPlaying) return;
 
+    // 자주 사용하는 구문 확인
+    if (isFrequentlyUsedPhrase(text)) {
+      setAnimationType('glb');
+      await handleConvertToSignLanguageGLB(text, customFilename);
+    } else {
+      setAnimationType('unity');
+      await handleConverToSignLanguageAni(text);
+    }
+  };
 
-  const handleConvertToSignLanguage = async (text, customFilename = null) => {
+  // GLB 애니메이션 처리 (기존 코드 분리)
+  const handleConvertToSignLanguageGLB = async (text, customFilename = null) => {
     if (!text.trim() || isPlaying) return;
 
     // 파일명 결정
@@ -154,12 +148,10 @@ const AvatarPage = () => {
       const response = await fetch(animationFileUrl);
       const contentType = response.headers.get("Content-Type");
 
-
       if (
         response.ok &&
         (contentType === "model/gltf-binary" || response.status === 304)
       ) {
-        
         // 먼저 애니메이션을 완전히 멈춤
         stopAnimation();
         
@@ -181,6 +173,7 @@ const AvatarPage = () => {
           requestId: `local-${Date.now()}`,
           status: false, // 평가되지 않은 상태
           duration: 3,
+          type: "glb"
         };
 
         setCurrentTranslation(newTranslation);
@@ -198,6 +191,47 @@ const AvatarPage = () => {
     } catch (error) {
       console.error("애니메이션 파일 확인 중 오류 발생:", error);
     }
+  };
+
+  // Unity 애니메이션 처리 (AI 서버 연동)
+  const handleConverToSignLanguageAni = async (text) => {
+    if (!text.trim() || isPlaying || !isUnityLoaded) return;
+
+    try {
+      // AI 서버에 텍스트 전송하여 좌표 데이터 받기
+      const result = await convertTextToSignLanguage(text);
+      
+      if (result.success) {
+        // Unity에 좌표 데이터 전송
+        const success = sendCoordinateData(result.data);
+        
+        if (success) {
+          const newTranslation = {
+            id: Date.now(),
+            text,
+            timestamp: new Date(),
+            requestId: result.requestId,
+            status: "PLAYING",
+            duration: estimateAnimationDuration(result.data),
+            type: "unity"
+          };
+
+          setCurrentTranslation(newTranslation);
+          setTranslationHistory(prev => [newTranslation, ...prev.slice(0, 9)]);
+
+          if (isSpeechEnabled) {
+            speakText(text);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("수어 변환 중 오류:", error);
+    }
+  };
+
+  // 애니메이션 지속 시간 추정 함수
+  const estimateAnimationDuration = (coordinateData) => {
+    return Array.isArray(coordinateData) ? coordinateData.length * 0.1 : 3; // 프레임당 100ms
   };
 
   const speakText = (text) => {
@@ -280,7 +314,9 @@ const AvatarPage = () => {
     if (conversionError) return "AI 변환 오류";
     if (isConversionLoading) return "AI 변환 중...";
     if (isUnityLoading) return "Unity 로딩 중...";
-    if (isPlaying) return "수어 재생 중";
+    if (isPlaying) {
+      return animationType === 'unity' ? "Unity 수어 재생 중" : "GLB 수어 재생 중";
+    }
     if (isUnityLoaded) return "준비 완료";
     return "초기화 중...";
   };
@@ -365,8 +401,7 @@ const AvatarPage = () => {
                 </button>
               </div>
             </div>
-
-            {/* avatar panel */}
+           {/* avatar panel */}
             <div className="w-full h-full flex items-center justify-center relative">
               <div
                 className={`w-full max-w-4xl h-full max-h-[600px]  border relative ${
@@ -378,15 +413,33 @@ const AvatarPage = () => {
                 }`}
                 style={{ minHeight: "400px" }}
               >
-                <GLBAvatarPlayer
-                  avatarUrl="/avatar.glb"
-                  animationUrl={animationUrl}
-                  play={isPlaying}
-                  dark={isDarkMode || theme === "high-contrast"}
-                  zoom={cameraZoom}
-                  onEnd={stopAnimation}
-                />
-
+                {animationType === 'glb' ? (
+                  <GLBAvatarPlayer
+                    avatarUrl="/avatar.glb"
+                    animationUrl={animationUrl}
+                    play={isPlaying}
+                    dark={isDarkMode || theme === "high-contrast"}
+                    zoom={cameraZoom}
+                    onEnd={stopAnimation}
+                  />
+                ) : (
+                  <div 
+                    ref={containerRef}
+                    className="w-full h-full"
+                    style={{ minHeight: "400px" }}
+                  >
+                    {/* Unity WebGL이 여기에 마운트됨 */}
+                  </div>
+                )}
+                
+                {/* 줌 컨트롤은 GLB일 때만 표시 */}
+                {animationType === 'glb' && (
+                  <div className="absolute top-2 right-2 md:top-2 md:right-2 z-20 flex items-center gap-1">
+                    {/* 기존 줌 컨트롤 코드 */}
+                  </div>
+                )}
+              </div>
+            </div>
                 {/* === Zoom controls INSIDE the panel (right-top) === */}
                 <div className="absolute top-2 right-2 md:top-2 md:right-2 z-20 flex items-center gap-1">
                   <button
