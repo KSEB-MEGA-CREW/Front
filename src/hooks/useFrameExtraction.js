@@ -199,7 +199,7 @@ export const useFrameExtraction = () => {
         // 번역 시작 메시지 전송
         console.log("번역 세션 시작 신호 전송...");
         try {
-          await startTranslation(sessionId.current);
+          startTranslation(sessionId.current);
           console.log("번역 세션 시작 완료");
         } catch (translationError) {
           console.warn("번역 시작 신호 전송 실패:", translationError.message);

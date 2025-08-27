@@ -16,6 +16,7 @@ import {
   Camera,
   Shield,
 } from "lucide-react";
+import { useWebSocket } from "../../hooks/useWebSocket";
 
 const VideoPage = () => {
   const videoRef = useRef(null);

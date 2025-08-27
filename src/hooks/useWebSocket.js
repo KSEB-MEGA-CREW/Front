@@ -119,12 +119,12 @@ export const useWebSocket = () => {
 
   //  추가: 번역 시작 함수
   const startTranslation = useCallback(
-    (sessionId) => {
+    (sessionId, userId)=> {
       const currentState = wsService.current.getConnectionState();
       const realTimeConnected = currentState === "OPEN";
 
       console.log(
-        ` startTranslation 호출: connected=${realTimeConnected}, sessionId=${sessionId}`
+        ` startTranslation 호출: connected=${realTimeConnected}, userId=${userId}`
       );
 
       if (!realTimeConnected) {
@@ -133,7 +133,7 @@ export const useWebSocket = () => {
       }
 
       try {
-        wsService.current.sendTranslationStart(sessionId);
+        wsService.current.sendTranslationStart(sessionId, userId);
         setTranslationState("active");
         console.log("Translation session started");
       } catch (error) {
@@ -145,11 +145,11 @@ export const useWebSocket = () => {
   );
 
   // 🔄 추가: 번역 종료 함수
-  const stopTranslation = useCallback((sessionId) => {
-    console.log(`stopTranslation 호출: sessionId=${sessionId}`);
+  const stopTranslation = useCallback((sessionId, userId) => {
+    console.log(`stopTranslation 호출: userId=${userId}`);
 
     try {
-      wsService.current.sendTranslationStop(sessionId);
+      wsService.current.sendTranslationStop(sessionId, userId);
       setTranslationState("idle");
       console.log("Translation session stopped");
     } catch (error) {
@@ -175,7 +175,7 @@ export const useWebSocket = () => {
       if (!sessionId) {
         throw new Error("Session ID가 필요합니다.");
       }
-      
+
       if (!userId) {
         throw new Error("User ID가 필요합니다.");
       }
@@ -204,11 +204,11 @@ export const useWebSocket = () => {
     error,
     lastResult,
     sessionStats,
-    translationState, // 추가: 번역 상태
+    translationState, 
     connect,
     disconnect,
-    startTranslation, // 추가: 번역 시작
-    stopTranslation, // 추가: 번역 종료
+    startTranslation, // 번역 시작
+    stopTranslation, // 번역 종료
     sendFrame,
     clearError,
     updateConnectionState,

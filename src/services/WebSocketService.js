@@ -91,7 +91,7 @@ export class WebSocketService {
     }
 
     // 🔄 추가: 번역 시작 메시지
-    sendTranslationStart(sessionId) {
+    sendTranslationStart(sessionId, userId) {
         if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             throw new Error('WebSocket not connected');
         }
@@ -100,8 +100,7 @@ export class WebSocketService {
 
         const message = {
             type: MESSAGE_TYPES.START_TRANSLATION,
-            session_id: sessionId,
-            timestamp: Date.now()
+            userId: userId
         };
 
         try {
@@ -114,7 +113,7 @@ export class WebSocketService {
     }
 
     // 🔄 추가: 번역 종료 메시지
-    sendTranslationStop(sessionId) {
+    sendTranslationStop(sessionId, userId) {
         if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             console.warn('WebSocket not connected for stop message');
             return;
@@ -122,8 +121,7 @@ export class WebSocketService {
 
         const message = {
             type: MESSAGE_TYPES.STOP_TRANSLATION,
-            session_id: sessionId,
-            timestamp: Date.now()
+            userId: userId
         };
 
         try {
@@ -144,7 +142,7 @@ export class WebSocketService {
         if (!sessionId) {
             throw new Error('Session ID is required');
         }
-        
+
         if (!userId) {
             throw new Error('User ID is required');
         }
@@ -171,7 +169,7 @@ export class WebSocketService {
             user_id: parseInt(userId), // 서버 스키마에 맞춘 int 타입
             timestamp: Date.now()
         };
-        
+
         // 서버 스키마에 맞는 메시지 구조 로깅
         console.log('🔍 [WebSocketService] 서버 스키마 메시지 구조:', {
             type: message.type,
