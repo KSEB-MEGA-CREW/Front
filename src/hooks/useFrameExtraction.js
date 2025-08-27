@@ -16,6 +16,7 @@ export const useFrameExtraction = () => {
 
   const { user } = useAuth();
 
+
   // WebSocket 훅 사용
   const {
     isConnected,
@@ -136,20 +137,20 @@ export const useFrameExtraction = () => {
       try {
         if (!isConnected) {
           await connect(token, user.id);
-          
+
           // 연결 성공 확인 (최대 5초 대기)
           let retryCount = 0;
           const maxRetries = 10;
-          
+
           while (!isConnected && retryCount < maxRetries) {
             await new Promise(resolve => setTimeout(resolve, 500));
             retryCount++;
           }
-          
+
           if (!isConnected) {
             throw new Error("WebSocket 연결이 설정되지 않았습니다");
           }
-          
+
           console.log("WebSocket 연결 성공 확인됨");
         }
       } catch (wsError) {
@@ -196,10 +197,19 @@ export const useFrameExtraction = () => {
         sessionStartTime.current = Date.now();
         frameCount.current = 0;
 
+        const userId = user?.id || user?.userId; // user에서 userId 추출 (id 또는 userId)
+
+        console.log("🔍 사용자 정보 확인:", { user, userId, userKeys: user ? Object.keys(user) : null });
+
+        if (!userId) {
+          setError("userId Error - 사용자 ID를 찾을 수 없습니다");
+          return;
+        }
+
         // 번역 시작 메시지 전송
         console.log("번역 세션 시작 신호 전송...");
         try {
-          startTranslation(sessionId.current);
+          startTranslation(sessionId.current, userId);
           console.log("번역 세션 시작 완료");
         } catch (translationError) {
           console.warn("번역 시작 신호 전송 실패:", translationError.message);
@@ -207,6 +217,27 @@ export const useFrameExtraction = () => {
 
         performanceLogger.clearMetrics();
 
+        // 번역 시작 메시지가 서버에 먼저 도달하도록 짧은 지연 후 프레임 처리 시작
+        console.log("⏳ 번역 시작 메시지 처리 대기 중...");
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // 번역 상태가 활성화될 때까지 최대 2초 대기
+        let translationReadyRetries = 0;
+        const maxTranslationRetries = 10;
+        
+        while (translationState !== "active" && translationReadyRetries < maxTranslationRetries) {
+          console.log(`📡 번역 상태 확인 중... (${translationReadyRetries + 1}/${maxTranslationRetries}): ${translationState}`);
+          await new Promise(resolve => setTimeout(resolve, 200));
+          translationReadyRetries++;
+        }
+        
+        if (translationState === "active") {
+          console.log("✅ 번역 세션 활성화 확인됨");
+        } else {
+          console.warn("⚠️ 번역 세션 활성화 확인 시간 초과, 프레임 처리 계속 진행");
+        }
+        
+        console.log("🎬 프레임 처리 인터벌 시작");
         // 프레임 처리 인터벌 시작
         intervalRef.current = setInterval(async () => {
           try {
@@ -237,7 +268,7 @@ export const useFrameExtraction = () => {
                 realTimeConnected,
                 realTimeState,
                 sessionId: sessionId.current,
-                userId: user?.id
+                userId: user?.id || user?.userId
               });
 
               // WebSocket 전송
@@ -248,7 +279,7 @@ export const useFrameExtraction = () => {
                     frameData.keypoints, // 단일 프레임 194개 값
                     frameData.frameIndex,
                     sessionId.current,
-                    user?.id // userId 추가
+                    user?.id || user?.userId // userId 추가
                   );
                   console.log("WebSocket 단일 프레임 전송 성공");
 
@@ -258,7 +289,7 @@ export const useFrameExtraction = () => {
                     {
                       frameIndex: frameData.frameIndex,
                       sessionId: sessionId.current,
-                      userId: user?.id
+                      userId: user?.id || user?.userId
                     }
                   );
                 } catch (sendError) {
@@ -276,7 +307,7 @@ export const useFrameExtraction = () => {
                       frameData.keypoints,
                       frameData.frameIndex,
                       sessionId.current,
-                      reconnectUser?.id
+                      reconnectUser?.id || reconnectUser?.userId
                     );
                     console.log("재연결 후 전송 성공");
                   } catch (reconnectError) {
@@ -289,17 +320,17 @@ export const useFrameExtraction = () => {
             }
           } catch (err) {
             console.error("Frame processing cycle error:", err);
-            
+
             // 에러 코드 기반 처리
             const errorCode = err.code || ERROR_CODES.UNKNOWN_ERROR;
-            
+
             switch (errorCode) {
               case ERROR_CODES.KEYPOINT_EXTRACTION_FAILED:
               case ERROR_CODES.MEDIAPIPE_PROCESSING_TIMEOUT:
                 console.warn("키포인트 추출 에러 - 프레임 건너뛰기", err.code);
                 // 키포인트 에러는 한 프레임만 건너뛰고 계속 진행
                 break;
-                
+
               case ERROR_CODES.AUTH_TOKEN_EXPIRED:
               case ERROR_CODES.AUTH_TOKEN_INVALID:
               case ERROR_CODES.AUTH_TOKEN_MISSING:
@@ -307,13 +338,13 @@ export const useFrameExtraction = () => {
                 setError("인증이 만료되었습니다. 다시 로그인하세요.");
                 stopFrameExtraction();
                 break;
-                
+
               case ERROR_CODES.WEBSOCKET_CONNECTION_FAILED:
               case ERROR_CODES.WEBSOCKET_SEND_FAILED:
                 console.error("WebSocket 에러 - 재연결 시도", err.code);
                 setError("서버 연결이 불안정합니다.");
                 break;
-                
+
               default:
                 console.error("알 수 없는 에러:", err.code || 'NO_CODE', err.message);
                 setError(err.message);
@@ -323,7 +354,7 @@ export const useFrameExtraction = () => {
         }, VIDEO_CONFIG.FRAME_INTERVAL);
       } catch (err) {
         console.error("Frame extraction start failed:", err);
-        
+
         // 에러 메시지 사용자 친화적으로 변환
         let userMessage = err.message;
         if (err.message.includes("MediaPipe")) {
@@ -333,7 +364,7 @@ export const useFrameExtraction = () => {
         } else if (err.message.includes("인증")) {
           userMessage = "인증에 실패했습니다. 다시 로그인하세요.";
         }
-        
+
         setError(userMessage);
         setIsProcessing(false);
         setStatus("error");
@@ -344,6 +375,7 @@ export const useFrameExtraction = () => {
       initialize,
       isConnected,
       connectionState,
+      translationState,
       startTranslation,
       sendFrame,
       getConnectionState,
@@ -367,15 +399,22 @@ export const useFrameExtraction = () => {
     // 번역 종료 메시지 전송
     console.log("🛑 번역 세션 종료 신호 전송...");
     try {
-      stopTranslation(sessionId.current);
-      console.log("✅ 번역 세션 종료 완료");
+      const userId = user?.id || user?.userId;
+      console.log("🔍 종료 시 사용자 정보 확인:", { user, userId, userKeys: user ? Object.keys(user) : null });
+      
+      if (userId) {
+        stopTranslation(sessionId.current, userId);
+        console.log("✅ 번역 세션 종료 완료");
+      } else {
+        console.warn("⚠️ userId가 없어 번역 종료 신호 전송을 건너뜁니다.", { user });
+      }
     } catch (translationError) {
       console.warn("⚠️ 번역 종료 신호 전송 실패:", translationError.message);
     }
 
     // 주의: 즉시 연결 종료하지 않음 (마지막 문장 대기)
     console.log("🕐 마지막 문장 처리 대기 중...");
-  }, [stopTranslation]);
+  }, [stopTranslation, user?.id, user?.userId]);
 
   // 완전한 정리 함수 (연결 종료 포함)
   const cleanup = useCallback(() => {
