@@ -84,18 +84,18 @@ export const useWebSocket = () => {
         });
 
         wsService.current.onMessage(
-          MESSAGE_TYPES.SENTENCE_GENERATED,
+          MESSAGE_TYPES.TRANSLATION_RESULT,
           (data) => {
-            console.log("Sentence generated:", data);
+            console.log("Translation result:", data);
             setLastResult({
               label: data.sentence,
-              confidence: 1.0,
+              confidence: data.confidence_avg || 1.0,
               type: "sentence",
             });
           }
         );
 
-        wsService.current.onMessage(MESSAGE_TYPES.STATUS, (data) => {
+        wsService.current.onMessage(MESSAGE_TYPES.TRANSLATION_STATUS, (data) => {
           console.log(" Status update:", data);
           if (data.status) {
             setTranslationState(data.status);
@@ -157,14 +157,14 @@ export const useWebSocket = () => {
     }
   }, []);
 
-  // 🔄 수정: sendFrame에 세션 ID 추가
+  // 🔄 수정: sendFrame에 세션 ID 및 userId 추가
   const sendFrame = useCallback(
-    (keypoints, frameIndex, sessionId) => {
+    (keypoints, frameIndex, sessionId, userId) => {
       const currentState = wsService.current.getConnectionState();
       const realTimeConnected = currentState === "OPEN";
 
       console.log(
-        ` sendFrame 호출: stored=${isConnected}, realTime=${realTimeConnected}, state=${currentState}`
+        `📶 sendFrame 호출: stored=${isConnected}, realTime=${realTimeConnected}, state=${currentState}, userId=${userId}`
       );
 
       if (!realTimeConnected) {
@@ -175,8 +175,12 @@ export const useWebSocket = () => {
       if (!sessionId) {
         throw new Error("Session ID가 필요합니다.");
       }
+      
+      if (!userId) {
+        throw new Error("User ID가 필요합니다.");
+      }
 
-      return wsService.current.sendFrame(keypoints, frameIndex, sessionId);
+      return wsService.current.sendFrame(keypoints, frameIndex, sessionId, userId);
     },
     [isConnected, updateConnectionState]
   );

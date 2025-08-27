@@ -23,10 +23,6 @@ export class NetworkService {
             });
 
             if (!response.ok) {
-                return false;
-            }
-            
-            if (!response.ok) {
                 console.warn('Token verification failed with status:', response.status);
                 return false;
             }
