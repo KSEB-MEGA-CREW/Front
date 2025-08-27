@@ -55,7 +55,7 @@ const SideMenu = ({
     },
     {
       icon: <Brain size={20} />,
-      label: "퀴즈",
+      label: "학습 퀴즈",
       onClick: onShowQuiz,
       id: "quiz", // 모달/해시 기반 네비게이션을 위한 ID
     },

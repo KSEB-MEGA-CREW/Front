@@ -296,7 +296,7 @@ export const authApi = {
   // postTransHistory 번역 기록에 대한 평가 전송
   postTransHistory: async (historyId, feedback, translatedText, translatedTime) => {
     try {
-      const response = await apiRequest("/api/transHistory", {
+      const response = await apiRequest("/api/translation-histories/feedback", {
         method: "POST",
         body: JSON.stringify({
           historyId,

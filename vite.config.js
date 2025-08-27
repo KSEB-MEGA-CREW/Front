@@ -23,7 +23,7 @@ export default defineConfig({
     // 프록시 설정 - 개발 환경에서만 사용
     proxy: process.env.NODE_ENV === "development" ? {
       "/api": {
-        target: "http://43.202.38.158:8080",
+        target: "http://localhost:8080",
         changeOrigin: true,
         secure: false,
         timeout: 60000,
@@ -45,14 +45,14 @@ export default defineConfig({
       },
 
       "/oauth2": {
-        target: "http://43.202.38.158:8080",
+        target: "http://localhost:8080",
         changeOrigin: true,
         secure: false,
         timeout: 60000,
       },
 
       "/ws": {
-        target: "ws://3.34.168.10:8000",
+        target: "ws://localhost:8000",
         ws: true,
         changeOrigin: true,
       },
@@ -71,7 +71,7 @@ export default defineConfig({
     __WS_URL__: JSON.stringify(
       process.env.VITE_WS_URL ||
       (process.env.NODE_ENV === "production"
-        ? "ws://3.34.168.10:8000"
+        ? "ws://3.34.168.10:8080"
         : "ws://localhost:8000"
       )
     ),

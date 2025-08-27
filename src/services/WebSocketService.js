@@ -91,7 +91,7 @@ export class WebSocketService {
     }
 
     // 🔄 추가: 번역 시작 메시지
-    sendTranslationStart(sessionId) {
+    sendTranslationStart(sessionId, userId) {
         if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             throw new Error('WebSocket not connected');
         }
@@ -100,8 +100,7 @@ export class WebSocketService {
 
         const message = {
             type: MESSAGE_TYPES.START_TRANSLATION,
-            session_id: sessionId,
-            timestamp: Date.now()
+            userId: userId
         };
 
         try {
@@ -114,7 +113,7 @@ export class WebSocketService {
     }
 
     // 🔄 추가: 번역 종료 메시지
-    sendTranslationStop(sessionId) {
+    sendTranslationStop(sessionId, userId) {
         if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             console.warn('WebSocket not connected for stop message');
             return;
@@ -122,8 +121,7 @@ export class WebSocketService {
 
         const message = {
             type: MESSAGE_TYPES.STOP_TRANSLATION,
-            session_id: sessionId,
-            timestamp: Date.now()
+            userId: userId
         };
 
         try {
@@ -136,7 +134,7 @@ export class WebSocketService {
     }
 
     // 🔄 수정: 키포인트 전송에 메시지 타입과 세션 ID 추가
-    sendFrame(keypoints, frameIndex, sessionId) {
+    sendFrame(keypoints, frameIndex, sessionId, userId) {
         if (!this.isConnected || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             throw new Error('WebSocket not connected');
         }
@@ -145,6 +143,22 @@ export class WebSocketService {
             throw new Error('Session ID is required');
         }
 
+        if (!userId) {
+            throw new Error('User ID is required');
+        }
+
+        // 🔍 데이터 형식 진단 로깅 (단일 프레임)
+        console.log('🔍 [WebSocketService] sendFrame 단일 프레임 데이터 진단:', {
+            keypointsType: Array.isArray(keypoints) ? 'Array' : typeof keypoints,
+            keypointsLength: Array.isArray(keypoints) ? keypoints.length : 'N/A',
+            expectedLength: 194,
+            isValidFormat: Array.isArray(keypoints) && keypoints.length === 194,
+            frameIndex,
+            sessionId,
+            userId,
+            sampleValues: Array.isArray(keypoints) ? keypoints.slice(0, 3) : 'N/A'
+        });
+
         performanceLogger.startTimer('websocket_send');
 
         const message = {
@@ -152,8 +166,24 @@ export class WebSocketService {
             session_id: sessionId,
             frame_index: frameIndex,
             keypoints: keypoints,
+            user_id: parseInt(userId), // 서버 스키마에 맞춘 int 타입
             timestamp: Date.now()
         };
+
+        // 서버 스키마에 맞는 메시지 구조 로깅
+        console.log('🔍 [WebSocketService] 서버 스키마 메시지 구조:', {
+            type: message.type,
+            session_id: message.session_id,
+            frame_index: message.frame_index,
+            user_id: message.user_id,
+            keypointsStructure: {
+                isArray: Array.isArray(message.keypoints),
+                length: Array.isArray(message.keypoints) ? message.keypoints.length : 'N/A',
+                expectedStructure: 'List[float] (194개 값)',
+                isValidFormat: Array.isArray(message.keypoints) && message.keypoints.length === 194,
+                sampleValues: Array.isArray(message.keypoints) ? message.keypoints.slice(0, 5) : 'N/A'
+            }
+        });
 
         try {
             this.ws.send(JSON.stringify(message));
@@ -215,7 +245,7 @@ export class WebSocketService {
     }
 
     attemptReconnect(token) {
-        if (this.reconnectAttempts >= API_CONFIG.MAX_RECONNECT_ATTEMPTS) {
+        if (this.reconnectAttempts >= (API_CONFIG.MAX_RECONNECT_ATTEMPTS || 3)) {
             console.error('Max reconnection attempts reached');
             return;
         }
@@ -225,7 +255,7 @@ export class WebSocketService {
         }
 
         this.reconnectAttempts++;
-        const delay = API_CONFIG.RECONNECT_INTERVAL * this.reconnectAttempts;
+        const delay = (API_CONFIG.RECONNECT_INTERVAL || 1000) * this.reconnectAttempts;
 
 
         this.reconnectTimer = setTimeout(() => {

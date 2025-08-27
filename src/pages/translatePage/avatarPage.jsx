@@ -106,23 +106,23 @@ const AvatarPage = () => {
   const FREQUENT_PHRASES = {
     "안녕하세요": "안녕하세요",
     "감사합니다": "감사합니다",
-    "알겠습니다": "알겠습니다",
     "죄송합니다": "죄송합니다",
-    "괜찮아요": "괜찮아요",
-    "좋아요": "좋아요",
-    "싫어요": "싫어요",
-    "도움이 필요하신가요": "help_needed"
+    "알겠습니다": "알겠습니다",
+    "좋다": "좋다",
+    "가다": "가다",
+    "잘하다": "잘하다",
+    "느리다": "느리다"
   };
 
   const predefinedPhrases = [
     { display: "안녕하세요", filename: "안녕하세요" },
     { display: "감사합니다", filename: "감사합니다" },
-    { display: "알겠습니다", filename: "알겠습니다" },
     { display: "죄송합니다", filename: "죄송합니다" },
-    { display: "괜찮아요", filename: "괜찮아요" },
-    { display: "좋아요", filename: "좋아요" },
-    { display: "싫어요", filename: "싫어요" },
-    { display: "도움이 필요하신가요", filename: "help_needed" },
+    { display: "알겠습니다", filename: "알겠습니다" },
+    { display: "좋다", filename: "좋다" },
+    { display: "가다", filename: "가다" },
+    { display: "잘하다", filename: "잘하다" },
+    { display: "느리다", filename: "느리다" },
   ];
 
   // 자주 사용하는 구문인지 판별하는 함수

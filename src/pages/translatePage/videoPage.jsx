@@ -16,6 +16,7 @@ import {
   Camera,
   Shield,
 } from "lucide-react";
+import { useWebSocket } from "../../hooks/useWebSocket";
 
 const VideoPage = () => {
   const videoRef = useRef(null);
@@ -143,9 +144,38 @@ const VideoPage = () => {
     }
   }, [checkCameraPermission]);
 
-  // 강제 즉시 정리 함수
+  // 스마트 일시정지 함수
+  const smartPause = useCallback(() => {
+    console.log('⏸️ [VideoPage] 스마트 일시정지 시작');
+    
+    // FrameExtraction 일시정지 (리소스 보존)
+    if (typeof cleanup === "function") {
+      try {
+        cleanup(); // 이제 cleanup은 pause로 동작
+      } catch (error) {
+        console.error("FrameExtraction pause 오류:", error);
+      }
+    }
+    
+    console.log('✅ [VideoPage] 스마트 일시정지 완료 - 리소스 보존됨');
+  }, [cleanup]);
+  
+  // 스마트 재개 함수
+  const smartResume = useCallback(() => {
+    console.log('▶️ [VideoPage] 스마트 재개 시작');
+    
+    // 상태 검증
+    if (!isMountedRef.current || cleanupExecutedRef.current) {
+      console.warn('⚠️ [VideoPage] 재개 불가 - 컴포넌트 비활성');
+      return;
+    }
+    
+    console.log('✅ [VideoPage] 스마트 재개 완료 - 리소스 유지됨');
+  }, []);
+  
+  // 강제 즉시 정리 함수 (비상 시에만 사용)
   const forceCleanup = useCallback(() => {
-    console.log(" 강제 즉시 정리 시작");
+    console.log(" [VideoPage] 강제 정리 시작 (비상 상황)");
 
     // 모든 타이머 정리
     if (initTimeoutRef.current) {

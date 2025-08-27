@@ -1,7 +1,7 @@
 // src/services/FrameProcessor.js
 import { keypointUtils } from "../utils/keypointUtils.js";
 import { performanceLogger } from "../utils/performanceUtils.js";
-import { MEDIAPIPE_CONFIG } from "../constants/videoConfig.js";
+import { MEDIAPIPE_CONFIG, ERROR_CODES } from "../constants/videoConfig.js";
 
 console.log('🔄 FrameProcessor.js 모듈 로드됨');
 
@@ -17,6 +17,12 @@ export class FrameProcessor {
         this.loadingTimeout = null;
         this.lastResults = null;
         this.pendingResolve = null; // 🔧 추가: 대기 중인 Promise resolve 함수
+        
+        // 스마트 일시정지 상태 추가
+        this.isPaused = false;
+        this.pauseReason = null;
+        this.pausedAt = null;
+        
         console.log('✅ FrameProcessor 생성 완료');
     }
 
@@ -97,7 +103,7 @@ export class FrameProcessor {
 
     // MediaPipe 라이브러리 로드 대기
     async waitForMediaPipe() {
-        const maxWaitTime = 5000;
+        const maxWaitTime = MEDIAPIPE_CONFIG.INITIALIZATION_TIMEOUT / 2; // 5초
         const checkInterval = 100;
         let waitTime = 0;
 
@@ -124,14 +130,33 @@ export class FrameProcessor {
   }
 
     async extractKeypoints(videoElement, sessionId) {
-        console.log('📊 키포인트 추출 시작');
+        console.log('📊 [FrameProcessor.js] 키포인트 추출 시작', {
+            ready: this.ready,
+            sessionId,
+            hands: !!this.hands,
+            isProcessing: this.isProcessing,
+            bufferSize: this.frameBuffer.length
+        });
 
         if (!this.ready) {
-            throw new Error('❌ FrameProcessor가 초기화되지 않았습니다');
+            const error = {
+                code: ERROR_CODES.MEDIAPIPE_INIT_FAILED,
+                message: 'FrameProcessor가 초기화되지 않았습니다'
+            };
+            console.error('[FrameProcessor.js]', error);
+            const err = new Error(error.message);
+            err.code = error.code;
+            throw err;
         }
 
     if (!videoElement || videoElement.videoWidth === 0) {
-      throw new Error(" 비디오 요소가 준비되지 않았습니다");
+      const error = {
+        code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
+        message: '비디오 요소가 준비되지 않았습니다'
+      };
+      const err = new Error(error.message);
+      err.code = error.code;
+      throw err;
     }
 
     if (this.isProcessing) {
@@ -146,7 +171,11 @@ export class FrameProcessor {
 
             // MediaPipe 사용 가능 여부에 따라 분기 처리
             if (this.hands && window.Hands) {
-                console.log('🤲 실제 MediaPipe로 키포인트 추출');
+                console.log('🤲 [FrameProcessor.js] 실제 MediaPipe로 키포인트 추출', {
+                    videoWidth: videoElement?.videoWidth,
+                    videoHeight: videoElement?.videoHeight,
+                    readyState: videoElement?.readyState
+                });
                 try {
                     const results = await this.processFrame(videoElement);
                     keypoints = keypointUtils.normalizeKeypoints(results || {});
@@ -155,7 +184,10 @@ export class FrameProcessor {
                     keypoints = this.generateTestKeypoints();
                 }
             } else {
-                console.log('🧪 테스트 모드: 가짜 키포인트 생성');
+                console.log('🧪 [FrameProcessor.js] 테스트 모드: 가짜 키포인트 생성', {
+                    handsExists: !!this.hands,
+                    windowHandsExists: !!window.Hands
+                });
                 keypoints = this.generateTestKeypoints();
             }
 
@@ -165,40 +197,35 @@ export class FrameProcessor {
                 keypoints = new Array(194).fill(0.0);
             }
 
-      // 프레임 버퍼에 추가
-      this.frameBuffer.push(keypoints);
+      // 단일 프레임 데이터 검증
+      console.log('📊 [FrameProcessor] 단일 프레임 데이터:', {
+        type: Array.isArray(keypoints) ? 'Array' : typeof keypoints,
+        length: Array.isArray(keypoints) ? keypoints.length : 'N/A',
+        firstFew: Array.isArray(keypoints) ? keypoints.slice(0, 3) : keypoints,
+        frameIndex: this.frameIndex + 1,
+        isValidFormat: Array.isArray(keypoints) && keypoints.length === 194
+      });
+      
       this.frameIndex++;
+      const extractionTime = performanceLogger.endTimer('keypointExtraction');
+      performanceLogger.addMetric("keypointExtraction", extractionTime);
 
-            const extractionTime = performanceLogger.endTimer('keypointExtraction');
+      // 서버 스키마에 맞춘 단일 프레임 데이터 반환
+      const frameData = {
+        keypoints: keypoints, // List[float] (194개 값)
+        frameIndex: this.frameIndex,
+        sessionId,
+      };
 
-            console.log(`📊 버퍼 상태: ${this.frameBuffer.length}/10 프레임`);
+      console.log(`📦 [FrameProcessor] 단일 프레임 전송 준비: 프레임 ${frameData.frameIndex}`);
+      console.log('📊 [FrameProcessor] 전송 데이터 구조:', {
+        keypointsType: Array.isArray(frameData.keypoints) ? 'Array' : typeof frameData.keypoints,
+        keypointsLength: Array.isArray(frameData.keypoints) ? frameData.keypoints.length : 'N/A',
+        dataStructure: 'List[float]', // 서버 기대 구조
+        sampleValues: Array.isArray(frameData.keypoints) ? frameData.keypoints.slice(0, 5) : 'N/A'
+      });
 
-      // 10프레임 배치 완성 시 반환
-      if (this.frameBuffer.length >= 10) {
-        const batchData = {
-          keypoints: [...this.frameBuffer],
-          frameIndex: this.frameIndex,
-          batchSize: this.frameBuffer.length,
-          sessionId,
-        };
-
-        this.frameBuffer = [];
-        performanceLogger.addMetric("keypointExtraction", extractionTime);
-
-                console.log(`📦 배치 완성: ${batchData.batchSize}프레임`);
-
-                // 배치 데이터 검증 로그
-                console.log('📊 배치 데이터 검증:', {
-                    totalFrames: batchData.keypoints.length,
-                    firstFrameLength: batchData.keypoints[0]?.length,
-                    allFramesSameLength: batchData.keypoints.every(frame => frame.length === 194),
-                    hasNonZeroValues: batchData.keypoints.some(frame => frame.some(val => val !== 0))
-                });
-
-                return batchData;
-            }
-
-            return null;
+      return frameData;
 
         } catch (error) {
             console.error('❌ 키포인트 추출 실패:', error);
@@ -225,12 +252,19 @@ export class FrameProcessor {
     // 🔧 수정: MediaPipe 처리 방식 개선
     processFrame(videoElement) {
         return new Promise((resolve, reject) => {
-            // 🔧 수정: 타임아웃 시간 증가 (100ms → 500ms)
+            console.log('🎬 [FrameProcessor.js] processFrame 시작', {
+                videoElement: !!videoElement,
+                videoWidth: videoElement?.videoWidth,
+                videoHeight: videoElement?.videoHeight,
+                hands: !!this.hands
+            });
+            
+            // 표준화된 타임아웃 사용
             const timeout = setTimeout(() => {
-                console.warn('⏰ MediaPipe 처리 타임아웃 (500ms)');
+                console.warn(`⏰ [FrameProcessor.js] MediaPipe 처리 타임아웃 (${MEDIAPIPE_CONFIG.PROCESSING_TIMEOUT}ms)`);
                 this.pendingResolve = null;
-                reject(new Error('MediaPipe 처리 타임아웃 (500ms)'));
-            }, 500);
+                reject(new Error(`MediaPipe 처리 타임아웃 (${MEDIAPIPE_CONFIG.PROCESSING_TIMEOUT}ms)`));
+            }, MEDIAPIPE_CONFIG.PROCESSING_TIMEOUT);
 
             try {
                 // 🔧 수정: 결과 대기 설정
@@ -251,42 +285,97 @@ export class FrameProcessor {
     }
 
     isReady() {
-        const readyState = this.ready && (this.hands !== null || !window.Hands);
-        console.log('🔍 isReady 호출됨, 상태:', readyState);
+        const readyState = this.ready && (this.hands !== null || !window.Hands) && !this.isPaused;
+        console.log('🔍 [FrameProcessor] isReady 호출됨:', {
+            ready: this.ready,
+            hands: !!this.hands,
+            isPaused: this.isPaused,
+            finalState: readyState
+        });
         return readyState;
     }
 
   resetFrameIndex() {
     this.frameIndex = 0;
-    this.frameBuffer = [];
+    // 버퍼는 더 이상 사용하지 않음
   }
 
   getCurrentBufferSize() {
-    return this.frameBuffer.length;
+    return 0; // 단일 프레임 전송이므로 사용하지 않음
   }
 
-  cleanup() {
-    try {
-      if (this.loadingTimeout) {
-        clearTimeout(this.loadingTimeout);
-        this.loadingTimeout = null;
-      }
+    // 스마트 일시정지: 리소스 보존
+    pause(reason = 'unknown') {
+        console.log(`⏸️ [FrameProcessor] 일시정지: ${reason}`);
+        this.isPaused = true;
+        this.pauseReason = reason;
+        this.pausedAt = Date.now();
+        this.isProcessing = false;
+    }
+    
+    // 스마트 재개: 즉시 복구
+    resume() {
+        console.log(`▶️ [FrameProcessor] 재개: 이전 ${this.pauseReason}`);
+        this.isPaused = false;
+        this.pauseReason = null;
+        this.pausedAt = null;
+        
+        // 상태 검증 후 재개
+        if (this.ready && this.hands) {
+            console.log('✅ [FrameProcessor] 재개 완료 - 상태 정상');
+            return true;
+        } else {
+            console.warn('⚠️ [FrameProcessor] 재개 시 상태 비정상:', {
+                ready: this.ready,
+                hands: !!this.hands
+            });
+            return false;
+        }
+    }
+    
+    // 일시정지 상태 확인
+    isPausedState() {
+        return {
+            isPaused: this.isPaused,
+            reason: this.pauseReason,
+            duration: this.pausedAt ? Date.now() - this.pausedAt : 0
+        };
+    }
 
-      if (this.hands) {
-        this.hands.close();
-        this.hands = null;
-      }
+    // 완전 정리는 전용 메서드로 분리 (비상 시에만 사용)
+    forceCleanup() {
+        console.log('🧺 [FrameProcessor] 강제 정리 시작');
+        try {
+            if (this.loadingTimeout) {
+                clearTimeout(this.loadingTimeout);
+                this.loadingTimeout = null;
+            }
+
+            if (this.hands) {
+                this.hands.close();
+                this.hands = null;
+            }
 
             this.ready = false;
             this.isProcessing = false;
             this.frameBuffer = [];
             this.initPromise = null;
             this.lastResults = null;
-            this.pendingResolve = null; // 🔧 추가: pendingResolve 초기화
+            this.pendingResolve = null;
+            
+            // 일시정지 상태도 초기화
+            this.isPaused = false;
+            this.pauseReason = null;
+            this.pausedAt = null;
 
-            console.log('✅ FrameProcessor 정리 완료');
+            console.log('✅ [FrameProcessor] 강제 정리 완료');
         } catch (error) {
-            console.error('❌ FrameProcessor 정리 오류:', error);
+            console.error('❌ [FrameProcessor] 강제 정리 오류:', error);
         }
+    }
+    
+    // 기본 cleanup은 일시정지로 변경
+    cleanup() {
+        this.pause('cleanup_requested');
     }
 }

@@ -84,18 +84,18 @@ export const useWebSocket = () => {
         });
 
         wsService.current.onMessage(
-          MESSAGE_TYPES.SENTENCE_GENERATED,
+          MESSAGE_TYPES.TRANSLATION_RESULT,
           (data) => {
-            console.log("Sentence generated:", data);
+            console.log("Translation result:", data);
             setLastResult({
               label: data.sentence,
-              confidence: 1.0,
+              confidence: data.confidence_avg || 1.0,
               type: "sentence",
             });
           }
         );
 
-        wsService.current.onMessage(MESSAGE_TYPES.STATUS, (data) => {
+        wsService.current.onMessage(MESSAGE_TYPES.TRANSLATION_STATUS, (data) => {
           console.log(" Status update:", data);
           if (data.status) {
             setTranslationState(data.status);
@@ -119,12 +119,12 @@ export const useWebSocket = () => {
 
   //  추가: 번역 시작 함수
   const startTranslation = useCallback(
-    (sessionId) => {
+    (sessionId, userId)=> {
       const currentState = wsService.current.getConnectionState();
       const realTimeConnected = currentState === "OPEN";
 
       console.log(
-        ` startTranslation 호출: connected=${realTimeConnected}, sessionId=${sessionId}`
+        ` startTranslation 호출: connected=${realTimeConnected}, userId=${userId}`
       );
 
       if (!realTimeConnected) {
@@ -133,7 +133,7 @@ export const useWebSocket = () => {
       }
 
       try {
-        wsService.current.sendTranslationStart(sessionId);
+        wsService.current.sendTranslationStart(sessionId, userId);
         setTranslationState("active");
         console.log("Translation session started");
       } catch (error) {
@@ -145,11 +145,11 @@ export const useWebSocket = () => {
   );
 
   // 🔄 추가: 번역 종료 함수
-  const stopTranslation = useCallback((sessionId) => {
-    console.log(`stopTranslation 호출: sessionId=${sessionId}`);
+  const stopTranslation = useCallback((sessionId, userId) => {
+    console.log(`stopTranslation 호출: userId=${userId}`);
 
     try {
-      wsService.current.sendTranslationStop(sessionId);
+      wsService.current.sendTranslationStop(sessionId, userId);
       setTranslationState("idle");
       console.log("Translation session stopped");
     } catch (error) {
@@ -157,14 +157,14 @@ export const useWebSocket = () => {
     }
   }, []);
 
-  // 🔄 수정: sendFrame에 세션 ID 추가
+  // 🔄 수정: sendFrame에 세션 ID 및 userId 추가
   const sendFrame = useCallback(
-    (keypoints, frameIndex, sessionId) => {
+    (keypoints, frameIndex, sessionId, userId) => {
       const currentState = wsService.current.getConnectionState();
       const realTimeConnected = currentState === "OPEN";
 
       console.log(
-        ` sendFrame 호출: stored=${isConnected}, realTime=${realTimeConnected}, state=${currentState}`
+        `📶 sendFrame 호출: stored=${isConnected}, realTime=${realTimeConnected}, state=${currentState}, userId=${userId}`
       );
 
       if (!realTimeConnected) {
@@ -176,7 +176,11 @@ export const useWebSocket = () => {
         throw new Error("Session ID가 필요합니다.");
       }
 
-      return wsService.current.sendFrame(keypoints, frameIndex, sessionId);
+      if (!userId) {
+        throw new Error("User ID가 필요합니다.");
+      }
+
+      return wsService.current.sendFrame(keypoints, frameIndex, sessionId, userId);
     },
     [isConnected, updateConnectionState]
   );
@@ -200,11 +204,11 @@ export const useWebSocket = () => {
     error,
     lastResult,
     sessionStats,
-    translationState, // 추가: 번역 상태
+    translationState, 
     connect,
     disconnect,
-    startTranslation, // 추가: 번역 시작
-    stopTranslation, // 추가: 번역 종료
+    startTranslation, // 번역 시작
+    stopTranslation, // 번역 종료
     sendFrame,
     clearError,
     updateConnectionState,
