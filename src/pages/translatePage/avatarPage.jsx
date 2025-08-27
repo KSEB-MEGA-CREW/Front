@@ -21,10 +21,6 @@ import {
 import { useTheme } from "../../Context/themeContext";
 import TransHistoryModal from "../../components/modals/TransHistoryModal";
 
-// 조건에 맞는 애니메이션 출력을 위한 상태 추가
-const [animationType, setAnimationType] = useState('glb'); // 'glb' 또는 'unity'
-
-
 /** GLBAvatarPlayer 메모이즈: 설정 토글 등 부모 리렌더 시 재마운트로 멈추는 현상 방지 */
 const GLBAvatarPlayer = memo(GLBAvatarPlayerRaw);
 
@@ -54,6 +50,9 @@ const useTextToSignAPI = () => {
 /** =============== Page =============== */
 const AvatarPage = () => {
   const { theme, isDarkMode } = useTheme();
+  // 조건에 맞는 애니메이션 출력을 위한 상태 추가
+  const [animationType, setAnimationType] = useState('glb'); // 'glb' 또는 'unity'
+
 
   const [inputText, setInputText] = useState("");
   const [translationHistory, setTranslationHistory] = useState([]);
