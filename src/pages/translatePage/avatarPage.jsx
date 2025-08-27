@@ -20,6 +20,7 @@ import {
 
 import { useTheme } from "../../Context/themeContext";
 import TransHistoryModal from "../../components/modals/TransHistoryModal";
+import { useUnityAvatar } from "../../hooks/useUnityAvatar"; // 이 훅을 사용하도록 가정
 
 /** GLBAvatarPlayer 메모이즈: 설정 토글 등 부모 리렌더 시 재마운트로 멈추는 현상 방지 */
 const GLBAvatarPlayer = memo(GLBAvatarPlayerRaw);
@@ -49,10 +50,10 @@ const useTextToSignAPI = () => {
 
 /** =============== Page =============== */
 const AvatarPage = () => {
-  const { theme, isDarkMode } = useTheme();
-  // 조건에 맞는 애니메이션 출력을 위한 상태 추가
+  // ✅ React Hooks는 컴포넌트 내부 최상위 레벨에서 호출되어야 합니다.
   const [animationType, setAnimationType] = useState('glb'); // 'glb' 또는 'unity'
-
+  const { theme, isDarkMode } = useTheme();
+  const containerRef = useRef(null); // Unity 컨테이너를 위한 ref
 
   const [inputText, setInputText] = useState("");
   const [translationHistory, setTranslationHistory] = useState([]);
@@ -400,7 +401,7 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
                 </button>
               </div>
             </div>
-           {/* avatar panel */}
+            {/* avatar panel */}
             <div className="w-full h-full flex items-center justify-center relative">
               <div
                 className={`w-full max-w-4xl h-full max-h-[600px]  border relative ${
@@ -439,181 +440,178 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
                 )}
               </div>
             </div>
-                {/* === Zoom controls INSIDE the panel (right-top) === */}
-                <div className="absolute top-2 right-2 md:top-2 md:right-2 z-20 flex items-center gap-1">
-                  <button
-                    onClick={handleZoomOut}
-                    className={`p-2 rounded-lg transition-all duration-200 shadow-lg ${
-                      theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                        : isDarkMode
-                        ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
-                        : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
-                    }`}
-                    title="축소"
-                  >
-                    <ZoomOut size={16} />
-                  </button>
-
-                  <button
-                    onClick={handleZoomReset}
-                    className={`px-2 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-lg ${
-                      theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                        : isDarkMode
-                        ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
-                        : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
-                    }`}
-                    title="원본 크기"
-                  >
-                    {Math.round(cameraZoom * 100)}%
-                  </button>
-
-                  <button
-                    onClick={handleZoomIn}
-                    className={`p-2 rounded-lg transition-all duration-200 shadow-lg ${
-                      theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                        : isDarkMode
-                        ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
-                        : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
-                    }`}
-                    title="확대"
-                  >
-                    <ZoomIn size={16} />
-                  </button>
-                </div>
-              </div>
-
-              {(isUnityLoading || isConversionLoading) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-                  <div
-                    className={`text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 ${
-                      theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400"
-                        : isDarkMode
-                        ? "bg-gray-800 border-gray-700 text-gray-200"
-                        : "bg-white border-gray-200 text-gray-800"
-                    }`}
-                  >
-                    <Loader size={24} className="animate-spin text-blue-500" />
-                    {isUnityLoading
-                      ? "Unity 아바타 로딩 중..."
-                      : "AI가 수어를 생성하고 있습니다..."}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* settings panel */}
-            {showSettings && (
-              <div
-                className={`absolute top-16 right-4 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px] border ${
+            {/* === Zoom controls INSIDE the panel (right-top) === */}
+            <div className="absolute top-2 right-2 md:top-2 md:right-2 z-20 flex items-center gap-1">
+              <button
+                onClick={handleZoomOut}
+                className={`p-2 rounded-lg transition-all duration-200 shadow-lg ${
                   theme === "high-contrast"
-                    ? "bg-black border-2 border-yellow-400"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
                     : isDarkMode
-                    ? "bg-gray-800 border-gray-700"
-                    : "bg-white border-gray-200"
+                    ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
+                    : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
+                }`}
+                title="축소"
+              >
+                <ZoomOut size={16} />
+              </button>
+
+              <button
+                onClick={handleZoomReset}
+                className={`px-2 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-lg ${
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : isDarkMode
+                    ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
+                    : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
+                }`}
+                title="원본 크기"
+              >
+                {Math.round(cameraZoom * 100)}%
+              </button>
+
+              <button
+                onClick={handleZoomIn}
+                className={`p-2 rounded-lg transition-all duration-200 shadow-lg ${
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                    : isDarkMode
+                    ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
+                    : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
+                }`}
+                title="확대"
+              >
+                <ZoomIn size={16} />
+              </button>
+            </div>
+          </div>
+
+          {(isUnityLoading || isConversionLoading) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+              <div
+                className={`text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 ${
+                  theme === "high-contrast"
+                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
+                    : isDarkMode
+                    ? "bg-gray-800 border-gray-700 text-gray-200"
+                    : "bg-white border-gray-200 text-gray-800"
                 }`}
               >
-                <h4
-                  className={`text-lg font-semibold mb-4 ${
+                <Loader size={24} className="animate-spin text-blue-500" />
+                {isUnityLoading
+                  ? "Unity 아바타 로딩 중..."
+                  : "AI가 수어를 생성하고 있습니다..."}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* settings panel */}
+        {showSettings && (
+          <div
+            className={`absolute top-16 right-4 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px] border ${
+              theme === "high-contrast"
+                ? "bg-black border-2 border-yellow-400"
+                : isDarkMode
+                ? "bg-gray-800 border-gray-700"
+                : "bg-white border-gray-200"
+            }`}
+          >
+            <h4
+              className={`text-lg font-semibold mb-4 ${
+                theme === "high-contrast"
+                  ? "text-yellow-400"
+                  : isDarkMode
+                  ? "text-white"
+                  : "text-gray-800"
+              }`}
+            >
+              아바타 설정
+            </h4>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span
+                  className={`text-sm font-semibold ${
                     theme === "high-contrast"
                       ? "text-yellow-400"
                       : isDarkMode
-                      ? "text-white"
-                      : "text-gray-800"
+                      ? "text-gray-300"
+                      : "text-gray-700"
                   }`}
                 >
-                  아바타 설정
-                </h4>
+                  음성 출력
+                </span>
+                <button
+                  onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
+                  className={`p-2 rounded-lg transition-all duration-200 ${
+                    theme === "high-contrast"
+                      ? "border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                      : isDarkMode
+                      ? "border border-gray-400 hover:bg-gray-500 text-white"
+                      : "border border-gray-400 hover:bg-gray-200 text-gray-800"
+                  }`}
+                >
+                  {isSpeechEnabled ? (
+                    <Volume2 size={16} />
+                  ) : (
+                    <VolumeX size={16} />
+                  )}
+                </button>
+              </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-sm font-semibold ${
-                        theme === "high-contrast"
-                          ? "text-yellow-400"
+              <div
+                className={`pt-2 border-t ${
+                  theme === "high-contrast"
+                    ? "border-yellow-400"
+                    : isDarkMode
+                    ? "border-gray-700"
+                    : "border-gray-200"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={resetAvatar}
+                    disabled={!isUnityLoaded}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
+                      !isUnityLoaded
+                        ? theme === "high-contrast"
+                          ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
                           : isDarkMode
-                          ? "text-gray-300"
-                          : "text-gray-700"
-                      }`}
-                    >
-                      음성 출력
-                    </span>
-                    <button
-                      onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
-                      className={`p-2 rounded-lg transition-all duration-200 ${
-                        theme === "high-contrast"
-                          ? "border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                          : isDarkMode
-                          ? "border border-gray-400 hover:bg-gray-500 text-white"
-                          : "border border-gray-400 hover:bg-gray-200 text-gray-800"
-                      }`}
-                    >
-                      {isSpeechEnabled ? (
-                        <Volume2 size={16} />
-                      ) : (
-                        <VolumeX size={16} />
-                      )}
-                    </button>
-                  </div>
-
-                  <div
-                    className={`pt-2 border-t ${
-                      theme === "high-contrast"
-                        ? "border-yellow-400"
-                        : isDarkMode
-                        ? "border-gray-700"
-                        : "border-gray-200"
+                          ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : theme === "high-contrast"
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                        : "bg-blue-500 hover:bg-blue-600 text-white"
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={resetAvatar}
-                        disabled={!isUnityLoaded}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
-                          !isUnityLoaded
-                            ? theme === "high-contrast"
-                              ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
-                              : isDarkMode
-                              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : theme === "high-contrast"
-                            ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                            : "bg-blue-500 hover:bg-blue-600 text-white"
-                        }`}
-                      >
-                        <User size={16} />
-                        리셋
-                      </button>
+                    <User size={16} />
+                    리셋
+                  </button>
 
-                      <button
-                        onClick={handleStopAnimation}
-                        disabled={!isPlaying}
-                        className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
-                          !isPlaying
-                            ? theme === "high-contrast"
-                              ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
-                              : isDarkMode
-                              ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            : theme === "high-contrast"
-                            ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                            : "bg-[#ff4444] hover:bg-red-600 text-white"
-                        }`}
-                      >
-                        <Square size={16} />
-                        정지
-                      </button>
-                    </div>
-                  </div>
+                  <button
+                    onClick={handleStopAnimation}
+                    disabled={!isPlaying}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
+                      !isPlaying
+                        ? theme === "high-contrast"
+                          ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
+                          : isDarkMode
+                          ? "bg-gray-600 text-gray-400 cursor-not-allowed"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : theme === "high-contrast"
+                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
+                        : "bg-[#ff4444] hover:bg-red-600 text-white"
+                    }`}
+                  >
+                    <Square size={16} />
+                    정지
+                  </button>
                 </div>
               </div>
-            )}
-          </div>
-        </div>
-
+            </div>
+            </div>
+        )}
         {/* ===== Right: Controls ===== */}
         <div
           className={`w-full xl:w-96 p-4 flex flex-col max-h-[50vh] xl:max-h-none ${
@@ -822,7 +820,6 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
           </div>
         </div>
       </div>
-
       {/* 변환 기록 모달 */}
       <TransHistoryModal
         isOpen={showHistoryModal}
