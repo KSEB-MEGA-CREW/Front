@@ -4,11 +4,14 @@ import router from "./router/root";
 import { RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./Context/authContext";
 import { ThemeProvider } from "./Context/themeContext";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 createRoot(document.getElementById("root")).render(
-  <ThemeProvider>
-    <AuthProvider>
-      <RouterProvider router={router} />
-    </AuthProvider>
-  </ThemeProvider>
+  <ErrorBoundary>
+    <ThemeProvider>
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
+    </ThemeProvider>
+  </ErrorBoundary>
 );
