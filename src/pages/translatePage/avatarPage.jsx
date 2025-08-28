@@ -429,34 +429,42 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
                 }`}
                 style={{ minHeight: "400px" }}
               >
-                {animationType === 'glb' ? (
-                  <GLBAvatarPlayer
-                    avatarUrl="/avatar.glb"
-                    animationUrl={animationUrl}
-                    play={isPlaying}
-                    dark={isDarkMode || theme === "high-contrast"}
-                    zoom={cameraZoom}
-                    onEnd={stopAnimation}
-                  />
-                ) : (
-                  <div 
-                    ref={containerRef}
-                    className="w-full h-full"
-                    style={{ minHeight: "400px" }}
-                  >
-                    {/* Unity WebGL이 여기에 마운트됨 */}
-                    {!isUnityLoaded && (
-                      <div className="flex items-center justify-center h-full">
-                        <div className="text-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                          <p className={isDarkMode ? "text-gray-300" : "text-gray-600"}>
-                            Unity 아바타 초기화 중...
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                {/* GLB 애니메이션 오버레이 */}
+                {animationType === 'glb' && (
+                  <div className="absolute inset-0 z-10">
+                    <GLBAvatarPlayer
+                      avatarUrl="/avatar.glb"
+                      animationUrl={animationUrl}
+                      play={isPlaying}
+                      dark={isDarkMode || theme === "high-contrast"}
+                      zoom={cameraZoom}
+                      onEnd={stopAnimation}
+                    />
                   </div>
                 )}
+                
+                {/* Unity 컨테이너 - 항상 DOM에 유지 */}
+                <div 
+                  ref={containerRef}
+                  className="w-full h-full"
+                  style={{ 
+                    minHeight: "400px", 
+                    visibility: animationType === 'unity' ? 'visible' : 'hidden',
+                    position: animationType === 'glb' ? 'absolute' : 'relative'
+                  }}
+                >
+                  {/* Unity WebGL이 여기에 마운트됨 */}
+                  {!isUnityLoaded && (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                        <p className={isDarkMode ? "text-gray-300" : "text-gray-600"}>
+                          Unity 아바타 초기화 중...
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
                 {/* 줌 컨트롤은 GLB일 때만 표시 */}
                 {animationType === 'glb' && (

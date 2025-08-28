@@ -41,6 +41,13 @@ export const useUnityAvatar = () => {
 
       await waitForUnityLoader();
 
+      // 컨테이너 유효성 검사
+      if (!containerRef.current) {
+        throw new Error('Unity 컨테이너가 준비되지 않았습니다. DOM 마운트를 확인하세요.');
+      }
+
+      console.log('Unity 컨테이너 확인됨:', containerRef.current);
+
       // Unity 인스턴스 생성
       const unityInstance = await window.createUnityInstance(containerRef.current, {
         dataUrl: "/unity/webgl.data",
