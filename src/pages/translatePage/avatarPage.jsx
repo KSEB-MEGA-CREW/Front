@@ -110,11 +110,12 @@ const AvatarPage = () => {
     return Object.prototype.hasOwnProperty.call(FREQUENT_PHRASES, text.trim());
   };
 
+  // Unity 초기화 - 애플리케이션 시작 시 항상 로드
   useEffect(() => {
-    if (!isUnityLoaded && !isUnityLoading && !unityError && animationType === 'unity' && containerRef.current) {
+    if (!isUnityLoaded && !isUnityLoading && !unityError) {
       initializeUnity();
     }
-  }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity, animationType]);
+  }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity]);
   //-------------unity 실제 구현------------//
   // 메인 수어 변환 함수 - 자주 사용하는 구문인지 판별하여 분기
 const handleConvertToSignLanguage = async (text, customFilename = null) => {
@@ -295,6 +296,21 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
     setCurrentTranslation(null);
   };
 
+  // 버튼 활성화 조건 확인 함수
+  const isConvertButtonEnabled = () => {
+    if (!inputText.trim() || isConversionLoading || isPlaying) {
+      return false;
+    }
+    
+    // 자주 사용하는 구문인 경우 GLB 모드로 처리 (Unity 불필요)
+    if (isFrequentlyUsedPhrase(inputText.trim())) {
+      return true;
+    }
+    
+    // 일반 텍스트인 경우 Unity 필요
+    return isUnityLoaded;
+  };
+
   // Zoom handlers
   const handleZoomIn = () => setCameraZoom((prev) => Math.min(prev + 0.1, 3));
   const handleZoomOut = () =>
@@ -426,10 +442,10 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
                   <div 
                     ref={containerRef}
                     className="w-full h-full"
-                    style={{ minHeight: "400px", display: animationType === 'unity' ? 'block' : 'none' }}
+                    style={{ minHeight: "400px" }}
                   >
                     {/* Unity WebGL이 여기에 마운트됨 */}
-                    {!isUnityLoaded && animationType === 'unity' && (
+                    {!isUnityLoaded && (
                       <div className="flex items-center justify-center h-full">
                         <div className="text-center">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
@@ -679,17 +695,9 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleConvertToSignLanguage(inputText)}
-                  disabled={
-                    !inputText.trim() ||
-                    !isUnityLoaded ||
-                    isConversionLoading ||
-                    isPlaying
-                  }
+                  disabled={!isConvertButtonEnabled()}
                   className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 font-semibold rounded-xl transition-all duration-300 transform shadow-lg ${
-                    !inputText.trim() ||
-                    !isUnityLoaded ||
-                    isConversionLoading ||
-                    isPlaying
+                    !isConvertButtonEnabled()
                       ? theme === "high-contrast"
                         ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
                         : isDarkMode
