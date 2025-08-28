@@ -24,10 +24,10 @@ export const useUnityAvatar = () => {
 
       // Unity 인스턴스 생성
       const unityInstance = await window.createUnityInstance(containerRef.current, {
-        dataUrl: "/unity/Build/WebGL.data",
-        frameworkUrl: "/unity/Build/WebGL.framework.js",
-        codeUrl: "/unity/Build/WebGL.wasm",
-        streamingAssetsUrl: "StreamingAssets",
+        dataUrl: "/unity/webgl.data",
+        frameworkUrl: "/unity/build.framework.js",
+        codeUrl: "/unity/build.wasm",
+        streamingAssetsUrl: "/unity/StreamingAssets",
         companyName: "YourCompany",
         productName: "SignLanguageAvatar",
         productVersion: "1.0",

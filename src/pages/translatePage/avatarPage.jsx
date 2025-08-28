@@ -111,10 +111,10 @@ const AvatarPage = () => {
   };
 
   useEffect(() => {
-    if (!isUnityLoaded && !isUnityLoading && !unityError) {
+    if (!isUnityLoaded && !isUnityLoading && !unityError && animationType === 'unity' && containerRef.current) {
       initializeUnity();
     }
-  }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity]);
+  }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity, animationType]);
   //-------------unity 실제 구현------------//
   // 메인 수어 변환 함수 - 자주 사용하는 구문인지 판별하여 분기
 const handleConvertToSignLanguage = async (text, customFilename = null) => {
@@ -426,9 +426,19 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
                   <div 
                     ref={containerRef}
                     className="w-full h-full"
-                    style={{ minHeight: "400px" }}
+                    style={{ minHeight: "400px", display: animationType === 'unity' ? 'block' : 'none' }}
                   >
                     {/* Unity WebGL이 여기에 마운트됨 */}
+                    {!isUnityLoaded && animationType === 'unity' && (
+                      <div className="flex items-center justify-center h-full">
+                        <div className="text-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                          <p className={isDarkMode ? "text-gray-300" : "text-gray-600"}>
+                            Unity 아바타 초기화 중...
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 

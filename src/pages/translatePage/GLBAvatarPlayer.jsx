@@ -47,6 +47,13 @@ function AvatarWithAnimation({
       actionRef.current = null;
     }
 
+    // GLB 애니메이션 데이터 유효성 검사
+    if (!animGltf.animations || animGltf.animations.length === 0) {
+      console.warn("애니메이션 데이터가 없습니다:", animationUrl);
+      onEnd?.();
+      return;
+    }
+
     const mixer = new THREE.AnimationMixer(avatarScene);
     mixerRef.current = mixer;
 
@@ -220,5 +227,5 @@ try {
   useGLTF.preload("/avatar.glb");
   useGLTF.preload("/만나서_반갑습니다.glb");
 } catch (error) {
-  // 프리로딩 실패 시 무시
+  console.warn("GLB 파일 프리로딩 실패:", error);
 }
