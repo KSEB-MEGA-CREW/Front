@@ -17,10 +17,29 @@ export const useUnityAvatar = () => {
       setIsLoading(true);
       setError(null);
 
-      // Unity Loader가 로드되었는지 확인
-      if (typeof window.createUnityInstance === 'undefined') {
-        throw new Error('Unity Loader가 로드되지 않았습니다.');
-      }
+      // Unity Loader가 로드되었는지 확인 (최대 10초 대기)
+      const waitForUnityLoader = () => {
+        return new Promise((resolve, reject) => {
+          const checkLoader = () => {
+            if (typeof window.createUnityInstance !== 'undefined') {
+              resolve();
+            } else {
+              setTimeout(checkLoader, 100);
+            }
+          };
+          
+          checkLoader();
+          
+          // 10초 후 타임아웃
+          setTimeout(() => {
+            if (typeof window.createUnityInstance === 'undefined') {
+              reject(new Error('Unity Loader 로드 타임아웃 (10초)'));
+            }
+          }, 10000);
+        });
+      };
+
+      await waitForUnityLoader();
 
       // Unity 인스턴스 생성
       const unityInstance = await window.createUnityInstance(containerRef.current, {
@@ -151,10 +170,11 @@ export const useUnityAvatar = () => {
 
     loadUnityLoader()
       .then(() => {
-        // Unity Loader가 로드되면 자동으로 Unity 초기화는 하지 않음
-        // 사용자가 명시적으로 initializeUnity를 호출해야 함
+        console.log('Unity Loader 스크립트가 성공적으로 로드되었습니다.');
+        // 스크립트 로드 완료를 알리기 위한 상태 업데이트는 initializeUnity에서 처리
       })
       .catch((error) => {
+        console.error('Unity Loader 스크립트 로드 실패:', error);
         setError(error.message);
       });
   }, []);
