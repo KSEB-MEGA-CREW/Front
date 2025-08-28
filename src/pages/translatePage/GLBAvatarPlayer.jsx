@@ -82,7 +82,9 @@ function AvatarWithAnimation({
       
       if (action) {
         action.clampWhenFinished = true;
-        action.loop = THREE.LoopOnce;
+        action.loop = THREE.LoopRepeat; // 반복 재생으로 변경
+        action.repetitions = 3; // 3번 반복
+        action.timeScale = 0.5; // 속도를 50%로 낮춤 (더 느리게)
         action.enabled = true;
         actionRef.current = action;
         
@@ -120,6 +122,10 @@ function AvatarWithAnimation({
         return;
       }
       
+      // 애니메이션 설정 재적용 (반복 및 속도)
+      action.loop = THREE.LoopRepeat;
+      action.repetitions = 3;
+      action.timeScale = 0.5;
       action.reset().play();
     } else {
       action.stop();

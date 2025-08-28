@@ -41,12 +41,30 @@ export const useUnityAvatar = () => {
 
       await waitForUnityLoader();
 
-      // 컨테이너 유효성 검사
-      if (!containerRef.current) {
-        throw new Error('Unity 컨테이너가 준비되지 않았습니다. DOM 마운트를 확인하세요.');
-      }
+      // 컨테이너 DOM 마운트 대기 (최대 5초)
+      const waitForContainer = () => {
+        return new Promise((resolve, reject) => {
+          const checkContainer = () => {
+            if (containerRef.current) {
+              console.log('Unity 컨테이너 확인됨:', containerRef.current);
+              resolve();
+            } else {
+              setTimeout(checkContainer, 100);
+            }
+          };
+          
+          checkContainer();
+          
+          // 5초 후 타임아웃
+          setTimeout(() => {
+            if (!containerRef.current) {
+              reject(new Error('Unity 컨테이너 DOM 마운트 타임아웃 (5초)'));
+            }
+          }, 5000);
+        });
+      };
 
-      console.log('Unity 컨테이너 확인됨:', containerRef.current);
+      await waitForContainer();
 
       // Unity 인스턴스 생성
       const unityInstance = await window.createUnityInstance(containerRef.current, {
