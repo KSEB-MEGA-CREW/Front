@@ -136,13 +136,13 @@ export const useUnityAvatar = () => {
   // Unity Loader 스크립트 로드
   useEffect(() => {
     const loadUnityLoader = () => {
-      if (document.querySelector('script[src*="UnityLoader"]')) {
+      if (document.querySelector('script[src*="76485bb6de948dcda80ca8ec0ddab156.loader"]')) {
         return Promise.resolve();
       }
 
       return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = '/unity/Build/UnityLoader.js';
+        script.src = '/unity/76485bb6de948dcda80ca8ec0ddab156.loader.js';
         script.onload = resolve;
         script.onerror = () => reject(new Error('Unity Loader 스크립트를 로드할 수 없습니다.'));
         document.head.appendChild(script);
