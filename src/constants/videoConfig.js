@@ -56,7 +56,7 @@ export const API_CONFIG = {
     // 환경별 설정 확인
     isProduction: import.meta.env.PROD,
     isDevelopment: import.meta.env.DEV,
-    
+
     // 연결 상태 검증
     validateConnection: () => {
         return {
@@ -70,12 +70,12 @@ export const API_CONFIG = {
 export const MEDIAPIPE_CONFIG = {
     MAX_NUM_HANDS: 2,
     MODEL_COMPLEXITY: 1,
-    MIN_DETECTION_CONFIDENCE: 0.7,
-    MIN_TRACKING_CONFIDENCE: 0.5,
+    MIN_DETECTION_CONFIDENCE: 0.5,
+    MIN_TRACKING_CONFIDENCE: 0.3,
     KEYPOINT_DIMENSIONS: 194, // 손 키포인트 차원
     SINGLE_HAND_LANDMARKS: 21,
     COORDINATES_PER_LANDMARK: 3, // x, y, z
-    
+
     // 타임아웃 설정 표준화
     PROCESSING_TIMEOUT: 500, // MediaPipe 처리 타임아웃 (ms)
     INITIALIZATION_TIMEOUT: 10000, // 초기화 타임아웃 (ms)
@@ -88,10 +88,10 @@ console.log('📊 [videoConfig.js] MEDIAPIPE_CONFIG:', MEDIAPIPE_CONFIG);
 export const MESSAGE_TYPES = {
     // client => server
     KEYPOINTS: 'keypoints',
-    TRANSLATION_START: 'start_translation', 
+    TRANSLATION_START: 'start_translation',
     TRANSLATION_END: 'stop_translation',
     PING: 'ping',
-    
+
     // server => client  
     PREDICTION_RESULT: 'prediction_result',
     TRANSLATION_RESULT: 'translation_result',
@@ -104,20 +104,20 @@ export const MESSAGE_TYPES = {
 export const ERROR_CODES = {
     // 인증 에러
     AUTH_TOKEN_MISSING: 'AUTH_TOKEN_MISSING',
-    AUTH_TOKEN_EXPIRED: 'AUTH_TOKEN_EXPIRED', 
+    AUTH_TOKEN_EXPIRED: 'AUTH_TOKEN_EXPIRED',
     AUTH_TOKEN_INVALID: 'AUTH_TOKEN_INVALID',
     AUTH_USER_NOT_FOUND: 'AUTH_USER_NOT_FOUND',
-    
+
     // MediaPipe 에러
     MEDIAPIPE_INIT_FAILED: 'MEDIAPIPE_INIT_FAILED',
     MEDIAPIPE_PROCESSING_TIMEOUT: 'MEDIAPIPE_PROCESSING_TIMEOUT',
     KEYPOINT_EXTRACTION_FAILED: 'KEYPOINT_EXTRACTION_FAILED',
-    
+
     // WebSocket 에러
     WEBSOCKET_CONNECTION_FAILED: 'WEBSOCKET_CONNECTION_FAILED',
     WEBSOCKET_SEND_FAILED: 'WEBSOCKET_SEND_FAILED',
     WEBSOCKET_RECONNECT_FAILED: 'WEBSOCKET_RECONNECT_FAILED',
-    
+
     // 일반 에러
     CAMERA_ACCESS_DENIED: 'CAMERA_ACCESS_DENIED',
     VIDEO_ELEMENT_NOT_READY: 'VIDEO_ELEMENT_NOT_READY',

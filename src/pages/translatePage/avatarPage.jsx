@@ -1,70 +1,43 @@
-// /src/pages/avatarPage.jsx
-import GLBAvatarPlayerRaw from "./GLBAvatarPlayer.jsx";
-
-import React, { useState, useEffect, useRef, memo } from "react";
-import {
-  Square,
-  RotateCcw,
-  Settings,
-  Volume2,
-  VolumeX,
-  Loader,
-  AlertCircle,
-  CheckCircle,
-  User,
-  MessageSquare,
-  Clock,
-  ZoomIn,
-  ZoomOut,
-} from "lucide-react";
-
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useTheme } from "../../Context/themeContext";
 import TransHistoryModal from "../../components/modals/TransHistoryModal";
-import { useUnityAvatar } from "../../hooks/useUnityAvatar"; // 이 훅을 사용하도록 가정
+import { useUnityAvatar } from "../../hooks/useUnityAvatar";
+import { AnimationManager } from "../../services/AnimationManager";
 
-/** GLBAvatarPlayer 메모이즈: 설정 토글 등 부모 리렌더 시 재마운트로 멈추는 현상 방지 */
-const GLBAvatarPlayer = memo(GLBAvatarPlayerRaw);
+// 분리된 컴포넌트들 임포트
+import AvatarDisplay from "./components/AvatarDisplay";
+import TextInputPanel from "./components/TextInputPanel";
+import PredefinedPhrasesPanel from "./components/PredefinedPhrasesPanel";
+import ControlPanel from "./components/ControlPanel";
 
 
-/** =============== Mock: useTextToSignAPI =============== */
-const useTextToSignAPI = () => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const convertTextToSignLanguage = async (_text) => {
-    setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
-    return {
-      success: true,
-      data: { requestId: `mock-${Date.now()}`, status: "SUBMITTED" },
-    };
-  };
-
-  return {
-    isLoading,
-    error: null,
-    convertTextToSignLanguage,
-    clearError: () => {},
-  };
-};
-
-/** =============== Page =============== */
+/** =============== 리팩토링된 AvatarPage =============== */
 const AvatarPage = () => {
-  // ✅ React Hooks는 컴포넌트 내부 최상위 레벨에서 호출되어야 합니다.
-  const [animationType, setAnimationType] = useState('glb'); // 'glb' 또는 'unity'
   const { theme, isDarkMode } = useTheme();
-  const containerRef = useRef(null); // Unity 컨테이너를 위한 ref
-
-  const [inputText, setInputText] = useState("");
-  const [translationHistory, setTranslationHistory] = useState([]);
-  const [showSettings, setShowSettings] = useState(false);
-  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
-  const [selectedPredefined, setSelectedPredefined] = useState("");
-  const [currentTranslation, setCurrentTranslation] = useState(null);
+  
+  // 애니메이션 관련 상태
+  const [animationType, setAnimationType] = useState('glb'); // 'glb' | 'unity'
   const [animationUrl, setAnimationUrl] = useState("/만나서_반갑습니다.glb");
-  const [cameraZoom, setCameraZoom] = useState(1);
+  const [currentTranslation, setCurrentTranslation] = useState(null);
+  
+  // UI 상태
+  const [inputText, setInputText] = useState("");
+  const [selectedPredefined, setSelectedPredefined] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
-
+  
+  // 설정
+  const [isSpeechEnabled, setIsSpeechEnabled] = useState(true);
+  const [cameraZoom, setCameraZoom] = useState(1);
+  
+  // 기록
+  const [translationHistory, setTranslationHistory] = useState([]);
+  
+  // 로딩 및 에러 상태
+  const [isConversionLoading, setIsConversionLoading] = useState(false);
+  const [conversionError, setConversionError] = useState(null);
+  
+  // Unity 훅
   const {
     isLoaded: isUnityLoaded,
     isLoading: isUnityLoading,
@@ -72,170 +45,73 @@ const AvatarPage = () => {
     isPlaying,
     initializeUnity,
     sendAnimationData,
+    sendCoordinateData,
     stopAnimation,
     resetAvatar,
+    containerRef
   } = useUnityAvatar();
+  
+  // AnimationManager 인스턴스
+  const animationManagerRef = useRef(null);
+  
+  // AnimationManager 초기화
+  useEffect(() => {
+    if (!animationManagerRef.current) {
+      animationManagerRef.current = new AnimationManager();
+      
+      // 이벤트 리스너 등록
+      const manager = animationManagerRef.current;
+      
+      manager.on('animationStart', (data) => {
+        setAnimationType(data.mode);
+        setCurrentTranslation(data);
+      });
+      
+      manager.on('glbAnimationReady', (animationData) => {
+        setAnimationUrl(animationData.animationUrl);
+        // GLB 애니메이션 시작 신호
+        setTimeout(() => {
+          sendAnimationData();
+        }, 500);
+        addToHistory(animationData);
+      });
+      
+      manager.on('unityAnimationReady', (animationData) => {
+        // Unity에 좌표 데이터 전송
+        if (sendCoordinateData(animationData.coordinateData)) {
+          addToHistory(animationData);
+        }
+      });
+      
+      manager.on('animationStop', () => {
+        setCurrentTranslation(null);
+      });
+      
+      manager.on('animationError', ({ error }) => {
+        setConversionError(error.message);
+        setIsConversionLoading(false);
+      });
+    }
+    
+    return () => {
+      if (animationManagerRef.current) {
+        animationManagerRef.current.dispose();
+      }
+    };
+  }, [sendAnimationData, sendCoordinateData]);
 
-  const {
-    isLoading: isConversionLoading,
-    error: conversionError,
-    convertTextToSignLanguage,
-  } = useTextToSignAPI();
-
-  // 자주 사용하는 구문 상수 정의
-  const FREQUENT_PHRASES = {
-    "안녕하세요": "안녕하세요",
-    "감사합니다": "감사합니다",
-    "죄송합니다": "죄송합니다",
-    "알겠습니다": "알겠습니다",
-    "좋다": "좋다",
-    "가다": "가다",
-    "잘하다": "잘하다",
-    "느리다": "느리다"
-  };
-
-  const predefinedPhrases = [
-    { display: "안녕하세요", filename: "안녕하세요" },
-    { display: "감사합니다", filename: "감사합니다" },
-    { display: "죄송합니다", filename: "죄송합니다" },
-    { display: "알겠습니다", filename: "알겠습니다" },
-    { display: "좋다", filename: "좋다" },
-    { display: "가다", filename: "가다" },
-    { display: "잘하다", filename: "잘하다" },
-    { display: "느리다", filename: "느리다" },
-  ];
-
-  // 자주 사용하는 구문인지 판별하는 함수
-  const isFrequentlyUsedPhrase = (text) => {
-    return Object.prototype.hasOwnProperty.call(FREQUENT_PHRASES, text.trim());
-  };
-
-  // Unity 초기화 - 애플리케이션 시작 시 항상 로드
+  // Unity 초기화
   useEffect(() => {
     if (!isUnityLoaded && !isUnityLoading && !unityError) {
       initializeUnity();
     }
   }, [isUnityLoaded, isUnityLoading, unityError, initializeUnity]);
-  //-------------unity 실제 구현------------//
-  // 메인 수어 변환 함수 - 자주 사용하는 구문인지 판별하여 분기
-const handleConvertToSignLanguage = async (text, customFilename = null) => {
-    if (!text.trim() || isPlaying) return;
+  // 헬퍼 함수들
+  const addToHistory = useCallback((animationData) => {
+    setTranslationHistory(prev => [animationData, ...prev.slice(0, 9)]);
+  }, []);
 
-    // 자주 사용하는 구문 확인
-    if (isFrequentlyUsedPhrase(text)) {
-      setAnimationType('glb');
-      await handleConvertToSignLanguageGLB(text, customFilename);
-    } else {
-      setAnimationType('unity');
-      await handleConverToSignLanguageAni(text);
-    }
-  };
-
-  // GLB 애니메이션 처리 (기존 코드 분리)
-  const handleConvertToSignLanguageGLB = async (text, customFilename = null) => {
-    if (!text.trim() || isPlaying) return;
-
-    // 파일명 결정
-    let processedText = customFilename;
-    if (!processedText) {
-      const predefined = predefinedPhrases.find((p) => p.display === text);
-      processedText = predefined
-        ? predefined.filename
-        : text.replace(/ /g, "_");
-    }
-    const animationFileUrl = `/${processedText}.glb`;
-
-    try {
-      const response = await fetch(animationFileUrl);
-      const contentType = response.headers.get("Content-Type");
-
-      if (
-        response.ok &&
-        (contentType === "model/gltf-binary" || response.status === 304)
-      ) {
-        // 먼저 애니메이션을 완전히 멈춤
-        stopAnimation();
-        
-        // 캐시 우회를 위해 타임스탬프를 추가한 URL 생성
-        const urlWithTimestamp = `${animationFileUrl}?t=${Date.now()}`;
-        
-        // 애니메이션 URL 변경 (캐시 우회)
-        setAnimationUrl(urlWithTimestamp);
-        
-        // GLB 로딩 완료를 더 오래 기다린 후 재생 시작
-        setTimeout(() => {
-          sendAnimationData();
-        }, 500);
-
-        const newTranslation = {
-          id: Date.now(),
-          text,
-          timestamp: new Date(),
-          requestId: `local-${Date.now()}`,
-          status: false, // 평가되지 않은 상태
-          duration: 3,
-          type: "glb"
-        };
-
-        setCurrentTranslation(newTranslation);
-        setTranslationHistory((prev) => [newTranslation, ...prev.slice(0, 9)]);
-
-        if (isSpeechEnabled) speakText(text);
-      } else {
-        console.error('GLB 파일 조건 불일치:', {
-          ok: response.ok,
-          status: response.status,
-          contentType,
-          animationFileUrl
-        });
-      }
-    } catch (error) {
-      console.error("애니메이션 파일 확인 중 오류 발생:", error);
-    }
-  };
-
-  // Unity 애니메이션 처리 (AI 서버 연동)
-  const handleConverToSignLanguageAni = async (text) => {
-    if (!text.trim() || isPlaying || !isUnityLoaded) return;
-
-    try {
-      // AI 서버에 텍스트 전송하여 좌표 데이터 받기
-      const result = await convertTextToSignLanguage(text);
-      
-      if (result.success) {
-        // Unity에 좌표 데이터 전송
-        const success = sendCoordinateData(result.data);
-        
-        if (success) {
-          const newTranslation = {
-            id: Date.now(),
-            text,
-            timestamp: new Date(),
-            requestId: result.requestId,
-            status: "PLAYING",
-            duration: estimateAnimationDuration(result.data),
-            type: "unity"
-          };
-
-          setCurrentTranslation(newTranslation);
-          setTranslationHistory(prev => [newTranslation, ...prev.slice(0, 9)]);
-
-          if (isSpeechEnabled) {
-            speakText(text);
-          }
-        }
-      }
-    } catch (error) {
-      console.error("수어 변환 중 오류:", error);
-    }
-  };
-
-  // 애니메이션 지속 시간 추정 함수
-  const estimateAnimationDuration = (coordinateData) => {
-    return Array.isArray(coordinateData) ? coordinateData.length * 0.1 : 3; // 프레임당 100ms
-  };
-
-  const speakText = (text) => {
+  const speakText = useCallback((text) => {
     if (text && isSpeechEnabled) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "ko-KR";
@@ -243,99 +119,142 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
       utterance.pitch = 1.0;
       window.speechSynthesis.speak(utterance);
     }
-  };
+  }, [isSpeechEnabled]);
 
-  /** 프리셋 클릭: 재생 중이면 바로 취소(정지) + 입력만 채우고 '대기' */
-  const handlePredefinedSelect = (phraseObj) => {
-    if (isPlaying) {
-      stopAnimation(); // 이전 재생 취소
-      setCurrentTranslation(null);
+  // 메인 수어 변환 함수 (AnimationManager 사용)
+  const handleConvertToSignLanguage = useCallback(async (text, customFilename = null) => {
+    if (!text.trim() || isPlaying) return;
+    
+    if (!animationManagerRef.current) {
+      setConversionError('Animation Manager가 초기화되지 않았습니다.');
+      return;
     }
-    setInputText(phraseObj.display); // 대기 상태로 입력만 채움
-    setSelectedPredefined(phraseObj.display);
-    // 자동 실행(변환 호출) 없음 — 사용자가 '수어 변환'을 눌러야 실행
-  };
 
-  const clearInput = () => {
+    try {
+      setIsConversionLoading(true);
+      setConversionError(null);
+      
+      // AnimationManager를 통한 변환 처리
+      const result = await animationManagerRef.current.convertTextToAnimation(text, {
+        customFilename,
+        speechEnabled: isSpeechEnabled
+      });
+      
+      // 음성 출력
+      if (isSpeechEnabled) {
+        speakText(text);
+      }
+      
+    } catch (error) {
+      console.error('애니메이션 변환 오류:', error);
+      setConversionError(error.message);
+    } finally {
+      setIsConversionLoading(false);
+    }
+  }, [isPlaying, isSpeechEnabled, speakText]);
+
+  // 사전 정의된 구문 선택 처리
+  const handlePredefinedSelect = useCallback((phraseObj) => {
+    if (isPlaying) {
+      handleStopAnimation();
+    }
+    setInputText(phraseObj.display);
+    setSelectedPredefined(phraseObj.display);
+  }, [isPlaying]);
+
+  // 입력 관련 핸들러들
+  const handleInputChange = useCallback((e) => {
+    setInputText(e.target.value);
+    setSelectedPredefined("");
+  }, []);
+
+  const clearInput = useCallback(() => {
     setInputText("");
     setSelectedPredefined("");
     setCurrentTranslation(null);
-  };
+  }, []);
 
-  const clearHistory = () => {
+  // 제어 관련 핸들러들
+  const handleStopAnimation = useCallback(() => {
+    stopAnimation();
+    if (animationManagerRef.current) {
+      animationManagerRef.current.stopAnimation();
+    }
+    setCurrentTranslation(null);
+  }, [stopAnimation]);
+
+  const handleToggleSettings = useCallback(() => {
+    setShowSettings(prev => !prev);
+  }, []);
+
+  const handleToggleSpeech = useCallback(() => {
+    setIsSpeechEnabled(prev => !prev);
+  }, []);
+
+  // 줌 컨트롤 핸들러들
+  const handleZoomIn = useCallback(() => {
+    setCameraZoom(prev => Math.min(prev + 0.1, 3));
+  }, []);
+
+  const handleZoomOut = useCallback(() => {
+    setCameraZoom(prev => Math.max(prev - 0.1, 0.5));
+  }, []);
+
+  const handleZoomReset = useCallback(() => {
+    setCameraZoom(1);
+  }, []);
+
+  // 히스토리 관련 핸들러들
+  const clearHistory = useCallback(() => {
     setTranslationHistory([]);
     setShowHistoryModal(false);
-  };
+  }, []);
 
-  const handleReplayTranslation = (text) => {
+  const handleShowHistory = useCallback(() => {
+    setShowHistoryModal(true);
+  }, []);
+
+  const handleReplayTranslation = useCallback(async (text) => {
     setInputText(text);
     setShowHistoryModal(false);
     
-    // 자주 사용하는 구문인지 확인하여 분기 처리
-    if (isFrequentlyUsedPhrase(text)) {
-      // 자주 사용하는 구문의 경우 해당 파일명으로 직접 변환 호출
-      const filename = FREQUENT_PHRASES[text.trim()];
-      handleConvertToSignLanguage(text, filename);
-    } else {
-      // 일반 텍스트는 기존 방식대로 처리 (AI 서버 연동)
-      handleConvertToSignLanguage(text);
-    }
-  };
+    // AnimationManager를 통해 다시 재생
+    await handleConvertToSignLanguage(text);
+  }, [handleConvertToSignLanguage]);
 
-  // 번역 기록 상태 업데이트 핸들러
-  const handleUpdateHistory = (historyId, updates) => {
+  const handleUpdateHistory = useCallback((historyId, updates) => {
     setTranslationHistory(prev => 
       prev.map(item => 
         item.id === historyId ? { ...item, ...updates } : item
       )
     );
-  };
+  }, []);
 
-  const handleStopAnimation = () => {
-    stopAnimation();
-    setCurrentTranslation(null);
-  };
-
-  // 버튼 활성화 조건 확인 함수
-  const isConvertButtonEnabled = () => {
+  // 버튼 상태 확인
+  const isConvertButtonEnabled = useCallback(() => {
     if (!inputText.trim() || isConversionLoading || isPlaying) {
       return false;
     }
     
+    const manager = animationManagerRef.current;
+    if (!manager) return false;
+    
     // 자주 사용하는 구문인 경우 GLB 모드로 처리 (Unity 불필요)
-    if (isFrequentlyUsedPhrase(inputText.trim())) {
+    if (manager.isFrequentlyUsedPhrase(inputText.trim())) {
       return true;
     }
     
     // 일반 텍스트인 경우 Unity 필요
     return isUnityLoaded;
-  };
+  }, [inputText, isConversionLoading, isPlaying, isUnityLoaded]);
 
-  // Zoom handlers
-  const handleZoomIn = () => setCameraZoom((prev) => Math.min(prev + 0.1, 3));
-  const handleZoomOut = () =>
-    setCameraZoom((prev) => Math.max(prev - 0.1, 0.5));
-  const handleZoomReset = () => setCameraZoom(1);
+  // 애니메이션 종료 처리
+  const handleAnimationEnd = useCallback(() => {
+    handleStopAnimation();
+  }, [handleStopAnimation]);
 
-  const getStatusColor = () => {
-    if (unityError || conversionError) return "text-red-500";
-    if (isConversionLoading || isUnityLoading) return "text-yellow-500";
-    if (isUnityLoaded && !isPlaying) return "text-green-500";
-    if (isPlaying) return "text-blue-500";
-    return "text-gray-500";
-  };
-
-  const getStatusText = () => {
-    if (unityError) return "Unity 로딩 오류";
-    if (conversionError) return "AI 변환 오류";
-    if (isConversionLoading) return "AI 변환 중...";
-    if (isUnityLoading) return "Unity 로딩 중...";
-    if (isPlaying) {
-      return animationType === 'unity' ? "Unity 수어 재생 중" : "GLB 수어 재생 중";
-    }
-    if (isUnityLoaded) return "준비 완료";
-    return "초기화 중...";
-  };
+  // AnimationManager에서 사전 정의된 구문 리스트 가져오기
+  const predefinedPhrases = animationManagerRef.current?.predefinedPhrases || [];
 
   return (
     <div
@@ -348,504 +267,75 @@ const handleConvertToSignLanguage = async (text, customFilename = null) => {
       }`}
     >
       <div className="relative w-full h-screen flex flex-col xl:flex-row">
-        {/* ===== Left: Avatar Area ===== */}
+        {/* ===== Left: Avatar Display Area ===== */}
         <div className="flex-1 relative p-4">
-          <div
-            className={`w-full h-full rounded-3xl overflow-hidden relative border ${
-              theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400"
-                : isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
-            }`}
-          >
-            {/* top status + settings */}
-            <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
-              <div className="flex items-center gap-3">
-                <div
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
-                    theme === "high-contrast"
-                      ? "bg-black border-2 border-yellow-400 text-yellow-400"
-                      : isDarkMode
-                      ? "bg-gray-700 text-gray-200"
-                      : "bg-gray-100 text-gray-700"
-                  } ${getStatusColor()}`}
-                >
-                  {isUnityLoading || isConversionLoading ? (
-                    <Loader size={16} className="animate-spin" />
-                  ) : unityError || conversionError ? (
-                    <AlertCircle size={16} />
-                  ) : isUnityLoaded ? (
-                    <CheckCircle size={16} />
-                  ) : (
-                    <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                  )}
-                  <span>{getStatusText()}</span>
-                </div>
+          <AvatarDisplay
+            // Unity 관련
+            isUnityLoaded={isUnityLoaded}
+            isUnityLoading={isUnityLoading}
+            unityError={unityError}
+            unityContainerRef={containerRef}
+            
+            // 애니메이션 관련
+            animationType={animationType}
+            animationUrl={animationUrl}
+            isPlaying={isPlaying}
+            currentTranslation={currentTranslation}
+            
+            // 공통 상태
+            isConversionLoading={isConversionLoading}
+            conversionError={conversionError}
+            
+            // GLB 관련
+            cameraZoom={cameraZoom}
+            onZoomIn={handleZoomIn}
+            onZoomOut={handleZoomOut}
+            onZoomReset={handleZoomReset}
+            onAnimationEnd={handleAnimationEnd}
+          />
 
-                {isPlaying && currentTranslation && (
-                  <div
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold ${
-                      theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400"
-                        : isDarkMode
-                        ? "bg-gray-700 text-[#ff4444]"
-                        : "bg-gray-100 text-[#ff4444]"
-                    }`}
-                  >
-                    <div className="w-2 h-2 bg-[#ff4444] rounded-full animate-pulse" />
-                    재생 중: {currentTranslation.text}
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // 설정 클릭이 다른 곳에 전파되어 재생에 영향 주지 않도록
-                    setShowSettings((v) => !v); // 재생 상태(isPlaying)는 그대로 유지
-                  }}
-                  className={`p-2 rounded-xl transition-all duration-200 ${
-                    theme === "high-contrast"
-                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                      : isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-gray-100"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                  }`}
-                >
-                  <Settings size={18} />
-                </button>
-              </div>
-            </div>
-            {/* avatar panel */}
-            <div className="w-full h-full flex items-center justify-center relative">
-              <div
-                className={`w-full max-w-4xl h-full max-h-[600px]  border relative ${
-                  theme === "high-contrast"
-                    ? "bg-gray-900 border-yellow-400"
-                    : isDarkMode
-                    ? "bg-gray-900/10 border-white/10"
-                    : "bg-gray-900/10 border-white/10"
-                }`}
-                style={{ minHeight: "400px" }}
-              >
-                {/* GLB 애니메이션 오버레이 */}
-                {animationType === 'glb' && (
-                  <div className="absolute inset-0 z-10">
-                    <GLBAvatarPlayer
-                      avatarUrl="/avatar.glb"
-                      animationUrl={animationUrl}
-                      play={isPlaying}
-                      dark={isDarkMode || theme === "high-contrast"}
-                      zoom={cameraZoom}
-                      onEnd={stopAnimation}
-                    />
-                  </div>
-                )}
-                
-                {/* Unity 컨테이너 - 항상 DOM에 유지 */}
-                <div 
-                  ref={containerRef}
-                  className="w-full h-full"
-                  style={{ 
-                    minHeight: "400px", 
-                    visibility: animationType === 'unity' ? 'visible' : 'hidden',
-                    position: animationType === 'glb' ? 'absolute' : 'relative'
-                  }}
-                >
-                  {/* Unity WebGL이 여기에 마운트됨 */}
-                  {!isUnityLoaded && (
-                    <div className="flex items-center justify-center h-full">
-                      <div className="text-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                        <p className={isDarkMode ? "text-gray-300" : "text-gray-600"}>
-                          Unity 아바타 초기화 중...
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                {/* 줌 컨트롤은 GLB일 때만 표시 */}
-                {animationType === 'glb' && (
-                  <div className="absolute top-2 right-2 md:top-2 md:right-2 z-20 flex items-center gap-1">
-                    {/* 기존 줌 컨트롤 코드 */}
-                  </div>
-                )}
-              </div>
-            </div>
-            {/* === Zoom controls INSIDE the panel (right-top) === */}
-            <div className="absolute top-2 right-2 md:top-2 md:right-2 z-20 flex items-center gap-1">
-              <button
-                onClick={handleZoomOut}
-                className={`p-2 rounded-lg transition-all duration-200 shadow-lg ${
-                  theme === "high-contrast"
-                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                    : isDarkMode
-                    ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
-                    : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
-                }`}
-                title="축소"
-              >
-                <ZoomOut size={16} />
-              </button>
-
-              <button
-                onClick={handleZoomReset}
-                className={`px-2 py-1 rounded-lg text-xs font-medium transition-all duration-200 shadow-lg ${
-                  theme === "high-contrast"
-                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                    : isDarkMode
-                    ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
-                    : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
-                }`}
-                title="원본 크기"
-              >
-                {Math.round(cameraZoom * 100)}%
-              </button>
-
-              <button
-                onClick={handleZoomIn}
-                className={`p-2 rounded-lg transition-all duration-200 shadow-lg ${
-                  theme === "high-contrast"
-                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                    : isDarkMode
-                    ? "bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white"
-                    : "bg-white hover:bg-gray-50 text-gray-700 hover:text-gray-900 border border-gray-200"
-                }`}
-                title="확대"
-              >
-                <ZoomIn size={16} />
-              </button>
-            </div>
+          {/* 설정 버튼 */}
+          <div className="absolute top-8 right-8 z-30">
+            <ControlPanel
+              showSettings={showSettings}
+              onToggleSettings={handleToggleSettings}
+              isSpeechEnabled={isSpeechEnabled}
+              onToggleSpeech={handleToggleSpeech}
+              isUnityLoaded={isUnityLoaded}
+              isPlaying={isPlaying}
+              onResetAvatar={resetAvatar}
+              onStopAnimation={handleStopAnimation}
+              translationHistoryCount={translationHistory.length}
+              onShowHistory={handleShowHistory}
+            />
           </div>
-
-          {(isUnityLoading || isConversionLoading) && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
-              <div
-                className={`text-lg font-semibold px-8 py-4 rounded-2xl shadow-2xl border flex items-center gap-3 ${
-                  theme === "high-contrast"
-                    ? "bg-black border-2 border-yellow-400 text-yellow-400"
-                    : isDarkMode
-                    ? "bg-gray-800 border-gray-700 text-gray-200"
-                    : "bg-white border-gray-200 text-gray-800"
-                }`}
-              >
-                <Loader size={24} className="animate-spin text-blue-500" />
-                {isUnityLoading
-                  ? "Unity 아바타 로딩 중..."
-                  : "AI가 수어를 생성하고 있습니다..."}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* settings panel */}
-        {showSettings && (
-          <div
-            className={`absolute top-16 right-4 rounded-2xl p-6 shadow-2xl z-20 min-w-[280px] border ${
-              theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400"
-                : isDarkMode
-                ? "bg-gray-800 border-gray-700"
-                : "bg-white border-gray-200"
-            }`}
-          >
-            <h4
-              className={`text-lg font-semibold mb-4 ${
-                theme === "high-contrast"
-                  ? "text-yellow-400"
-                  : isDarkMode
-                  ? "text-white"
-                  : "text-gray-800"
-              }`}
-            >
-              아바타 설정
-            </h4>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span
-                  className={`text-sm font-semibold ${
-                    theme === "high-contrast"
-                      ? "text-yellow-400"
-                      : isDarkMode
-                      ? "text-gray-300"
-                      : "text-gray-700"
-                  }`}
-                >
-                  음성 출력
-                </span>
-                <button
-                  onClick={() => setIsSpeechEnabled(!isSpeechEnabled)}
-                  className={`p-2 rounded-lg transition-all duration-200 ${
-                    theme === "high-contrast"
-                      ? "border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                      : isDarkMode
-                      ? "border border-gray-400 hover:bg-gray-500 text-white"
-                      : "border border-gray-400 hover:bg-gray-200 text-gray-800"
-                  }`}
-                >
-                  {isSpeechEnabled ? (
-                    <Volume2 size={16} />
-                  ) : (
-                    <VolumeX size={16} />
-                  )}
-                </button>
-              </div>
-
-              <div
-                className={`pt-2 border-t ${
-                  theme === "high-contrast"
-                    ? "border-yellow-400"
-                    : isDarkMode
-                    ? "border-gray-700"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={resetAvatar}
-                    disabled={!isUnityLoaded}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
-                      !isUnityLoaded
-                        ? theme === "high-contrast"
-                          ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
-                          : isDarkMode
-                          ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                        : "bg-blue-500 hover:bg-blue-600 text-white"
-                    }`}
-                  >
-                    <User size={16} />
-                    리셋
-                  </button>
-
-                  <button
-                    onClick={handleStopAnimation}
-                    disabled={!isPlaying}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg transition-all duration-200 text-sm ${
-                      !isPlaying
-                        ? theme === "high-contrast"
-                          ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
-                          : isDarkMode
-                          ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        : theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                        : "bg-[#ff4444] hover:bg-red-600 text-white"
-                    }`}
-                  >
-                    <Square size={16} />
-                    정지
-                  </button>
-                </div>
-              </div>
-            </div>
-            </div>
-        )}
-        {/* ===== Right: Controls ===== */}
+        {/* ===== Right: Control Panels ===== */}
         <div
           className={`w-full xl:w-96 p-4 flex flex-col max-h-[50vh] xl:max-h-none ${
             theme === "high-contrast" ? "overflow-y-auto" : ""
           }`}
         >
-          {/* 입력 */}
-          <div
-            className={`rounded-2xl shadow-lg mb-4 border ${
-              theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400 p-4"
-                : isDarkMode
-                ? "bg-gray-800 border-gray-700 p-6"
-                : "bg-white border-gray-200 p-6"
-            }`}
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <MessageSquare
-                size={20}
-                className={`${
-                  theme === "high-contrast"
-                    ? "text-yellow-400"
-                    : isDarkMode
-                    ? "text-gray-300"
-                    : "text-gray-700"
-                }`}
-              />
-              <h3
-                className={`text-lg font-semibold ${
-                  theme === "high-contrast"
-                    ? "text-yellow-400"
-                    : isDarkMode
-                    ? "text-white"
-                    : "text-gray-800"
-                }`}
-              >
-                텍스트 입력
-              </h3>
-            </div>
+          {/* 텍스트 입력 패널 */}
+          <TextInputPanel
+            inputText={inputText}
+            onInputChange={handleInputChange}
+            onConvert={() => handleConvertToSignLanguage(inputText)}
+            onClear={clearInput}
+            isConvertButtonEnabled={isConvertButtonEnabled()}
+          />
 
-            <div className="space-y-4">
-              <textarea
-                value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
-                placeholder="수어로 변환할 텍스트를 입력하세요..."
-                className={`w-full h-32 rounded-xl p-4 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 border ${
-                  theme === "high-contrast"
-                    ? "bg-black border-2 border-yellow-400 text-yellow-400 placeholder-yellow-400"
-                    : isDarkMode
-                    ? "bg-gray-700 border-gray-600 text-gray-200 placeholder-gray-400"
-                    : "bg-gray-50 border-gray-200 text-gray-800 placeholder-gray-500"
-                }`}
-              />
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleConvertToSignLanguage(inputText)}
-                  disabled={!isConvertButtonEnabled()}
-                  className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 font-semibold rounded-xl transition-all duration-300 transform shadow-lg ${
-                    !isConvertButtonEnabled()
-                      ? theme === "high-contrast"
-                        ? "bg-black border-2 border-yellow-400 text-yellow-400 opacity-50 cursor-not-allowed"
-                        : isDarkMode
-                        ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      : theme === "high-contrast"
-                      ? "bg-black border-4 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                      : "bg-blue-500 hover:bg-blue-600 text-white hover:scale-[1.02]"
-                  }`}
-                >
-                  수어 변환
-                </button>
-
-                <button
-                  onClick={clearInput}
-                  className={`p-3 rounded-xl transition-all duration-200 ${
-                    theme === "high-contrast"
-                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                      : isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  <RotateCcw size={18} />
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* 프리셋 */}
-          <div
-            className={`rounded-2xl shadow-lg mb-4 border ${
-              theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400 p-4"
-                : isDarkMode
-                ? "bg-gray-800 border-gray-700 p-6"
-                : "bg-white border-gray-200 p-6"
-            }`}
-          >
-            <h3
-              className={`text-lg font-semibold mb-4 ${
-                theme === "high-contrast"
-                  ? "text-yellow-400"
-                  : isDarkMode
-                  ? "text-white"
-                  : "text-gray-800"
-              }`}
-            >
-              자주 사용하는 구문
-            </h3>
-
-            <div className="grid grid-cols-2 gap-2">
-              {predefinedPhrases.map((phraseObj) => (
-                <button
-                  key={phraseObj.display}
-                  onClick={() => handlePredefinedSelect(phraseObj)}
-                  className={`p-3 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                    selectedPredefined === phraseObj.display
-                      ? theme === "high-contrast"
-                        ? "bg-yellow-400 text-black border-2 border-yellow-400"
-                        : "bg-blue-500 text-white shadow-lg"
-                      : theme === "high-contrast"
-                      ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                      : isDarkMode
-                      ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
-                      : "bg-gray-100 hover:bg-gray-200 text-gray-700"
-                  }`}
-                >
-                  {phraseObj.display}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 변환 기록 보기 버튼 */}
-          <div
-            className={`rounded-2xl shadow-lg border ${
-              theme === "high-contrast"
-                ? "bg-black border-2 border-yellow-400 p-4"
-                : isDarkMode
-                ? "bg-gray-800 border-gray-700 p-6"
-                : "bg-white border-gray-200 p-6"
-            }`}
-          >
-            <div className="text-center space-y-4">
-              <div className="flex items-center justify-center gap-2">
-                <Clock
-                  size={20}
-                  className={`${
-                    theme === "high-contrast"
-                      ? "text-yellow-400"
-                      : isDarkMode
-                      ? "text-gray-300"
-                      : "text-gray-700"
-                  }`}
-                />
-                <h3
-                  className={`text-lg font-semibold ${
-                    theme === "high-contrast"
-                      ? "text-yellow-400"
-                      : isDarkMode
-                      ? "text-white"
-                      : "text-gray-800"
-                  }`}
-                >
-                  변환 기록
-                </h3>
-              </div>
-
-              <div
-                className={`text-sm mb-4 ${
-                  theme === "high-contrast"
-                    ? "text-yellow-400"
-                    : isDarkMode
-                    ? "text-gray-400"
-                    : "text-gray-600"
-                }`}
-              >
-                {translationHistory.length > 0
-                  ? `${translationHistory.length}개의 변환 기록이 있습니다`
-                  : "아직 변환 기록이 없습니다"}
-              </div>
-
-              <button
-                onClick={() => setShowHistoryModal(true)}
-                className={`w-full flex items-center justify-center gap-2 py-3 px-4 font-semibold rounded-xl transition-all duration-200 ${
-                  theme === "high-contrast"
-                    ? "bg-black border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
-                    : isDarkMode
-                    ? "bg-gray-700 hover:bg-gray-600 text-gray-300 hover:text-white"
-                    : "bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900"
-                }`}
-              >
-                <MessageSquare size={18} />
-                변환 기록 보기
-              </button>
-            </div>
-          </div>
+          {/* 사전 정의된 구문 패널 */}
+          <PredefinedPhrasesPanel
+            predefinedPhrases={predefinedPhrases}
+            selectedPhrase={selectedPredefined}
+            onPhraseSelect={handlePredefinedSelect}
+            isDisabled={isPlaying}
+          />
         </div>
       </div>
+
       {/* 변환 기록 모달 */}
       <TransHistoryModal
         isOpen={showHistoryModal}
