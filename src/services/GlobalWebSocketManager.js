@@ -237,6 +237,64 @@ export class GlobalWebSocketManager {
         return true;
     }
 
+    // 프레임 배치 전송 (새로 추가)
+    sendFrameBatch(batchData) {
+        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            console.warn('⚠️ [GlobalWebSocketManager] 프레임 배치 전송 실패 - 연결 없음');
+            return false;
+        }
+
+        if (!this.currentSessionId) {
+            console.warn('⚠️ [GlobalWebSocketManager] 프레임 배치 전송 실패 - 세션 없음');
+            return false;
+        }
+
+        if (this.translationState !== 'active') {
+            console.warn('⚠️ [GlobalWebSocketManager] 프레임 배치 전송 실패 - 번역 비활성');
+            return false;
+        }
+
+        try {
+            const message = {
+                type: "frame_batch",
+                session_id: this.currentSessionId,
+                batch_index: batchData.batchIndex,
+                frame_count: batchData.frameCount,
+                frames: batchData.frames.map(frame => ({
+                    frame_index: frame.frameIndex,
+                    image_data: frame.imageData,
+                    timestamp: frame.timestamp,
+                    dimensions: frame.dimensions
+                })),
+                timestamp: batchData.timestamp,
+                is_final: batchData.isFinal || false,
+                user_id: parseInt(this.userId)
+            };
+
+            console.log("📤 [GlobalWebSocketManager] 프레임 배치 전송:", {
+                batchIndex: message.batch_index,
+                frameCount: message.frame_count,
+                isFinal: message.is_final,
+                dataSize: JSON.stringify(message).length
+            });
+
+            this.ws.send(JSON.stringify(message));
+            
+            performanceLogger.addMetric('websocketSendBatch', 0, {
+                batchIndex: message.batch_index,
+                frameCount: message.frame_count,
+                sessionId: message.session_id,
+                messageSize: JSON.stringify(message).length
+            });
+
+            return true;
+
+        } catch (error) {
+            console.error("🚨 [GlobalWebSocketManager] 프레임 배치 전송 오류:", error);
+            return false;
+        }
+    }
+
     async processFrameQueue() {
         if (this.isProcessingQueue || this.frameQueue.length === 0) {
             return;

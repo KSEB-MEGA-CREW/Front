@@ -1,29 +1,37 @@
 // src/services/FrameProcessor.js
-import { keypointUtils } from "../utils/keypointUtils.js";
 import { performanceLogger } from "../utils/performanceUtils.js";
-import { MEDIAPIPE_CONFIG, ERROR_CODES } from "../constants/videoConfig.js";
+import { ERROR_CODES } from "../constants/videoConfig.js";
 
-console.log('🔄 FrameProcessor.js 모듈 로드됨');
+console.log('🔄 FrameProcessor.js 모듈 로드됨 - 프레임 배치 모드');
 
 export class FrameProcessor {
     constructor() {
-        console.log('🔧 FrameProcessor constructor 호출됨');
+        console.log('🔧 FrameProcessor constructor - 프레임 배치 모드');
+        
+        // MediaPipe 관련 제거
         this.hands = null;
-        this.ready = false;
+        this.ready = true; // MediaPipe 초기화 불필요
+        
+        // 배치 처리 관련 추가
         this.frameIndex = 0;
-        this.frameBuffer = [];
+        this.frameBuffer = []; // 10개 프레임 저장
+        this.batchSize = 10;
         this.isProcessing = false;
         this.initPromise = null;
         this.loadingTimeout = null;
         this.lastResults = null;
-        this.pendingResolve = null; // 🔧 추가: 대기 중인 Promise resolve 함수
+        this.pendingResolve = null;
+        
+        // 성능 최적화를 위한 Canvas 재사용
+        this.canvas = null;
+        this.ctx = null;
         
         // 스마트 일시정지 상태 추가
         this.isPaused = false;
         this.pauseReason = null;
         this.pausedAt = null;
         
-        console.log('✅ FrameProcessor 생성 완료');
+        console.log('✅ FrameProcessor 생성 완료 - 배치 모드');
     }
 
   async initialize() {
@@ -39,103 +47,37 @@ export class FrameProcessor {
     try {
       // 1. 브라우저 환경 확인
       if (typeof window === "undefined") {
-        throw new Error(" 브라우저 환경이 아닙니다");
+        throw new Error("브라우저 환경이 아닙니다");
       }
 
-      // 2. MediaPipe 라이브러리 대기 (최대 5초)
-      await this.waitForMediaPipe();
+      // 2. Canvas 미리 생성 (성능 최적화)
+      this.canvas = document.createElement('canvas');
+      this.ctx = this.canvas.getContext('2d');
+      
+      // 3. 초기화 완료
+      this.ready = true;
+      this.initPromise = null;
 
-            // 3. Hands 인스턴스 생성
-            console.log('🤲 MediaPipe Hands 인스턴스 생성 중...');
+      console.log('✅ FrameProcessor 초기화 완료 - Canvas 준비됨');
+      return true;
 
-            if (window.Hands) {
-                this.hands = new window.Hands({
-                    locateFile: (file) => {
-                        const url = `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-                        console.log(`📁 MediaPipe 파일 로드: ${url}`);
-                        return url;
-                    }
-                });
-
-                // 4. 설정 적용
-                this.hands.setOptions({
-                    maxNumHands: MEDIAPIPE_CONFIG?.MAX_NUM_HANDS || 2,
-                    modelComplexity: MEDIAPIPE_CONFIG?.MODEL_COMPLEXITY || 1,
-                    minDetectionConfidence: MEDIAPIPE_CONFIG?.MIN_DETECTION_CONFIDENCE || 0.7,
-                    minTrackingConfidence: MEDIAPIPE_CONFIG?.MIN_TRACKING_CONFIDENCE || 0.5
-                });
-
-                // 🔧 수정: MediaPipe 결과 콜백 개선
-                this.hands.onResults((results) => {
-                    this.lastResults = results;
-                    console.log('📊 MediaPipe 결과 수신:', {
-                        handsDetected: results?.multiHandLandmarks?.length || 0,
-                        timestamp: Date.now()
-                    });
-
-                    // 🔧 추가: 대기 중인 Promise 해결
-                    if (this.pendingResolve) {
-                        this.pendingResolve(results);
-                        this.pendingResolve = null;
-                    }
-                });
-
-                console.log('✅ MediaPipe Hands 설정 완료');
-            } else {
-                console.log('⚠️ MediaPipe 없음 - 테스트 모드');
-            }
-
-            // 5. 초기화 완료
-            this.ready = true;
-            this.initPromise = null;
-
-            console.log('✅ FrameProcessor 초기화 완료');
-            return true;
-
-        } catch (error) {
-            console.error('❌ FrameProcessor 초기화 실패:', error);
-            this.ready = false;
-            this.initPromise = null;
-            this.cleanup();
-            throw error;
-        }
+    } catch (error) {
+      console.error('❌ FrameProcessor 초기화 실패:', error);
+      this.ready = false;
+      this.initPromise = null;
+      this.cleanup();
+      throw error;
     }
-
-    // MediaPipe 라이브러리 로드 대기
-    async waitForMediaPipe() {
-        const maxWaitTime = MEDIAPIPE_CONFIG.INITIALIZATION_TIMEOUT / 2; // 5초
-        const checkInterval = 100;
-        let waitTime = 0;
-
-        return new Promise((resolve) => {
-            const checkMediaPipe = () => {
-                if (window.Hands) {
-                    console.log('✅ MediaPipe Hands 로드 완료');
-                    resolve();
-                    return;
-                }
-
-                waitTime += checkInterval;
-                if (waitTime >= maxWaitTime) {
-                    console.warn('⚠️ MediaPipe 라이브러리 로드 타임아웃 - 테스트 모드로 전환');
-                    resolve();
-                    return;
-                }
-
-        setTimeout(checkMediaPipe, checkInterval);
-      };
-
-      checkMediaPipe();
-    });
   }
 
-    async extractKeypoints(videoElement, sessionId) {
-        console.log('📊 [FrameProcessor.js] 키포인트 추출 시작', {
+    // MediaPipe 관련 메서드 제거 - 더 이상 필요하지 않음
+
+    async extractFrame(videoElement, sessionId) {
+        console.log('📊 [FrameProcessor] 프레임 추출 시작', {
             ready: this.ready,
             sessionId,
-            hands: !!this.hands,
-            isProcessing: this.isProcessing,
-            bufferSize: this.frameBuffer.length
+            bufferSize: this.frameBuffer.length,
+            frameIndex: this.frameIndex
         });
 
         if (!this.ready) {
@@ -143,166 +85,139 @@ export class FrameProcessor {
                 code: ERROR_CODES.MEDIAPIPE_INIT_FAILED,
                 message: 'FrameProcessor가 초기화되지 않았습니다'
             };
-            console.error('[FrameProcessor.js]', error);
+            console.error('[FrameProcessor]', error);
             const err = new Error(error.message);
             err.code = error.code;
             throw err;
         }
 
-    if (!videoElement || videoElement.videoWidth === 0) {
-      const error = {
-        code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
-        message: '비디오 요소가 준비되지 않았습니다'
-      };
-      const err = new Error(error.message);
-      err.code = error.code;
-      throw err;
-    }
+        if (!videoElement || videoElement.videoWidth === 0) {
+            const error = {
+                code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
+                message: '비디오 요소가 준비되지 않았습니다'
+            };
+            const err = new Error(error.message);
+            err.code = error.code;
+            throw err;
+        }
 
-    if (this.isProcessing) {
-      return null;
-    }
+        if (this.isProcessing) {
+            return null;
+        }
 
-    try {
-      this.isProcessing = true;
-      performanceLogger.startTimer("keypointExtraction");
+        try {
+            this.isProcessing = true;
+            performanceLogger.startTimer("frameExtraction");
 
-            let keypoints;
+            // Canvas 크기 설정 (최초 1회만)
+            if (this.canvas.width !== videoElement.videoWidth) {
+                this.canvas.width = videoElement.videoWidth;
+                this.canvas.height = videoElement.videoHeight;
+            }
 
-            // MediaPipe 사용 가능 여부에 따라 분기 처리
-            if (this.hands && window.Hands) {
-                console.log('🤲 [FrameProcessor.js] 실제 MediaPipe로 키포인트 추출', {
-                    videoWidth: videoElement?.videoWidth,
-                    videoHeight: videoElement?.videoHeight,
-                    readyState: videoElement?.readyState
-                });
-                try {
-                    const results = await this.processFrame(videoElement);
-                    keypoints = keypointUtils.normalizeKeypoints(results || {});
-                } catch (mpError) {
-                    console.warn('⚠️ MediaPipe 처리 실패, 테스트 모드로 전환:', mpError.message);
-                    keypoints = this.generateTestKeypoints();
+            // 프레임 추출
+            this.ctx.drawImage(videoElement, 0, 0);
+            const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+
+            // 프레임 데이터 생성
+            const frameData = {
+                imageData: imageData,
+                frameIndex: ++this.frameIndex,
+                timestamp: Date.now(),
+                dimensions: {
+                    width: videoElement.videoWidth,
+                    height: videoElement.videoHeight
                 }
-            } else {
-                console.log('🧪 [FrameProcessor.js] 테스트 모드: 가짜 키포인트 생성', {
-                    handsExists: !!this.hands,
-                    windowHandsExists: !!window.Hands
+            };
+
+            // 버퍼에 추가
+            this.frameBuffer.push(frameData);
+            
+            console.log(`📦 [FrameProcessor] 프레임 버퍼링: ${this.frameBuffer.length}/${this.batchSize}`, {
+                currentFrame: frameData.frameIndex,
+                bufferSize: this.frameBuffer.length
+            });
+
+            // 10개 모이면 배치 반환
+            if (this.frameBuffer.length >= this.batchSize) {
+                const batchData = {
+                    type: 'frame_batch',
+                    sessionId: sessionId,
+                    batchIndex: Math.floor(this.frameIndex / this.batchSize),
+                    frames: [...this.frameBuffer], // 복사본 생성
+                    frameCount: this.frameBuffer.length,
+                    timestamp: Date.now()
+                };
+
+                // 버퍼 클리어
+                this.frameBuffer = [];
+                
+                const extractionTime = performanceLogger.endTimer('frameExtraction');
+                performanceLogger.addMetric("frameExtraction", extractionTime);
+
+                console.log(`📤 [FrameProcessor] 배치 전송 준비 완료:`, {
+                    batchIndex: batchData.batchIndex,
+                    frameCount: batchData.frameCount,
+                    firstFrame: batchData.frames[0]?.frameIndex,
+                    lastFrame: batchData.frames[batchData.frameCount - 1]?.frameIndex
                 });
-                keypoints = this.generateTestKeypoints();
+
+                return batchData;
             }
 
-            // 키포인트 데이터 검증
-            if (!Array.isArray(keypoints) || keypoints.length !== 194) {
-                console.warn('⚠️ 잘못된 키포인트 형식, 기본값으로 대체');
-                keypoints = new Array(194).fill(0.0);
-            }
-
-      // 단일 프레임 데이터 검증
-      console.log('📊 [FrameProcessor] 단일 프레임 데이터:', {
-        type: Array.isArray(keypoints) ? 'Array' : typeof keypoints,
-        length: Array.isArray(keypoints) ? keypoints.length : 'N/A',
-        firstFew: Array.isArray(keypoints) ? keypoints.slice(0, 3) : keypoints,
-        frameIndex: this.frameIndex + 1,
-        isValidFormat: Array.isArray(keypoints) && keypoints.length === 194
-      });
-      
-      this.frameIndex++;
-      const extractionTime = performanceLogger.endTimer('keypointExtraction');
-      performanceLogger.addMetric("keypointExtraction", extractionTime);
-
-      // 서버 스키마에 맞춘 단일 프레임 데이터 반환
-      const frameData = {
-        keypoints: keypoints, // List[float] (194개 값)
-        frameIndex: this.frameIndex,
-        sessionId,
-      };
-
-      console.log(`📦 [FrameProcessor] 단일 프레임 전송 준비: 프레임 ${frameData.frameIndex}`);
-      console.log('📊 [FrameProcessor] 전송 데이터 구조:', {
-        keypointsType: Array.isArray(frameData.keypoints) ? 'Array' : typeof frameData.keypoints,
-        keypointsLength: Array.isArray(frameData.keypoints) ? frameData.keypoints.length : 'N/A',
-        dataStructure: 'List[float]', // 서버 기대 구조
-        sampleValues: Array.isArray(frameData.keypoints) ? frameData.keypoints.slice(0, 5) : 'N/A'
-      });
-
-      return frameData;
+            // 10개 미만이면 null 반환 (아직 전송하지 않음)
+            return null;
 
         } catch (error) {
-            console.error('❌ 키포인트 추출 실패:', error);
+            console.error('❌ 프레임 추출 실패:', error);
             throw error;
         } finally {
             this.isProcessing = false;
         }
     }
 
-    generateTestKeypoints() {
-        const keypoints = new Array(194).fill(0.0);
+    // 강제 배치 전송 (세션 종료 시)
+    flushBuffer(sessionId) {
+        if (this.frameBuffer.length > 0) {
+            const batchData = {
+                type: 'frame_batch_final',
+                sessionId: sessionId,
+                batchIndex: Math.floor(this.frameIndex / this.batchSize),
+                frames: [...this.frameBuffer],
+                frameCount: this.frameBuffer.length,
+                timestamp: Date.now(),
+                isFinal: true
+            };
 
-        // 손이 감지된 것처럼 일부 값을 랜덤하게 설정
-        for (let i = 0; i < 63; i += 3) {
-            keypoints[i] = Math.random() * 0.5 + 0.25; // x 좌표
-            keypoints[i + 1] = Math.random() * 0.5 + 0.25; // y 좌표  
-            keypoints[i + 2] = Math.random() * 0.1; // z 좌표
-        }
-
-        console.log('🧪 테스트 키포인트 생성 완료');
-        return keypoints;
-    }
-
-    // 🔧 수정: MediaPipe 처리 방식 개선
-    processFrame(videoElement) {
-        return new Promise((resolve, reject) => {
-            console.log('🎬 [FrameProcessor.js] processFrame 시작', {
-                videoElement: !!videoElement,
-                videoWidth: videoElement?.videoWidth,
-                videoHeight: videoElement?.videoHeight,
-                hands: !!this.hands
+            this.frameBuffer = [];
+            console.log(`📤 [FrameProcessor] 최종 배치 전송:`, {
+                frameCount: batchData.frameCount,
+                isFinal: true
             });
-            
-            // 표준화된 타임아웃 사용
-            const timeout = setTimeout(() => {
-                console.warn(`⏰ [FrameProcessor.js] MediaPipe 처리 타임아웃 (${MEDIAPIPE_CONFIG.PROCESSING_TIMEOUT}ms)`);
-                this.pendingResolve = null;
-                reject(new Error(`MediaPipe 처리 타임아웃 (${MEDIAPIPE_CONFIG.PROCESSING_TIMEOUT}ms)`));
-            }, MEDIAPIPE_CONFIG.PROCESSING_TIMEOUT);
 
-            try {
-                // 🔧 수정: 결과 대기 설정
-                this.pendingResolve = (results) => {
-                    clearTimeout(timeout);
-                    resolve(results);
-                };
-
-                // MediaPipe에 이미지 전송
-                this.hands.send({ image: videoElement });
-
-            } catch (error) {
-                clearTimeout(timeout);
-                this.pendingResolve = null;
-                reject(error);
-            }
-        });
+            return batchData;
+        }
+        return null;
     }
 
     isReady() {
-        const readyState = this.ready && (this.hands !== null || !window.Hands) && !this.isPaused;
+        const readyState = this.ready && !this.isPaused;
         console.log('🔍 [FrameProcessor] isReady 호출됨:', {
             ready: this.ready,
-            hands: !!this.hands,
             isPaused: this.isPaused,
             finalState: readyState
         });
         return readyState;
     }
 
-  resetFrameIndex() {
-    this.frameIndex = 0;
-    // 버퍼는 더 이상 사용하지 않음
-  }
+    resetFrameIndex() {
+        this.frameIndex = 0;
+        this.frameBuffer = []; // 버퍼도 클리어
+    }
 
-  getCurrentBufferSize() {
-    return 0; // 단일 프레임 전송이므로 사용하지 않음
-  }
+    getCurrentBufferSize() {
+        return this.frameBuffer.length;
+    }
 
     // 스마트 일시정지: 리소스 보존
     pause(reason = 'unknown') {
@@ -351,9 +266,9 @@ export class FrameProcessor {
                 this.loadingTimeout = null;
             }
 
-            if (this.hands) {
-                this.hands.close();
-                this.hands = null;
+            if (this.canvas) {
+                this.canvas = null;
+                this.ctx = null;
             }
 
             this.ready = false;
@@ -376,6 +291,11 @@ export class FrameProcessor {
     
     // 기본 cleanup은 일시정지로 변경
     cleanup() {
-        this.pause('cleanup_requested');
+        this.frameBuffer = [];
+        if (this.canvas) {
+            this.canvas = null;
+            this.ctx = null;
+        }
+        console.log('🧹 [FrameProcessor] 정리 완료');
     }
 }

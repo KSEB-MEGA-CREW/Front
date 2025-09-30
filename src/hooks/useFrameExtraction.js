@@ -1,4 +1,4 @@
-// 단순화된 키포인트 추출 훅 - 오직 추출과 전송만 담당
+// 프레임 배치 추출 훅 - 10개 단위 배치 전송
 import { useCallback, useRef, useState, useEffect } from "react";
 import { useWebSocketContext } from "../Context/WebSocketContext";
 import { VIDEO_CONFIG, ERROR_CODES } from "../constants/videoConfig";
@@ -9,8 +9,8 @@ export const useFrameExtraction = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState(null);
 
-  // WebSocket Context 사용
-  const { sendKeypoints, isTranslationActive } = useWebSocketContext();
+  // WebSocket Context에서 새로운 배치 전송 함수 사용
+  const { sendFrameBatch, isTranslationActive } = useWebSocketContext();
   
   // 최신 상태를 추적하기 위한 ref
   const isTranslationActiveRef = useRef(isTranslationActive);
@@ -21,7 +21,7 @@ export const useFrameExtraction = () => {
   const currentSessionId = useRef(null);
   const isInitializedRef = useRef(false);
 
-  // FrameProcessor 초기화
+  // FrameProcessor 초기화 (MediaPipe 제거)
   const initializeFrameProcessor = useCallback(async () => {
     try {
       if (!frameProcessor.current) {
@@ -29,7 +29,7 @@ export const useFrameExtraction = () => {
       }
 
       if (!frameProcessor.current.isReady()) {
-        console.log("📦 [useFrameExtraction] FrameProcessor 초기화 중...");
+        console.log("📦 [useFrameExtraction] FrameProcessor 초기화 중 (프레임 모드)...");
         await frameProcessor.current.initialize();
         console.log("✅ [useFrameExtraction] FrameProcessor 초기화 완료");
       }
@@ -37,12 +37,12 @@ export const useFrameExtraction = () => {
       return true;
     } catch (error) {
       console.error("🚨 [useFrameExtraction] FrameProcessor 초기화 실패:", error);
-      setError("키포인트 추출 초기화에 실패했습니다: " + error.message);
+      setError("프레임 추출 초기화에 실패했습니다: " + error.message);
       throw error;
     }
   }, []);
 
-  // 키포인트 추출 시작
+  // 프레임 추출 시작 (기존 키포인트 로직 대체)
   const startFrameExtraction = useCallback(async (videoElement, sessionId) => {
     if (!videoElement) {
       const errorMsg = "비디오 요소가 제공되지 않았습니다";
@@ -62,9 +62,8 @@ export const useFrameExtraction = () => {
     }
 
     try {
-      console.log("🎬 [useFrameExtraction] 키포인트 추출 시작:", sessionId);
+      console.log("🎬 [useFrameExtraction] 프레임 배치 추출 시작:", sessionId);
       
-      // FrameProcessor 초기화
       await initializeFrameProcessor();
 
       setIsProcessing(true);
@@ -72,13 +71,12 @@ export const useFrameExtraction = () => {
       currentSessionId.current = sessionId;
       frameCount.current = 0;
       
-      // 프레임 처리 리셋
       frameProcessor.current.resetFrameIndex();
       performanceLogger.clearMetrics();
 
-      // 번역이 활성화될 때까지 대기 (최대 3초)
+      // 번역 활성화 대기 (기존과 동일)
       let waitCount = 0;
-      const maxWait = 15; // 3초 (200ms * 15)
+      const maxWait = 15;
       
       while (!isTranslationActive && waitCount < maxWait) {
         console.log(`⏳ [useFrameExtraction] 번역 활성화 대기 중... (${waitCount + 1}/${maxWait})`);
@@ -95,101 +93,85 @@ export const useFrameExtraction = () => {
       // 프레임 처리 인터벌 시작
       intervalRef.current = setInterval(async () => {
         try {
-          // 최신 번역 상태 확인
           const currentTranslationActive = isTranslationActiveRef.current;
           
-          // 번역이 비활성 상태면 프레임 처리 건너뛰기
           if (!currentTranslationActive) {
-            console.log("⏸️ [useFrameExtraction] 번역 비활성 - 프레임 건너뛰기", { 
-              currentTranslationActive,
-              originalIsTranslationActive: isTranslationActive 
-            });
+            console.log("⏸️ [useFrameExtraction] 번역 비활성 - 프레임 건너뛰기");
             return;
           }
           
           console.log("🎬 [useFrameExtraction] 프레임 처리 중...", { 
-            frameCount: frameCount.current, 
-            currentTranslationActive,
-            originalIsTranslationActive: isTranslationActive,
+            frameCount: frameCount.current,
+            bufferSize: frameProcessor.current.getCurrentBufferSize(),
             sessionId: currentSessionId.current 
           });
 
           frameCount.current++;
 
-          // 키포인트 추출
-          const frameData = await frameProcessor.current.extractKeypoints(
+          // 프레임 추출 (키포인트 대신)
+          const batchData = await frameProcessor.current.extractFrame(
             videoElement,
             currentSessionId.current
           );
 
-          if (frameData && frameData.keypoints) {
-            // 손이 감지되었는지 확인 (키포인트가 모두 0이 아닌지 체크)
-            const hasValidKeypoints = Array.isArray(frameData.keypoints) && 
-              frameData.keypoints.some(point => point !== 0);
-            
-            console.log('🤲 [useFrameExtraction] 키포인트 유효성 체크:', {
-              hasKeypoints: !!frameData.keypoints,
-              keypointsLength: frameData.keypoints?.length,
-              hasValidKeypoints,
-              handsDetected: frameData.handsDetected || 'unknown'
+          // 10개 배치가 완성된 경우에만 전송
+          if (batchData) {
+            console.log('📤 [useFrameExtraction] 10개 프레임 배치 전송:', {
+              batchIndex: batchData.batchIndex,
+              frameCount: batchData.frameCount,
+              type: batchData.type
             });
-            
-            if (!hasValidKeypoints) {
-              console.log('⚠️ [useFrameExtraction] 손이 감지되지 않음 - 키포인트 전송 건너뛰기');
-              return;
-            }
 
-            // WebSocket을 통한 키포인트 전송
-            const sent = sendKeypoints(frameData.keypoints, frameData.frameIndex);
+            // WebSocket을 통한 배치 전송
+            const sent = sendFrameBatch(batchData);
             
             if (sent) {
               performanceLogger.logPerformance(
-                "Frame sent successfully",
+                "Frame batch sent successfully",
                 0,
                 {
-                  frameIndex: frameData.frameIndex,
-                  sessionId: currentSessionId.current,
-                  keypointsCount: frameData.keypoints.length
+                  batchIndex: batchData.batchIndex,
+                  frameCount: batchData.frameCount,
+                  sessionId: currentSessionId.current
                 }
               );
             } else {
-              console.warn("⚠️ [useFrameExtraction] 키포인트 전송 실패");
+              console.warn("⚠️ [useFrameExtraction] 프레임 배치 전송 실패");
             }
           } else {
-            console.warn("⚠️ [useFrameExtraction] 유효하지 않은 프레임 데이터");
+            console.log(`📦 [useFrameExtraction] 버퍼링 중: ${frameProcessor.current.getCurrentBufferSize()}/10`);
           }
 
         } catch (frameError) {
           console.error("🚨 [useFrameExtraction] 프레임 처리 오류:", frameError);
-
-          // 에러 타입에 따른 처리
-          if (frameError.code === ERROR_CODES.KEYPOINT_EXTRACTION_FAILED ||
-              frameError.code === ERROR_CODES.MEDIAPIPE_PROCESSING_TIMEOUT) {
-            // 키포인트 추출 오류는 한 프레임만 건너뛰고 계속
-            console.warn("⏭️ [useFrameExtraction] 프레임 건너뛰기");
-          } else {
-            // 심각한 오류는 처리 중단
-            setError(`프레임 처리 오류: ${frameError.message}`);
-            stopFrameExtraction();
-          }
+          setError(`프레임 처리 오류: ${frameError.message}`);
+          stopFrameExtraction();
         }
       }, VIDEO_CONFIG.FRAME_INTERVAL);
 
-      console.log("✅ [useFrameExtraction] 키포인트 추출 시작 완료");
+      console.log("✅ [useFrameExtraction] 프레임 배치 추출 시작 완료");
 
     } catch (error) {
-      console.error("🚨 [useFrameExtraction] 키포인트 추출 시작 실패:", error);
+      console.error("🚨 [useFrameExtraction] 프레임 추출 시작 실패:", error);
       setIsProcessing(false);
-      setError(`키포인트 추출 시작 실패: ${error.message}`);
+      setError(`프레임 추출 시작 실패: ${error.message}`);
       throw error;
     }
-  }, [isProcessing, initializeFrameProcessor, isTranslationActive, sendKeypoints]);
+  }, [isProcessing, initializeFrameProcessor, isTranslationActive, sendFrameBatch]);
 
-  // 키포인트 추출 중지
+  // 프레임 추출 중지 (세션 종료 시 남은 프레임 전송)
   const stopFrameExtraction = useCallback(() => {
-    console.log("🛑 [useFrameExtraction] 키포인트 추출 중지");
+    console.log("🛑 [useFrameExtraction] 프레임 추출 중지");
 
-    // 인터벌 정리
+    // 버퍼에 남은 프레임이 있으면 최종 전송
+    if (frameProcessor.current && currentSessionId.current) {
+      const finalBatch = frameProcessor.current.flushBuffer(currentSessionId.current);
+      if (finalBatch) {
+        console.log("📤 [useFrameExtraction] 최종 프레임 배치 전송:", finalBatch.frameCount);
+        sendFrameBatch(finalBatch);
+      }
+    }
+
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -199,8 +181,8 @@ export const useFrameExtraction = () => {
     currentSessionId.current = null;
     frameCount.current = 0;
     
-    console.log("✅ [useFrameExtraction] 키포인트 추출 중지 완료");
-  }, []);
+    console.log("✅ [useFrameExtraction] 프레임 추출 중지 완료");
+  }, [sendFrameBatch]);
 
   // 에러 초기화
   const clearError = useCallback(() => {

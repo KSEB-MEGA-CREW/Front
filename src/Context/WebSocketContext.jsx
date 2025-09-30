@@ -224,7 +224,7 @@ export const WebSocketProvider = ({ children }) => {
         managerRef.current.stopTranslation();
     }, []);
 
-    // 키포인트 전송
+    // 키포인트 전송 (기존 유지)
     const sendKeypoints = useCallback((keypoints, frameIndex) => {
         if (!managerRef.current) {
             return false;
@@ -232,6 +232,34 @@ export const WebSocketProvider = ({ children }) => {
 
         return managerRef.current.sendKeypoints(keypoints, frameIndex);
     }, []);
+
+    // 프레임 배치 전송 (새로 추가)
+    const sendFrameBatch = useCallback((batchData) => {
+        if (!managerRef.current) {
+            console.warn("⚠️ [WebSocketContext] WebSocket 관리자 없음 - 배치 전송 실패");
+            return false;
+        }
+
+        if (!isConnected) {
+            console.warn("⚠️ [WebSocketContext] WebSocket 연결되지 않음 - 배치 전송 실패");
+            return false;
+        }
+
+        try {
+            console.log("📤 [WebSocketContext] 프레임 배치 전송:", {
+                batchIndex: batchData.batchIndex,
+                frameCount: batchData.frameCount,
+                isFinal: batchData.isFinal,
+                type: batchData.type
+            });
+
+            return managerRef.current.sendFrameBatch(batchData);
+
+        } catch (error) {
+            console.error("🚨 [WebSocketContext] 프레임 배치 전송 오류:", error);
+            return false;
+        }
+    }, [isConnected]);
 
     // 에러 초기화
     const clearError = useCallback(() => {
@@ -272,7 +300,8 @@ export const WebSocketProvider = ({ children }) => {
         connectToServer,
         startTranslation,
         stopTranslation,
-        sendKeypoints,
+        sendKeypoints, // 기존 유지 (혹시 다른 곳에서 사용 중일 수 있음)
+        sendFrameBatch, // 새로 추가
         clearError,
         clearHistory,
         reconnect,
