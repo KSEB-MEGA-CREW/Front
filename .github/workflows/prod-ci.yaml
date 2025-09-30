@@ -27,7 +27,7 @@ jobs:
      run: npm run build
      env:
        VITE_API_URL: https://api.korean-signlanguage-sudam.com # 운영 백엔드 서버
-       VITE_WS_URL: wss://ai.korean-signlanguage-sudam.com # 운영 WebSocket 서버
+       VITE_WS_URL: wss://api.korean-signlanguage-sudam.com # 운영 WebSocket 서버
        
    - name: Configure AWS credentials
      uses: aws-actions/configure-aws-credentials@v4
