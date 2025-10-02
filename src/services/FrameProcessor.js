@@ -54,6 +54,15 @@ export class FrameProcessor {
       this.canvas = document.createElement('canvas');
       this.ctx = this.canvas.getContext('2d');
       
+      // Canvas Context 생성 검증
+      if (!this.ctx) {
+        throw new Error('Canvas 2D Context 생성에 실패했습니다');
+      }
+      
+      // Canvas 기본 속성 설정
+      this.canvas.style.display = 'none'; // DOM에 표시되지 않도록
+      console.log('🎨 [FrameProcessor] Canvas 및 Context 생성 완료');
+      
       // 3. 초기화 완료
       this.ready = true;
       this.initPromise = null;
@@ -133,9 +142,22 @@ export class FrameProcessor {
             this.isProcessing = true;
             performanceLogger.startTimer("frameExtraction");
 
-            // Canvas와 Context 유효성 재확인
+            // Canvas와 Context 유효성 재확인 (강화된 검증)
             if (!this.canvas || !this.ctx) {
                 throw new Error('Canvas 또는 Context가 유효하지 않습니다');
+            }
+            
+            // Context가 손실되었는지 추가 확인
+            if (typeof this.ctx.drawImage !== 'function') {
+                throw new Error('Canvas Context가 손실되었습니다');
+            }
+            
+            // Canvas 요소가 DOM에서 분리되었는지 확인
+            if (this.canvas.width === 0 && this.canvas.height === 0) {
+                // Canvas 크기가 0이면 재초기화 시도
+                console.warn('⚠️ [FrameProcessor] Canvas 크기가 0입니다. 재초기화 시도...');
+                this.canvas.width = 640;  // 기본 크기로 설정
+                this.canvas.height = 480;
             }
 
             // Canvas 크기 설정 (안전하게)
@@ -305,9 +327,16 @@ export class FrameProcessor {
                 this.loadingTimeout = null;
             }
 
+            // Canvas 강제 정리 (forceCleanup에서만 사용)
             if (this.canvas) {
-                this.canvas = null;
-                this.ctx = null;
+                try {
+                    this.canvas.width = 0;
+                    this.canvas.height = 0;
+                    this.canvas = null;
+                    this.ctx = null;
+                } catch (error) {
+                    console.error('❌ [FrameProcessor] 강제 Canvas 정리 오류:', error);
+                }
             }
 
             this.ready = false;
@@ -328,13 +357,31 @@ export class FrameProcessor {
         }
     }
     
-    // 기본 cleanup은 일시정지로 변경
+    // 기본 cleanup은 안전한 메모리 정리로 변경
     cleanup() {
         this.frameBuffer = [];
-        if (this.canvas) {
-            this.canvas = null;
-            this.ctx = null;
+        
+        // Canvas 정리 시 진행 중인 작업 확인
+        if (this.isProcessing) {
+            console.warn('⚠️ [FrameProcessor] 처리 중인 작업이 있음에도 cleanup 호출됨');
+            this.isProcessing = false;
         }
-        console.log('🧹 [FrameProcessor] 정리 완료');
+        
+        // Canvas 정리 (null 대신 플래그 사용)
+        if (this.canvas) {
+            try {
+                // Canvas 크기를 0으로 설정하여 메모리 해제
+                this.canvas.width = 0;
+                this.canvas.height = 0;
+                this.canvas = null;
+                this.ctx = null;
+            } catch (error) {
+                console.error('❌ [FrameProcessor] Canvas 정리 오류:', error);
+            }
+        }
+        
+        // ready 상태 유지 (재초기화 가능하도록)
+        this.ready = false;
+        console.log('🧹 [FrameProcessor] 안전한 정리 완료');
     }
 }
