@@ -69,22 +69,34 @@ export class GlobalWebSocketManager {
                     try {
                         let messageData = event.data;
                         
-                        // Echo 메시지 및 디버그 메시지 필터링
-                        if (typeof messageData === 'string') {
-                            if (messageData.startsWith('Echo:')) {
-                                console.log('📢 [GlobalWebSocketManager] 서버 Echo 메시지 무시:', messageData);
-                                return;
-                            }
+                        // Echo 메시지 처리 수정 - JSON 데이터 추출
+                        if (typeof messageData === 'string' && messageData.startsWith('Echo:')) {
+                            console.log('📢 [GlobalWebSocketManager] Echo 메시지 수신:', messageData);
                             
-                            // JSON 형태가 아닌 일반 텍스트 메시지 필터링
-                            const trimmed = messageData.trim();
-                            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
-                                console.warn('⚠️ [GlobalWebSocketManager] 비정상 메시지 형태 무시:', messageData);
+                            // "Echo: " 부분을 제거하고 JSON 부분만 추출
+                            const jsonPart = messageData.substring(5).trim(); // "Echo: " 제거
+                            
+                            try {
+                                const data = JSON.parse(jsonPart);
+                                console.log('✅ [GlobalWebSocketManager] Echo에서 JSON 추출 성공:', data);
+                                this.handleMessage(data);
+                                return;
+                            } catch (parseError) {
+                                console.warn('⚠️ [GlobalWebSocketManager] Echo 메시지 JSON 파싱 실패:', parseError);
                                 return;
                             }
                         }
                         
-                        // JSON 파싱 시도
+                        // 일반 JSON 메시지 처리
+                        if (typeof messageData === 'string') {
+                            const trimmed = messageData.trim();
+                            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+                                console.warn('⚠️ [GlobalWebSocketManager] 비JSON 메시지 무시:', messageData);
+                                return;
+                            }
+                        }
+                        
+                        // 직접 JSON 파싱
                         const data = JSON.parse(messageData);
                         this.handleMessage(data);
                         

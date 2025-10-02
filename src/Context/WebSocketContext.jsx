@@ -246,14 +246,21 @@ export const WebSocketProvider = ({ children }) => {
         }
 
         try {
-            console.log("📤 [WebSocketContext] 프레임 배치 전송:", {
-                batchIndex: batchData.batchIndex,
-                frameCount: batchData.frameCount,
-                isFinal: batchData.isFinal,
-                type: batchData.type
+            // F2T 서버 호환 - user_id 추가
+            const f2tCompatibleData = {
+                ...batchData,
+                user_id: user?.id || parseInt(batchData.session_id) || 1
+            };
+
+            console.log("📤 [WebSocketContext] F2T 호환 프레임 배치 전송:", {
+                batch_index: f2tCompatibleData.batch_index,
+                frameCount: f2tCompatibleData.frameCount,
+                user_id: f2tCompatibleData.user_id,
+                isFinal: f2tCompatibleData.isFinal,
+                type: f2tCompatibleData.type
             });
 
-            return managerRef.current.sendFrameBatch(batchData);
+            return managerRef.current.sendFrameBatch(f2tCompatibleData);
 
         } catch (error) {
             console.error("🚨 [WebSocketContext] 프레임 배치 전송 오류:", error);

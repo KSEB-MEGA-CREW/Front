@@ -70,32 +70,23 @@ export class FrameProcessor {
             this.ctx.drawImage(videoElement, 0, 0);
             const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
 
-            // 배치 처리
-            const frameData = {
-                imageData: imageData,
-                frameIndex: ++this.frameIndex,
-                timestamp: Date.now(),
-                dimensions: {
-                    width: videoElement.videoWidth,
-                    height: videoElement.videoHeight
-                }
-            };
-
-            this.frameBuffer.push(frameData);
+            // F2T 서버 호환 - 단순 Base64 문자열만 저장
+            this.frameBuffer.push(imageData);
+            this.frameIndex++;
 
             // 10개 모이면 배치 반환
             if (this.frameBuffer.length >= this.batchSize) {
                 const batchData = {
                     type: 'frame_batch',
-                    sessionId: sessionId,
-                    batchIndex: Math.floor(this.frameIndex / this.batchSize),
-                    frames: [...this.frameBuffer],
-                    frameCount: this.frameBuffer.length,
-                    timestamp: Date.now()
+                    frame_batch: [...this.frameBuffer], // F2T 서버 호환 필드명
+                    batch_index: Math.floor(this.frameIndex / this.batchSize),
+                    user_id: parseInt(sessionId) || 1, // F2T 서버 필수 필드
+                    session_id: sessionId,
+                    frameCount: this.frameBuffer.length
                 };
 
                 this.frameBuffer = [];
-                console.log(`📤 배치 전송: ${batchData.frameCount}개 프레임`);
+                console.log(`📤 F2T 호환 배치 전송: ${batchData.frameCount}개 프레임`);
                 return batchData;
             }
 
@@ -107,21 +98,21 @@ export class FrameProcessor {
         }
     }
 
-    // 세션 종료 시 남은 프레임 전송
+    // 세션 종료 시 남은 프레임 전송 - F2T 서버 호환
     flushBuffer(sessionId) {
         if (this.frameBuffer.length > 0) {
             const batchData = {
-                type: 'frame_batch_final',
-                sessionId: sessionId,
-                batchIndex: Math.floor(this.frameIndex / this.batchSize),
-                frames: [...this.frameBuffer],
+                type: 'frame_batch',
+                frame_batch: [...this.frameBuffer], // F2T 서버 호환 필드명
+                batch_index: Math.floor(this.frameIndex / this.batchSize),
+                user_id: parseInt(sessionId) || 1, // F2T 서버 필수 필드
+                session_id: sessionId,
                 frameCount: this.frameBuffer.length,
-                timestamp: Date.now(),
                 isFinal: true
             };
 
             this.frameBuffer = [];
-            console.log(`📤 최종 배치 전송: ${batchData.frameCount}개 프레임`);
+            console.log(`📤 F2T 호환 최종 배치 전송: ${batchData.frameCount}개 프레임`);
             return batchData;
         }
         return null;

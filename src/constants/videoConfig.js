@@ -84,16 +84,18 @@ export const MEDIAPIPE_CONFIG = {
 
 console.log('📊 [videoConfig.js] MEDIAPIPE_CONFIG:', MEDIAPIPE_CONFIG);
 
-// AI 서버 메시지 타입 정의 (서버와 동일)
+// AI 서버 메시지 타입 정의 (F2T 서버와 동일)
 export const MESSAGE_TYPES = {
     // client => server
     KEYPOINTS: 'keypoints',
+    FRAME_BATCH: 'frame_batch', // F2T 서버 호환 추가
     TRANSLATION_START: 'start_translation',
     TRANSLATION_END: 'stop_translation',
     PING: 'ping',
 
     // server => client  
     PREDICTION_RESULT: 'prediction_result',
+    BATCH_PREDICTION_RESULT: 'batch_prediction_result', // F2T 서버 호환 추가
     TRANSLATION_RESULT: 'translation_result',
     TRANSLATION_STATUS: 'translation_status',
     ERROR: 'error',
