@@ -248,33 +248,22 @@ const VideoPage = () => {
         throw new Error("비디오 요소가 준비되지 않았습니다");
       }
 
-      // 비디오 준비 상태 대기
-      if (videoElement.readyState < 2) {
-        console.log("⏳ [VideoPage] 비디오 메타데이터 로딩 대기 중...");
+      // 단순화된 비디오 준비 확인
+      if (videoElement.readyState < 2 || !videoElement.videoWidth) {
+        console.log("⏳ 비디오 준비 대기 중...");
         
-        const waitForVideo = () => new Promise((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            reject(new Error("비디오 로딩 시간 초과"));
-          }, 5000);
-
-          const checkReady = () => {
-            if (videoElement.readyState >= 2 && videoElement.videoWidth > 0) {
-              clearTimeout(timeout);
-              resolve();
-            } else {
-              setTimeout(checkReady, 100);
-            }
-          };
-          
-          checkReady();
-        });
-
-        await waitForVideo();
-        console.log("✅ [VideoPage] 비디오 준비 완료:", {
-          readyState: videoElement.readyState,
-          width: videoElement.videoWidth,
-          height: videoElement.videoHeight
-        });
+        // 간단한 대기 (최대 3초)
+        for (let i = 0; i < 30; i++) {
+          if (videoElement.readyState >= 2 && videoElement.videoWidth > 0) {
+            break;
+          }
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        
+        // 여전히 준비되지 않았으면 경고만 출력하고 계속 진행
+        if (videoElement.readyState < 2) {
+          console.warn("⚠️ 비디오가 완전히 준비되지 않았지만 계속 진행");
+        }
       }
       
       // 새로운 세션 ID 생성
