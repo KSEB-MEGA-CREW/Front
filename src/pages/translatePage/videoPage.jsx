@@ -242,6 +242,41 @@ const VideoPage = () => {
     try {
       console.log("🚀 [VideoPage] 번역 시작");
       
+      // 비디오 요소 상태 검증
+      const videoElement = videoRef.current;
+      if (!videoElement) {
+        throw new Error("비디오 요소가 준비되지 않았습니다");
+      }
+
+      // 비디오 준비 상태 대기
+      if (videoElement.readyState < 2) {
+        console.log("⏳ [VideoPage] 비디오 메타데이터 로딩 대기 중...");
+        
+        const waitForVideo = () => new Promise((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            reject(new Error("비디오 로딩 시간 초과"));
+          }, 5000);
+
+          const checkReady = () => {
+            if (videoElement.readyState >= 2 && videoElement.videoWidth > 0) {
+              clearTimeout(timeout);
+              resolve();
+            } else {
+              setTimeout(checkReady, 100);
+            }
+          };
+          
+          checkReady();
+        });
+
+        await waitForVideo();
+        console.log("✅ [VideoPage] 비디오 준비 완료:", {
+          readyState: videoElement.readyState,
+          width: videoElement.videoWidth,
+          height: videoElement.videoHeight
+        });
+      }
+      
       // 새로운 세션 ID 생성
       sessionIdRef.current = uuidv4();
       clearWsError();
@@ -250,7 +285,7 @@ const VideoPage = () => {
       // 번역 세션 시작
       startTranslation(sessionIdRef.current);
       
-      // 키포인트 추출 시작 (세션 ID 전달)
+      // 키포인트 추출 시작 (세션 ID 전달) - 비디오 준비 완료 후
       await startFrameExtraction(videoRef.current, sessionIdRef.current);
       
     } catch (error) {

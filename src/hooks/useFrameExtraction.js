@@ -56,6 +56,19 @@ export const useFrameExtraction = () => {
       throw new Error(errorMsg);
     }
 
+    // 비디오 요소 상세 검증
+    if (videoElement.readyState < 2) {
+      const errorMsg = `비디오가 준비되지 않았습니다. readyState: ${videoElement.readyState}`;
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    }
+
+    if (!videoElement.videoWidth || !videoElement.videoHeight) {
+      const errorMsg = `비디오 크기가 유효하지 않습니다: ${videoElement.videoWidth}x${videoElement.videoHeight}`;
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    }
+
     if (isProcessing) {
       console.warn("⚠️ [useFrameExtraction] 이미 처리 중입니다");
       return;
@@ -99,20 +112,43 @@ export const useFrameExtraction = () => {
             console.log("⏸️ [useFrameExtraction] 번역 비활성 - 프레임 건너뛰기");
             return;
           }
+
+          // 비디오 요소 상태 재검증 (런타임 중에도)
+          if (!videoElement || videoElement.readyState < 2 || 
+              videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+            console.warn("⚠️ [useFrameExtraction] 비디오 상태가 유효하지 않음, 건너뛰기", {
+              readyState: videoElement?.readyState,
+              width: videoElement?.videoWidth,
+              height: videoElement?.videoHeight
+            });
+            return;
+          }
           
           console.log("🎬 [useFrameExtraction] 프레임 처리 중...", { 
             frameCount: frameCount.current,
             bufferSize: frameProcessor.current.getCurrentBufferSize(),
-            sessionId: currentSessionId.current 
+            sessionId: currentSessionId.current,
+            videoState: {
+              readyState: videoElement.readyState,
+              width: videoElement.videoWidth,
+              height: videoElement.videoHeight
+            }
           });
 
           frameCount.current++;
 
-          // 프레임 추출 (키포인트 대신)
-          const batchData = await frameProcessor.current.extractFrame(
-            videoElement,
-            currentSessionId.current
-          );
+          // 프레임 추출 (키포인트 대신) - try-catch로 개별 오류 처리
+          let batchData = null;
+          try {
+            batchData = await frameProcessor.current.extractFrame(
+              videoElement,
+              currentSessionId.current
+            );
+          } catch (frameExtractionError) {
+            console.error("🚨 [useFrameExtraction] 개별 프레임 추출 실패:", frameExtractionError);
+            // 개별 프레임 실패는 전체 프로세스 중단하지 않음
+            return;
+          }
 
           // 10개 배치가 완성된 경우에만 전송
           if (batchData) {

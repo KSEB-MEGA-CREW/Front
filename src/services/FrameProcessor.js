@@ -91,10 +91,34 @@ export class FrameProcessor {
             throw err;
         }
 
-        if (!videoElement || videoElement.videoWidth === 0) {
+        // 강화된 비디오 요소 검증
+        if (!videoElement) {
             const error = {
                 code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
-                message: '비디오 요소가 준비되지 않았습니다'
+                message: '비디오 요소가 null입니다'
+            };
+            const err = new Error(error.message);
+            err.code = error.code;
+            throw err;
+        }
+
+        // readyState 확인 (최소 2 이상이어야 메타데이터 로드됨)
+        if (videoElement.readyState < 2) {
+            const error = {
+                code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
+                message: `비디오가 아직 준비되지 않았습니다. readyState: ${videoElement.readyState}`
+            };
+            const err = new Error(error.message);
+            err.code = error.code;
+            throw err;
+        }
+
+        // 비디오 크기 검증
+        if (!videoElement.videoWidth || !videoElement.videoHeight || 
+            videoElement.videoWidth === 0 || videoElement.videoHeight === 0) {
+            const error = {
+                code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
+                message: `비디오 크기가 유효하지 않습니다: ${videoElement.videoWidth}x${videoElement.videoHeight}`
             };
             const err = new Error(error.message);
             err.code = error.code;
@@ -109,76 +133,79 @@ export class FrameProcessor {
             this.isProcessing = true;
             performanceLogger.startTimer("frameExtraction");
 
-            // Canvas 크기 설정 (최초 1회만) - null/undefined 방지
-            if (videoElement && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
-                if (this.canvas.width !== videoElement.videoWidth) {
-                    this.canvas.width = videoElement.videoWidth;
-                    this.canvas.height = videoElement.videoHeight;
-                    console.log(`📐 [FrameProcessor] Canvas 크기 설정: ${videoElement.videoWidth}x${videoElement.videoHeight}`);
-                }
-            } else {
-                const error = {
-                    code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
-                    message: `비디오 요소가 준비되지 않았습니다: width=${videoElement?.videoWidth}, height=${videoElement?.videoHeight}`
-                };
-                console.error('[FrameProcessor] Canvas 크기 설정 실패:', error);
-                const err = new Error(error.message);
-                err.code = error.code;
-                throw err;
+            // Canvas와 Context 유효성 재확인
+            if (!this.canvas || !this.ctx) {
+                throw new Error('Canvas 또는 Context가 유효하지 않습니다');
             }
 
-            // 프레임 추출
-            this.ctx.drawImage(videoElement, 0, 0);
-            const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+            // Canvas 크기 설정 (안전하게)
+            if (this.canvas.width !== videoElement.videoWidth || this.canvas.height !== videoElement.videoHeight) {
+                this.canvas.width = videoElement.videoWidth;
+                this.canvas.height = videoElement.videoHeight;
+                console.log(`📐 [FrameProcessor] Canvas 크기 설정: ${videoElement.videoWidth}x${videoElement.videoHeight}`);
+            }
 
-            // 프레임 데이터 생성
-            const frameData = {
-                imageData: imageData,
-                frameIndex: ++this.frameIndex,
-                timestamp: Date.now(),
-                dimensions: {
-                    width: videoElement.videoWidth,
-                    height: videoElement.videoHeight
+            // 안전한 프레임 추출 (추가 검증 후 drawImage 호출)
+            if (videoElement.videoWidth > 0 && videoElement.videoHeight > 0 && videoElement.readyState >= 2) {
+                this.ctx.drawImage(videoElement, 0, 0, videoElement.videoWidth, videoElement.videoHeight);
+                const imageData = this.canvas.toDataURL('image/jpeg', 0.8);
+
+                // 생성된 이미지 데이터 검증
+                if (!imageData || imageData.length < 100) {
+                    throw new Error('유효하지 않은 이미지 데이터가 생성되었습니다');
                 }
-            };
 
-            // 버퍼에 추가
-            this.frameBuffer.push(frameData);
-            
-            console.log(`📦 [FrameProcessor] 프레임 버퍼링: ${this.frameBuffer.length}/${this.batchSize}`, {
-                currentFrame: frameData.frameIndex,
-                bufferSize: this.frameBuffer.length
-            });
-
-            // 10개 모이면 배치 반환
-            if (this.frameBuffer.length >= this.batchSize) {
-                const batchData = {
-                    type: 'frame_batch',
-                    sessionId: sessionId,
-                    batchIndex: Math.floor(this.frameIndex / this.batchSize),
-                    frames: [...this.frameBuffer], // 복사본 생성
-                    frameCount: this.frameBuffer.length,
-                    timestamp: Date.now()
+                // 프레임 데이터 생성
+                const frameData = {
+                    imageData: imageData,
+                    frameIndex: ++this.frameIndex,
+                    timestamp: Date.now(),
+                    dimensions: {
+                        width: videoElement.videoWidth,
+                        height: videoElement.videoHeight
+                    }
                 };
 
-                // 버퍼 클리어
-                this.frameBuffer = [];
+                // 버퍼에 추가
+                this.frameBuffer.push(frameData);
                 
-                const extractionTime = performanceLogger.endTimer('frameExtraction');
-                performanceLogger.addMetric("frameExtraction", extractionTime);
-
-                console.log(`📤 [FrameProcessor] 배치 전송 준비 완료:`, {
-                    batchIndex: batchData.batchIndex,
-                    frameCount: batchData.frameCount,
-                    firstFrame: batchData.frames[0]?.frameIndex,
-                    lastFrame: batchData.frames[batchData.frameCount - 1]?.frameIndex
+                console.log(`📦 [FrameProcessor] 프레임 버퍼링: ${this.frameBuffer.length}/${this.batchSize}`, {
+                    currentFrame: frameData.frameIndex,
+                    bufferSize: this.frameBuffer.length
                 });
 
-                return batchData;
-            }
+                // 10개 모이면 배치 반환
+                if (this.frameBuffer.length >= this.batchSize) {
+                    const batchData = {
+                        type: 'frame_batch',
+                        sessionId: sessionId,
+                        batchIndex: Math.floor(this.frameIndex / this.batchSize),
+                        frames: [...this.frameBuffer], // 복사본 생성
+                        frameCount: this.frameBuffer.length,
+                        timestamp: Date.now()
+                    };
 
-            // 10개 미만이면 null 반환 (아직 전송하지 않음)
-            return null;
+                    // 버퍼 클리어
+                    this.frameBuffer = [];
+                    
+                    const extractionTime = performanceLogger.endTimer('frameExtraction');
+                    performanceLogger.addMetric("frameExtraction", extractionTime);
+
+                    console.log(`📤 [FrameProcessor] 배치 전송 준비 완료:`, {
+                        batchIndex: batchData.batchIndex,
+                        frameCount: batchData.frameCount,
+                        firstFrame: batchData.frames[0]?.frameIndex,
+                        lastFrame: batchData.frames[batchData.frameCount - 1]?.frameIndex
+                    });
+
+                    return batchData;
+                }
+
+                // 10개 미만이면 null 반환 (아직 전송하지 않음)
+                return null;
+            } else {
+                throw new Error('비디오 요소가 렌더링 가능한 상태가 아닙니다');
+            }
 
         } catch (error) {
             console.error('❌ 프레임 추출 실패:', error);
