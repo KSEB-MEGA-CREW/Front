@@ -109,10 +109,22 @@ export class FrameProcessor {
             this.isProcessing = true;
             performanceLogger.startTimer("frameExtraction");
 
-            // Canvas 크기 설정 (최초 1회만)
-            if (this.canvas.width !== videoElement.videoWidth) {
-                this.canvas.width = videoElement.videoWidth;
-                this.canvas.height = videoElement.videoHeight;
+            // Canvas 크기 설정 (최초 1회만) - null/undefined 방지
+            if (videoElement && videoElement.videoWidth > 0 && videoElement.videoHeight > 0) {
+                if (this.canvas.width !== videoElement.videoWidth) {
+                    this.canvas.width = videoElement.videoWidth;
+                    this.canvas.height = videoElement.videoHeight;
+                    console.log(`📐 [FrameProcessor] Canvas 크기 설정: ${videoElement.videoWidth}x${videoElement.videoHeight}`);
+                }
+            } else {
+                const error = {
+                    code: ERROR_CODES.VIDEO_ELEMENT_NOT_READY,
+                    message: `비디오 요소가 준비되지 않았습니다: width=${videoElement?.videoWidth}, height=${videoElement?.videoHeight}`
+                };
+                console.error('[FrameProcessor] Canvas 크기 설정 실패:', error);
+                const err = new Error(error.message);
+                err.code = error.code;
+                throw err;
             }
 
             // 프레임 추출

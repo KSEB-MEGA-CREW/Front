@@ -67,10 +67,31 @@ export class GlobalWebSocketManager {
 
                 this.ws.onmessage = (event) => {
                     try {
-                        const data = JSON.parse(event.data);
+                        let messageData = event.data;
+                        
+                        // Echo 메시지 및 디버그 메시지 필터링
+                        if (typeof messageData === 'string') {
+                            if (messageData.startsWith('Echo:')) {
+                                console.log('📢 [GlobalWebSocketManager] 서버 Echo 메시지 무시:', messageData);
+                                return;
+                            }
+                            
+                            // JSON 형태가 아닌 일반 텍스트 메시지 필터링
+                            const trimmed = messageData.trim();
+                            if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) {
+                                console.warn('⚠️ [GlobalWebSocketManager] 비정상 메시지 형태 무시:', messageData);
+                                return;
+                            }
+                        }
+                        
+                        // JSON 파싱 시도
+                        const data = JSON.parse(messageData);
                         this.handleMessage(data);
+                        
                     } catch (error) {
                         console.error('🚨 [GlobalWebSocketManager] 메시지 파싱 오류:', error);
+                        console.error('🚨 [GlobalWebSocketManager] 원본 메시지:', event.data);
+                        console.error('🚨 [GlobalWebSocketManager] 메시지 타입:', typeof event.data);
                     }
                 };
 
